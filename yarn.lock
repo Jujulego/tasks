@@ -2060,7 +2060,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:4.21.3, browserslist@npm:^4.20.2":
+"browserslist@npm:4.21.4":
+  version: 4.21.4
+  resolution: "browserslist@npm:4.21.4"
+  dependencies:
+    caniuse-lite: ^1.0.30001400
+    electron-to-chromium: ^1.4.251
+    node-releases: ^2.0.6
+    update-browserslist-db: ^1.0.9
+  bin:
+    browserslist: cli.js
+  checksum: 4af3793704dbb4615bcd29059ab472344dc7961c8680aa6c4bb84f05340e14038d06a5aead58724eae69455b8fade8b8c69f1638016e87e5578969d74c078b79
+  languageName: node
+  linkType: hard
+
+"browserslist@npm:^4.20.2":
   version: 4.21.3
   resolution: "browserslist@npm:4.21.3"
   dependencies:
@@ -2182,6 +2196,13 @@ __metadata:
   version: 1.0.30001393
   resolution: "caniuse-lite@npm:1.0.30001393"
   checksum: 72b7cd81c51f41965f2fbdbb20729d71f2bd5e376d9b4effa22616dd2707640b8676862e8db3db83b76c3bcf2aaefc9ebd5991a10eeb483b460322de5548b98e
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001400":
+  version: 1.0.30001410
+  resolution: "caniuse-lite@npm:1.0.30001410"
+  checksum: 0b1479dc13a736d244afe0f941bdd4d1ce26a73023f017b653f101d6e9398dee527b60bc6abfcd002e873240923cc766687ed9739dc233c47bcbf2a7673c3864
   languageName: node
   linkType: hard
 
@@ -2783,6 +2804,13 @@ __metadata:
   version: 1.4.246
   resolution: "electron-to-chromium@npm:1.4.246"
   checksum: 0e616e657d97de9d250a2415e5bded0ee8085345c652a30c08bf4e93398aca303ce69743c72f244400f679539e5f89f283875118b88299703539ccace071f450
+  languageName: node
+  linkType: hard
+
+"electron-to-chromium@npm:^1.4.251":
+  version: 1.4.258
+  resolution: "electron-to-chromium@npm:1.4.258"
+  checksum: 9e49fba74c8f4d9457b59c3ba8f1bee7579c588fa257b00bff04627fa60f4e995d895cba00300930f5f228a92e8b79ab57641274c77bb0e743275b657b46f993
   languageName: node
   linkType: hard
 
@@ -5108,7 +5136,7 @@ __metadata:
     "@types/node": 16.11.58
     "@typescript-eslint/eslint-plugin": 5.36.2
     "@typescript-eslint/parser": 5.36.2
-    browserslist: 4.21.3
+    browserslist: 4.21.4
     del: 6.1.1
     eslint: 8.22.0
     eslint-plugin-jest: 27.0.2
@@ -7383,6 +7411,20 @@ __metadata:
   bin:
     browserslist-lint: cli.js
   checksum: 443ed6e77d4607b8bdf12710fe1c0b570fcbb992ebcafaa0c647811e5646fa51e0b5a17641637e10044e4b770bfc3a9ce2a9350a646477545aed882a1fcff8ce
+  languageName: node
+  linkType: hard
+
+"update-browserslist-db@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "update-browserslist-db@npm:1.0.9"
+  dependencies:
+    escalade: ^3.1.1
+    picocolors: ^1.0.0
+  peerDependencies:
+    browserslist: ">= 4.21.0"
+  bin:
+    browserslist-lint: cli.js
+  checksum: f625899b236f6a4d7f62b56be1b8da230c5563d1fef84d3ef148f2e1a3f11a5a4b3be4fd7e3703e51274c116194017775b10afb4de09eb2c0d09d36b90f1f578
   languageName: node
   linkType: hard
 
