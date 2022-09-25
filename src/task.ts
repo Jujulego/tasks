@@ -83,10 +83,10 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     let complexity = cache.get(this);
 
     if (complexity === undefined) {
-      complexity = 0;
+      complexity = 1;
 
       for (const dep of this._dependencies) {
-        complexity += dep.complexity(cache) + 1;
+        complexity += dep.complexity(cache);
       }
 
       cache.set(this, complexity);
