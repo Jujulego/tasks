@@ -1,0 +1,1 @@
+import { TaskManager } from '../src';

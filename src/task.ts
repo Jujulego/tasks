@@ -79,7 +79,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param cache stores all computed complexities, to not recompute complexities while running threw the whole graph.
    */
-  complexity(cache: Map<Task, number> = new Map()): number {
+  complexity(cache: Map<Task<C>, number> = new Map()): number {
     let complexity = cache.get(this);
 
     if (complexity === undefined) {
@@ -127,7 +127,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   // Properties
   abstract get name(): string;
 
-  get dependencies(): ReadonlyArray<Task> {
+  get dependencies(): ReadonlyArray<Task<C>> {
     return this._dependencies;
   }
 
