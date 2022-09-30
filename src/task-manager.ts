@@ -69,12 +69,12 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
       }
 
       if (t.status === 'ready') {
-        this._running.add(t);
-
         t.subscribe('status.done', () => this._startNext(t));
         t.subscribe('status.failed', () => this._startNext(t));
 
         t.start();
+        this._running.add(t);
+
         this.emit('started', t);
       }
     }
@@ -87,7 +87,7 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
   }
 
   // Properties
-  get tasks(): Task<C>[] {
+  get tasks(): readonly Task<C>[] {
     return this._tasks;
   }
 
