@@ -39,7 +39,7 @@
     "regenerator-runtime": "0.13.9"
   },
   "dependencies": {
-    "@jujulego/event-tree": "1.1.0-alpha.6"
+    "@jujulego/event-tree": "1.1.0-rc.1"
   },
   "devDependencies": {
     "@jujulego/flow": "1.1.0",
