@@ -17,7 +17,7 @@ export type TaskSetEventMap<C extends TaskContext> = {
 }
 
 // Class
-export class TaskSet<C extends TaskContext> extends EventSource<TaskSetEventMap<C>> {
+export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<TaskSetEventMap<C>> {
   // Attributes
   private readonly _tasks = new Set<Task<C>>();
 
@@ -29,7 +29,7 @@ export class TaskSet<C extends TaskContext> extends EventSource<TaskSetEventMap<
 
   // Constructor
   constructor(
-    readonly manager: TaskManager<C> = TaskManager.global
+    readonly manager: TaskManager<C>
   ) {
     super();
   }
@@ -60,7 +60,7 @@ export class TaskSet<C extends TaskContext> extends EventSource<TaskSetEventMap<
       return;
     }
 
-    // Add listener
+    // Listen to task's status
     task.subscribe('status', ({ status }) => {
       if (status === 'running') {
         this.emit('started', task);
@@ -69,12 +69,8 @@ export class TaskSet<C extends TaskContext> extends EventSource<TaskSetEventMap<
       }
     });
 
-    // Add task and it's dependencies
+    // Add task
     this._tasks.add(task);
-
-    for (const t of task.dependencies) {
-      this.add(t);
-    }
   }
 
   start(): void {
