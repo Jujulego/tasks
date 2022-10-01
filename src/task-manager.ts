@@ -35,6 +35,17 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
     this._logger.verbose(`Run up to ${this._jobs} tasks at the same time`);
   }
 
+  // Statics
+  private static _instance?: TaskManager<any>;
+
+  static get global(): TaskManager<any> {
+    if (!this._instance) {
+      this._instance = new TaskManager();
+    }
+
+    return this._instance;
+  }
+
   // Methods
   private _sortByComplexity() {
     const cache = new Map<Task<C>, number>();

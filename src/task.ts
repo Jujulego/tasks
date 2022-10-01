@@ -3,7 +3,7 @@ import { EventSource } from '@jujulego/event-tree';
 import { ILogger, logger } from './logger';
 
 // Types
-export type TaskContext = Record<string, any>;
+export type TaskContext = Record<string, unknown>;
 export interface TaskOptions {
   logger?: ILogger;
 }
