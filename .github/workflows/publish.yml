@@ -1,0 +1,102 @@
+name: 'Publish'
+
+on:
+  push:
+    branches: [ master ]
+
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3.0.2
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3.5.0
+        with:
+          node-version: 16.x
+          cache: yarn
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3.0.2
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3.5.0
+        with:
+          node-version: 16.x
+          cache: yarn
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3.0.2
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3.5.0
+        with:
+          node-version: 16.x
+          cache: yarn
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Test
+        run: yarn test
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage
+
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    needs: [ lint, build, tests ]
+
+    steps:
+      - uses: actions/checkout@v3.0.2
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3.5.0
+        with:
+          node-version: 16.x
+          registry-url: https://registry.npmjs.org
+          cache: yarn
+
+      - name: Install
+        run: yarn install --immutable
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist
+
+      - name: Publish
+        run: yarn npm publish --access public --tolerate-republish
+        env:
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
