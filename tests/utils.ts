@@ -25,4 +25,5 @@ export class TestTask extends Task {
 export const spyLogger: ILogger = {
   debug: jest.fn(),
   verbose: jest.fn(),
+  warn: jest.fn(),
 };

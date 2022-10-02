@@ -28,6 +28,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   protected constructor(readonly context: Readonly<C>, opts: TaskOptions = {}) {
     super();
 
+    // Parse options
     this._logger = opts.logger ?? logger;
   }
 
