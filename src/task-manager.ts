@@ -2,7 +2,7 @@ import { EventSource } from '@jujulego/event-tree';
 import os from 'node:os';
 
 import { ILogger, logger } from './logger';
-import { Task, TaskContext } from './task';
+import { Task, TaskContext, TaskEventMap } from './task';
 
 // Types
 export interface TaskManagerOpts {
@@ -80,7 +80,7 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
     }
   }
 
-  add(task: Task<C>): void {
+  add<M extends TaskEventMap>(task: Task<C, M>): void {
     this._add(task);
     this._sortByComplexity();
     this._startNext();

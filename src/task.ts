@@ -57,16 +57,16 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param task the dependency to add
    */
-  dependsOn(task: Task<C>): void {
+  dependsOn<M extends TaskEventMap>(task: Task<C, M>): void {
     if (['blocked', 'ready'].includes(this._status)) {
       this._dependencies.push(task);
       this._recomputeStatus();
 
-      task.subscribe('status.done', () => {
+      (task as Task<C>).subscribe('status.done', () => {
         this._recomputeStatus();
       });
 
-      task.subscribe('status.failed', () => {
+      (task as Task<C>).subscribe('status.failed', () => {
         this._recomputeStatus();
       });
     } else {

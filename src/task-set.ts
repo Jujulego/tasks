@@ -1,6 +1,6 @@
 import { EventSource } from '@jujulego/event-tree';
 
-import { Task, TaskContext } from './task';
+import { Task, TaskContext, TaskEventMap } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
@@ -51,7 +51,7 @@ export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<Ta
     }
   }
 
-  add(task: Task<C>): void {
+  add<M extends TaskEventMap>(task: Task<C, M>): void {
     if (this._status !== 'created') {
       throw Error(`Cannot add a task to a ${this._status} task set`);
     }
@@ -61,7 +61,7 @@ export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<Ta
     }
 
     // Listen to task's status
-    task.subscribe('status', ({ status }) => {
+    (task as Task<C>).subscribe('status', ({ status }) => {
       if (status === 'running') {
         this.emit('started', task);
       } else if (status === 'done' || status === 'failed') {
