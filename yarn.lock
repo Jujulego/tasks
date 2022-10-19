@@ -875,7 +875,7 @@ __metadata:
     "@types/gulp": 4.0.9
     "@types/gulp-sourcemaps": 0.0.35
     "@types/jest": 29.0.3
-    "@types/node": 16.11.63
+    "@types/node": 16.11.68
     "@typescript-eslint/eslint-plugin": 5.38.0
     "@typescript-eslint/parser": 5.38.0
     browserslist: 4.21.4
@@ -1355,10 +1355,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:16.11.63":
-  version: 16.11.63
-  resolution: "@types/node@npm:16.11.63"
-  checksum: d0c905916560fea680cadca356418016bd07d0227b7374139b6342191e11cc0fa2251400453d08c49f111bd88c58728113271573b8ce8d90796d220b7d3a9b39
+"@types/node@npm:16.11.68":
+  version: 16.11.68
+  resolution: "@types/node@npm:16.11.68"
+  checksum: a35293b6b8867e10ab9e10b6cd5f0e4224a86256d5ef102581dcb9f79f35f255ad87443e8584ddf8dce1229ee28885c58187e41822cf8d1e82495e7897c47c3f
   languageName: node
   linkType: hard
 
