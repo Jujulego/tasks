@@ -14,13 +14,22 @@ export interface TaskStatusEvent {
   status: TaskStatus;
 }
 
-export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent>;
+export interface TaskCompletedEvent {
+  status: 'done' | 'failed';
+  duration: number;
+}
+
+export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
+  completed: TaskCompletedEvent;
+};
 
 // Class
 export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends EventSource<M> {
   // Attributes
   private _status: TaskStatus = 'ready';
   private _dependencies: Task<C>[] = [];
+  private _startTime = 0;
+  private _endTime = 0;
 
   protected readonly _logger: ILogger;
 
@@ -107,6 +116,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     }
 
     this._logger.verbose(`Running ${this.name}`);
+    this._startTime = Date.now();
     this.status = 'running';
     this._start();
   }
@@ -136,6 +146,14 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     return ['done', 'failed'].includes(this.status);
   }
 
+  get duration(): number {
+    if (!this._startTime) {
+      return 0;
+    }
+
+    return (this._endTime || Date.now()) - this._startTime;
+  }
+
   get status(): TaskStatus {
     return this._status;
   }
@@ -152,5 +170,15 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
 
     this._logger.debug(`${this.name} is ${status}`);
     this.emit(`status.${status}`, { previous, status });
+
+    // Emit completed
+    if (status === 'done' || status === 'failed') {
+      this._endTime = Date.now();
+
+      this.emit('completed', {
+        status,
+        duration: this._endTime - this._startTime,
+      });
+    }
   }
 }

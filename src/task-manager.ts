@@ -74,8 +74,7 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
       }
 
       if (t.status === 'ready') {
-        t.subscribe('status.done', () => this._startNext(t));
-        t.subscribe('status.failed', () => this._startNext(t));
+        t.subscribe('completed', () => this._startNext(t));
 
         t.start();
         this._running.add(t);

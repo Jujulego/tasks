@@ -1,10 +1,11 @@
-import { TaskStatusEvent } from '../src';
+import { TaskCompletedEvent, TaskStatusEvent } from '../src';
 
 import { spyLogger, TestTask } from './utils';
 
 // Setup
 let task: TestTask;
 
+const completedEventSpy = jest.fn<void, [TaskCompletedEvent]>();
 const statusEventSpy = jest.fn<void, [TaskStatusEvent]>();
 
 beforeEach(() => {
@@ -12,7 +13,9 @@ beforeEach(() => {
 
   jest.resetAllMocks();
   jest.restoreAllMocks();
+  jest.useRealTimers();
 
+  task.subscribe('completed', completedEventSpy);
   task.subscribe('status', statusEventSpy);
 });
 
@@ -50,7 +53,8 @@ describe('Task.dependsOn', () => {
     it(`should throw if task is ${status}`, () => {
       task.status = status;
 
-      expect(() => task.dependsOn(dep)).toThrowError(`Cannot add a dependency to a ${status} task`);
+      expect(() => task.dependsOn(dep))
+        .toThrow(`Cannot add a dependency to a ${status} task`);
     });
   }
 });
@@ -111,7 +115,8 @@ describe('Task.start', () => {
     it(`should throw if task is ${status}`, () => {
       task.status = status;
 
-      expect(() => task.start()).toThrowError(`Cannot start a ${status} task`);
+      expect(() => task.start())
+        .toThrow(`Cannot start a ${status} task`);
     });
   }
 });
@@ -154,12 +159,60 @@ describe('Task.completed', () => {
   }
 });
 
+describe('Task.duration', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  it('should be at 0 if not started', () => {
+    expect(task.duration).toBe(0);
+  });
+
+  it('should be at spent time since start', () => {
+    task.start();
+
+    jest.advanceTimersByTime(500);
+    expect(task.duration).toBe(500);
+
+    jest.advanceTimersByTime(500);
+    expect(task.duration).toBe(1000);
+  });
+
+  it('should store duration at done time', () => {
+    task.start();
+
+    // "wait" and complete
+    jest.advanceTimersByTime(500);
+    task.status = 'done';
+
+    expect(task.duration).toBe(500);
+
+    // "wait" again
+    jest.advanceTimersByTime(500);
+    expect(task.duration).toBe(500);
+  });
+
+  it('should store duration at failed time', () => {
+    task.start();
+
+    // "wait" and complete
+    jest.advanceTimersByTime(500);
+    task.status = 'failed';
+
+    expect(task.duration).toBe(500);
+
+    // "wait" again
+    jest.advanceTimersByTime(500);
+    expect(task.duration).toBe(500);
+  });
+});
+
 describe('Task.status', () => {
   it('should be ready on initialization', () => {
     expect(task.status).toBe('ready');
   });
 
-  for (const status of ['blocked', 'running', 'done', 'failed'] as const) {
+  for (const status of ['blocked', 'running'] as const) {
     it(`should emit and log status change (ready => ${status})`, () => {
       task.status = status;
 
@@ -168,6 +221,33 @@ describe('Task.status', () => {
       expect(statusEventSpy).toHaveBeenCalledWith(
         { previous: 'ready', status },
         { origin: task, key: `status.${status}` }
+      );
+
+      expect(completedEventSpy).not.toHaveBeenCalled();
+    });
+  }
+
+  for (const status of ['done', 'failed'] as const) {
+    it(`should emit and log status change (ready => ${status})`, () => {
+      // Start task to store current date then "wait" for 1s
+      jest.useFakeTimers();
+
+      task.start();
+      jest.advanceTimersByTime(1000);
+
+      // Set completed status
+      task.status = status;
+
+      expect(task.status).toBe(status);
+      expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
+      expect(statusEventSpy).toHaveBeenCalledWith(
+        { previous: 'running', status },
+        { origin: task, key: `status.${status}` }
+      );
+
+      expect(completedEventSpy).toHaveBeenCalledWith(
+        { status, duration: 1000 },
+        { origin: task, key: 'completed' }
       );
     });
   }
