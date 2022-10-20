@@ -11,6 +11,7 @@ export interface TaskManagerOpts {
 }
 
 export type TaskManagerEventMap<C extends TaskContext = TaskContext> = {
+  added: Task<C>;
   started: Task<C>;
   completed: Task<C>;
 }
@@ -46,10 +47,14 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
       return;
     }
 
-    // Add task and it's dependencies
+    // Add task
     this._tasks.push(task);
     this._index.add(task);
 
+    // Prepare event emit
+    queueMicrotask(() => this.emit('added', task));
+
+    // Add task's dependencies
     for (const t of task.dependencies) {
       this._add(t);
     }
