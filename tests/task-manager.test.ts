@@ -7,6 +7,7 @@ import { spyLogger, TestTask } from './utils';
 let tasks: TestTask[];
 let manager: TaskManager;
 
+const addedEventSpy = jest.fn<void, [Task]>();
 const startedEventSpy = jest.fn<void, [Task]>();
 const completedEventSpy = jest.fn<void, [Task]>();
 
@@ -22,13 +23,14 @@ beforeEach(() => {
   jest.resetAllMocks();
   jest.restoreAllMocks();
 
+  manager.subscribe('added', addedEventSpy);
   manager.subscribe('started', startedEventSpy);
   manager.subscribe('completed', completedEventSpy);
 });
 
 // Tests
 describe('TaskManager.add', () => {
-  it('should store task and start it', () => {
+  it('should store task and start it', async () => {
     manager.add(tasks[0]);
 
     expect(manager.tasks).toContain(tasks[0]);
@@ -37,6 +39,12 @@ describe('TaskManager.add', () => {
     expect(startedEventSpy).toHaveBeenCalledWith(
       tasks[0],
       { key: 'started', origin: manager },
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(addedEventSpy).toHaveBeenCalledWith(
+      tasks[0],
+      { key: 'added', origin: manager },
     );
   });
 
