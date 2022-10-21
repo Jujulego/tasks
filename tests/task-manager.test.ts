@@ -30,7 +30,7 @@ beforeEach(() => {
 
 // Tests
 describe('TaskManager.add', () => {
-  it('should store task and start it', async () => {
+  it('should store task and start it', () => {
     manager.add(tasks[0]);
 
     expect(manager.tasks).toContain(tasks[0]);
@@ -41,7 +41,6 @@ describe('TaskManager.add', () => {
       { key: 'started', origin: manager },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(addedEventSpy).toHaveBeenCalledWith(
       tasks[0],
       { key: 'added', origin: manager },

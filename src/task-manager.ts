@@ -51,8 +51,7 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
     this._tasks.push(task);
     this._index.add(task);
 
-    // Prepare event emit
-    queueMicrotask(() => this.emit('added', task));
+    this.emit('added', task);
 
     // Add task's dependencies
     for (const t of task.dependencies) {
