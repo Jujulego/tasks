@@ -1,4 +1,5 @@
 import cp from 'node:child_process';
+import { createHash } from 'node:crypto';
 import kill from 'tree-kill';
 
 import { Task, TaskContext, TaskEventMap, TaskOptions } from './task';
@@ -31,6 +32,21 @@ export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskE
   readonly cwd: string;
   readonly env: SpawnTaskEnv;
 
+  // Statics
+  private static _buildId(cmd: string, args: readonly string[], cwd?: string): string {
+    const hash = createHash('md5');
+
+    hash.update(cmd);
+
+    for (const arg of args) {
+      hash.update(arg);
+    }
+
+    hash.update(cwd ?? process.cwd());
+
+    return hash.digest('hex');
+  }
+
   // Constructor
   constructor(
     readonly cmd: string,
@@ -38,7 +54,10 @@ export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskE
     context: Readonly<C>,
     opts: SpawnTaskOptions = {}
   ) {
-    super(context, opts);
+    super(context, {
+      ...opts,
+      id: opts.id ?? SpawnTask._buildId(cmd, args, opts.cwd),
+    });
 
     // Parse options
     this.cwd = opts.cwd ?? process.cwd();

@@ -1,10 +1,12 @@
 import { EventSource } from '@jujulego/event-tree';
 
 import { ILogger, logger } from './logger';
+import { nanoid } from 'nanoid';
 
 // Types
 export type TaskContext = Record<string, unknown>;
 export interface TaskOptions {
+  id?: string;
   logger?: ILogger;
 }
 
@@ -31,6 +33,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   private _startTime = 0;
   private _endTime = 0;
 
+  readonly id: string;
   protected readonly _logger: ILogger;
 
   // Constructor
@@ -38,6 +41,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     super();
 
     // Parse options
+    this.id = opts.id ?? nanoid();
     this._logger = opts.logger ?? logger;
   }
 

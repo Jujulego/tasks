@@ -37,6 +37,7 @@
   "packageManager": "yarn@3.2.4",
   "dependencies": {
     "@jujulego/event-tree": "^1.1.0-rc.2",
+    "nanoid": "^4.0.0",
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {
