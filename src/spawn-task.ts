@@ -51,7 +51,7 @@ export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskE
   constructor(
     readonly cmd: string,
     readonly args: readonly string[],
-    context: Readonly<C>,
+    context: C,
     opts: SpawnTaskOptions = {}
   ) {
     super(context, {

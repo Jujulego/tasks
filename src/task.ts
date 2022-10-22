@@ -25,22 +25,26 @@ export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
   completed: TaskCompletedEvent;
 };
 
+export type AnyTask = Task<any, any>;
+
 // Class
 export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends EventSource<M> {
   // Attributes
   private _status: TaskStatus = 'ready';
-  private _dependencies: Task<C>[] = [];
+  private _dependencies: Task[] = [];
   private _startTime = 0;
   private _endTime = 0;
 
+  readonly context: C;
   readonly id: string;
   protected readonly _logger: ILogger;
 
   // Constructor
-  protected constructor(readonly context: Readonly<C>, opts: TaskOptions = {}) {
+  protected constructor(context: C, opts: TaskOptions = {}) {
     super();
 
     // Parse options
+    this.context = context;
     this.id = opts.id ?? crypto.randomUUID();
     this._logger = opts.logger ?? logger;
   }
@@ -70,16 +74,16 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param task the dependency to add
    */
-  dependsOn<M extends TaskEventMap>(task: Task<C, M>): void {
+  dependsOn(task: AnyTask): void {
     if (['blocked', 'ready'].includes(this._status)) {
       this._dependencies.push(task);
       this._recomputeStatus();
 
-      (task as Task<C>).subscribe('status.done', () => {
+      task.subscribe('status.done', () => {
         this._recomputeStatus();
       });
 
-      (task as Task<C>).subscribe('status.failed', () => {
+      task.subscribe('status.failed', () => {
         this._recomputeStatus();
       });
     } else {
@@ -93,8 +97,8 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param cache stores all computed complexities, to not recompute complexities while running threw the whole graph.
    */
-  complexity(cache: Map<Task<C>, number> = new Map()): number {
-    let complexity = cache.get(this);
+  complexity(cache: Map<string, number> = new Map()): number {
+    let complexity = cache.get(this.id);
 
     if (complexity === undefined) {
       complexity = 1;
@@ -103,7 +107,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
         complexity += dep.complexity(cache);
       }
 
-      cache.set(this, complexity);
+      cache.set(this.id, complexity);
     }
 
     return complexity;
@@ -142,7 +146,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   // Properties
   abstract get name(): string;
 
-  get dependencies(): ReadonlyArray<Task<C>> {
+  get dependencies(): ReadonlyArray<Task> {
     return this._dependencies;
   }
 

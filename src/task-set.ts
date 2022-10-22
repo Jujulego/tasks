@@ -1,6 +1,6 @@
 import { EventSource } from '@jujulego/event-tree';
 
-import { Task, TaskContext, TaskEventMap } from './task';
+import { AnyTask, Task } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
@@ -10,16 +10,16 @@ export interface TaskSetResults {
 }
 
 export type TaskSetStatus = 'created' | 'started' | 'finished';
-export type TaskSetEventMap<C extends TaskContext> = {
-  started: Task<C>,
-  completed: Task<C>,
+export type TaskSetEventMap = {
+  started: Task,
+  completed: Task,
   finished: Readonly<TaskSetResults>
 }
 
 // Class
-export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<TaskSetEventMap<C>> {
+export class TaskSet extends EventSource<TaskSetEventMap> {
   // Attributes
-  private readonly _tasks = new Set<Task<C>>();
+  private readonly _tasks = new Set<Task>();
 
   private _status: TaskSetStatus = 'created';
   private readonly _results: TaskSetResults = {
@@ -29,13 +29,13 @@ export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<Ta
 
   // Constructor
   constructor(
-    readonly manager: TaskManager<C>
+    readonly manager: TaskManager
   ) {
     super();
   }
 
   // Methods
-  private _handleComplete(task: Task<C>, success: boolean): void {
+  private _handleComplete(task: Task, success: boolean): void {
     this.emit('completed', task);
 
     // Trigger finished
@@ -51,7 +51,7 @@ export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<Ta
     }
   }
 
-  add<M extends TaskEventMap>(task: Task<C, M>): void {
+  add(task: AnyTask): void {
     if (this._status !== 'created') {
       throw Error(`Cannot add a task to a ${this._status} task set`);
     }
@@ -61,7 +61,7 @@ export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<Ta
     }
 
     // Listen to task's status
-    (task as Task<C>).subscribe('status', ({ status }) => {
+    (task as Task).subscribe('status', ({ status }) => {
       if (status === 'running') {
         this.emit('started', task);
       } else if (status === 'done' || status === 'failed') {
@@ -97,7 +97,7 @@ export class TaskSet<C extends TaskContext = TaskContext> extends EventSource<Ta
     return this._status;
   }
 
-  get tasks(): ReadonlyArray<Task<C>> {
+  get tasks(): ReadonlyArray<Task> {
     return Array.from(this._tasks.values());
   }
 
