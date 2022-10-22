@@ -2,9 +2,13 @@ import { EventSource } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
 import { ILogger, logger } from './logger';
+import { TaskManager } from './task-manager';
 
 // Types
-export type TaskContext = Record<string, unknown>;
+export type TaskContext = Record<string, unknown> & {
+  groupTaskId?: string;
+};
+
 export interface TaskOptions {
   id?: string;
   logger?: ILogger;
@@ -50,7 +54,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   }
 
   // Methods
-  protected abstract _start(): void;
+  protected abstract _start(manager?: TaskManager): void;
   protected abstract _stop(): void;
 
   private _recomputeStatus(): void {
@@ -118,7 +122,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    * The task will be started only if it's status is "ready".
    * In other cases, it will throw an error.
    */
-  start(): void {
+  start(manager?: TaskManager): void {
     if (this._status !== 'ready') {
       throw Error(`Cannot start a ${this._status} task`);
     }
@@ -126,7 +130,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     this._logger.verbose(`Running ${this.name}`);
     this._startTime = Date.now();
     this.status = 'running';
-    this._start();
+    this._start(manager);
   }
 
   /**

@@ -75,7 +75,7 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
       if (t.status === 'ready') {
         t.subscribe('completed', () => this._startNext(t));
 
-        t.start();
+        t.start(this);
         this._running.add(t);
 
         this.emit('started', t);
