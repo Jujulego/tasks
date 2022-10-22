@@ -1,5 +1,6 @@
 import cp from 'node:child_process';
-import { createHash } from 'node:crypto';
+import crypto from 'node:crypto';
+import path from 'node:path';
 import kill from 'tree-kill';
 
 import { Task, TaskContext, TaskEventMap, TaskOptions } from './task';
@@ -34,15 +35,14 @@ export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskE
 
   // Statics
   private static _buildId(cmd: string, args: readonly string[], cwd?: string): string {
-    const hash = createHash('md5');
+    const hash = crypto.createHash('md5');
 
+    hash.update(path.resolve(cwd ?? '.'));
     hash.update(cmd);
 
     for (const arg of args) {
       hash.update(arg);
     }
-
-    hash.update(cwd ?? process.cwd());
 
     return hash.digest('hex');
   }
