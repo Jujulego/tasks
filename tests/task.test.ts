@@ -1,5 +1,6 @@
-import { TaskCompletedEvent, TaskStatusEvent } from '../src';
+import crypto from 'node:crypto';
 
+import { TaskCompletedEvent, TaskStatusEvent } from '../src';
 import { spyLogger, TestTask } from './utils';
 
 // Setup
@@ -139,6 +140,26 @@ describe('Task.stop', () => {
       expect(spyLogger.verbose).not.toHaveBeenCalled();
     });
   }
+});
+
+describe('Task.id', () => {
+  it('should be a random uuid', () => {
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue('uuid');
+
+    const task = new TestTask('test');
+
+    expect(task.id).toBe('uuid');
+    expect(crypto.randomUUID).toHaveBeenCalled();
+  });
+
+  it('should be given id', () => {
+    jest.spyOn(crypto, 'randomUUID');
+
+    const task = new TestTask('test', { id: 'test' });
+
+    expect(task.id).toBe('test');
+    expect(crypto.randomUUID).not.toHaveBeenCalled();
+  });
 });
 
 describe('Task.completed', () => {

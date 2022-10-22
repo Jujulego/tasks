@@ -1,7 +1,7 @@
 import { EventSource } from '@jujulego/event-tree';
+import crypto from 'node:crypto';
 
 import { ILogger, logger } from './logger';
-import { nanoid } from 'nanoid';
 
 // Types
 export type TaskContext = Record<string, unknown>;
@@ -41,7 +41,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     super();
 
     // Parse options
-    this.id = opts.id ?? nanoid();
+    this.id = opts.id ?? crypto.randomUUID();
     this._logger = opts.logger ?? logger;
   }
 
