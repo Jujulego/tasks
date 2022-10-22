@@ -1,4 +1,5 @@
 import cp from 'node:child_process';
+import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import kill from 'tree-kill';
 
@@ -136,5 +137,18 @@ describe('SpawnTask.stop', () => {
 describe('SpawnTask.name', () => {
   it('should return joined command with arguments', () => {
     expect(task.name).toBe('test -a --arg');
+  });
+});
+
+describe('SpawnTask.id', () => {
+  it('should be a md5 hash of directory, command and args', () => {
+    // Build hash
+    const hash = crypto.createHash('md5');
+    hash.update(process.cwd());
+    hash.update('test');
+    hash.update('-a');
+    hash.update('--arg');
+
+    expect(task.id).toBe(hash.digest('hex'));
   });
 });
