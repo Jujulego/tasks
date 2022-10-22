@@ -25,15 +25,17 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
   }
 
   // Methods
-  protected abstract _orchestrate(manager: TaskManager): void;
+  protected abstract _orchestrate(): AsyncGenerator<Task>;
 
-  protected _start(manager?: TaskManager): void {
+  protected async _start(manager?: TaskManager): Promise<void> {
     if (!manager) {
       throw new Error('A GroupTask must be started using a TaskManager');
     }
 
     if (this._tasks.length > 0) {
-      this._orchestrate(manager);
+      for await (const task of this._orchestrate()) {
+        manager.add(task);
+      }
     } else {
       this._logger.verbose(`no tasks in group ${this.name}`);
       this.status = 'done';

@@ -1,13 +1,12 @@
 import { GroupTask } from './group-task';
-import { TaskContext } from './task';
-import { TaskManager } from './task-manager';
+import { Task, TaskContext } from './task';
 
 // Class
 export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
   // Methods
-  protected _orchestrate(manager: TaskManager) {
+  protected async* _orchestrate(): AsyncGenerator<Task> {
     for (const task of this.tasks) {
-      manager.add(task);
+      yield task;
 
       task.subscribe('completed', () => {
         const stats = this.stats;
