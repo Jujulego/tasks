@@ -1,12 +1,13 @@
 import { EventSource } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
+import { GroupTask } from './group-task';
 import { ILogger, logger } from './logger';
 import { TaskManager } from './task-manager';
 
 // Types
 export type TaskContext = Record<string, unknown> & {
-  groupTaskId?: string;
+  groupTask?: GroupTask;
 };
 
 export interface TaskOptions {
@@ -30,6 +31,11 @@ export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
 };
 
 export type AnyTask = Task<any, any>;
+
+// Utils
+export function assertIsTask(task: AnyTask): asserts task is Task {
+  return;
+}
 
 // Class
 export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends EventSource<M> {
@@ -79,6 +85,8 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    * @param task the dependency to add
    */
   dependsOn(task: AnyTask): void {
+    assertIsTask(task);
+
     if (['blocked', 'ready'].includes(this._status)) {
       this._dependencies.push(task);
       this._recomputeStatus();

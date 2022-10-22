@@ -1,6 +1,6 @@
-import { ILogger, Task, TaskOptions, TaskStatus } from '../src';
+import { GroupTask, ILogger, Task, TaskOptions, TaskStatus } from '../src';
 
-// Class
+// Classes
 export class TestTask extends Task {
   // Constructor
   constructor(readonly name: string, opts: TaskOptions = {}) {
@@ -19,6 +19,16 @@ export class TestTask extends Task {
   set status(status: TaskStatus) {
     super.status = status;
   }
+}
+
+export class TestGroupTask extends GroupTask {
+  // Constructor
+  constructor(name: string, opts: TaskOptions = {}) {
+    super(name, {}, { logger: spyLogger, ...opts });
+  }
+
+  // Methods
+  _orchestrate = jest.fn();
 }
 
 // Logger

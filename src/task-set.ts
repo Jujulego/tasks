@@ -1,6 +1,6 @@
 import { EventSource } from '@jujulego/event-tree';
 
-import { AnyTask, Task } from './task';
+import { AnyTask, assertIsTask, Task } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
@@ -52,6 +52,8 @@ export class TaskSet extends EventSource<TaskSetEventMap> {
   }
 
   add(task: AnyTask): void {
+    assertIsTask(task);
+
     if (this._status !== 'created') {
       throw Error(`Cannot add a task to a ${this._status} task set`);
     }
@@ -61,7 +63,7 @@ export class TaskSet extends EventSource<TaskSetEventMap> {
     }
 
     // Listen to task's status
-    (task as Task).subscribe('status', ({ status }) => {
+    task.subscribe('status', ({ status }) => {
       if (status === 'running') {
         this.emit('started', task);
       } else if (status === 'done' || status === 'failed') {
