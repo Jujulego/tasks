@@ -16,7 +16,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
   private readonly _tasks: Task[] = [];
 
   // Constructor
-  protected constructor(
+  constructor(
     readonly name: string,
     context: C,
     opts?: TaskOptions
