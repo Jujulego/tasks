@@ -21,7 +21,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
     context: C,
     opts?: TaskOptions
   ) {
-    super(context, opts);
+    super(context, { weight: 0, ...opts });
   }
 
   // Methods

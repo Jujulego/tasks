@@ -20,6 +20,7 @@ export type TaskManagerEventMap = {
 export class TaskManager extends EventSource<TaskManagerEventMap> {
   // Attributes
   private _jobs: number;
+  private _runningWeight = 0;
 
   private readonly _tasks: Task[] = [];
   private readonly _index = new Set<Task>();
@@ -64,21 +65,23 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
     if (previous) {
       this._running.delete(previous);
       this.emit('completed', previous);
+      this._runningWeight -= previous.weight;
     }
 
     // Start other tasks
-    for (const t of this._tasks) {
-      if (this._running.size >= this._jobs) {
+    for (const task of this._tasks) {
+      if (this._runningWeight >= this._jobs) {
         break;
       }
 
-      if (t.status === 'ready') {
-        t.subscribe('completed', () => this._startNext(t));
+      if (task.status === 'ready') {
+        task.subscribe('completed', () => this._startNext(task));
 
-        t.start(this);
-        this._running.add(t);
+        task.start(this);
+        this._running.add(task);
+        this._runningWeight += task.weight;
 
-        this.emit('started', t);
+        this.emit('started', task);
       }
     }
   }

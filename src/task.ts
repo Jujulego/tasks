@@ -13,6 +13,7 @@ export type TaskContext = Record<string, unknown> & {
 export interface TaskOptions {
   id?: string;
   logger?: ILogger;
+  weight?: number;
 }
 
 export type TaskStatus = 'blocked' | 'ready' | 'running' | 'done' | 'failed';
@@ -47,6 +48,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
 
   readonly context: C;
   readonly id: string;
+  readonly weight: number;
   protected readonly _logger: ILogger;
 
   // Constructor
@@ -56,6 +58,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     // Parse options
     this.context = context;
     this.id = opts.id ?? crypto.randomUUID();
+    this.weight = opts.weight ?? 1;
     this._logger = opts.logger ?? logger;
   }
 
