@@ -27,11 +27,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
   // Methods
   protected abstract _orchestrate(): AsyncGenerator<Task>;
 
-  protected async _start(manager?: TaskManager): Promise<void> {
-    if (!manager) {
-      throw new Error('A GroupTask must be started using a TaskManager');
-    }
-
+  private async _loop(manager: TaskManager): Promise<void> {
     try {
       for await (const task of this._orchestrate()) {
         if (!this._tasks.includes(task)) {
@@ -41,11 +37,19 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
         manager.add(task);
       }
     } catch (err) {
-      this._logger.error(`An error happened in group task ${this.name}. Stopping it`, err);
+      this._logger.error(`An error happened in group ${this.name}. Stopping it`, err);
 
-      this.status = 'failed';
       this.stop();
+      this.status = 'failed';
     }
+  }
+
+  protected _start(manager?: TaskManager): void {
+    if (!manager) {
+      throw new Error('A GroupTask must be started using a TaskManager');
+    }
+
+    this._loop(manager);
   }
 
   add(task: AnyTask) {

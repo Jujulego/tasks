@@ -1,8 +1,9 @@
-import { Task } from '../src';
-import { TestGroupTask, TestTask } from './utils';
+import { Task, TaskManager } from '../src';
+import { spyLogger, TestGroupTask, TestTask } from './utils';
 
 // Setup
 let group: TestGroupTask;
+let manager: TaskManager;
 
 const taskAddedEventSpy = jest.fn<void, [Task]>();
 const taskStartedEventSpy = jest.fn<void, [Task]>();
@@ -10,6 +11,7 @@ const taskCompletedEventSpy = jest.fn<void, [Task]>();
 
 beforeEach(() => {
   group = new TestGroupTask('test');
+  manager = new TaskManager({ jobs: 1, logger: spyLogger });
 
   jest.resetAllMocks();
   jest.restoreAllMocks();
@@ -66,5 +68,54 @@ describe('GroupTask.add', () => {
 
     expect(() => group.add(task))
       .toThrow('Cannot add task test-1 to group test, it\'s already in group other');
+  });
+});
+
+describe('GroupTask.start', () => {
+  it('should call orchestrate and start yielded task', async () => {
+    // Mock orchestrate
+    const task = new TestTask('test-1');
+
+    group._orchestrate.mockImplementation(async function* () {
+      yield task;
+    });
+
+    // Start group
+    manager.add(group);
+
+    jest.spyOn(manager, 'add');
+    jest.spyOn(group, 'add');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(group._orchestrate).toHaveBeenCalled();
+    expect(group.add).toHaveBeenCalledWith(task);
+    expect(manager.add).toHaveBeenCalledWith(task);
+  });
+
+  it('should throw if called directly, without a manager', () => {
+    expect(() => group.start()).toThrow('A GroupTask must be started using a TaskManager');
+
+    expect(group._orchestrate).not.toHaveBeenCalled();
+  });
+
+  it('should stop itself if orchestrate fails', async () => {
+    // Mock orchestrate
+    // eslint-disable-next-line require-yield
+    group._orchestrate.mockImplementation(async function* () {
+      throw new Error('Failed !');
+    });
+
+    // Start group
+    manager.add(group);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(group.status).toBe('failed');
+    expect(group._stop).toHaveBeenCalled();
+
+    expect(spyLogger.error).toHaveBeenCalledWith(
+      'An error happened in group test. Stopping it',
+      new Error('Failed !')
+    );
   });
 });

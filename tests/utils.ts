@@ -29,6 +29,7 @@ export class TestGroupTask extends GroupTask {
 
   // Methods
   _orchestrate = jest.fn();
+  _stop = jest.fn();
 }
 
 // Logger
@@ -36,4 +37,5 @@ export const spyLogger: ILogger = {
   debug: jest.fn(),
   verbose: jest.fn(),
   warn: jest.fn(),
+  error: jest.fn(),
 };
