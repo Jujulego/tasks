@@ -32,13 +32,19 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
       throw new Error('A GroupTask must be started using a TaskManager');
     }
 
-    if (this._tasks.length > 0) {
+    try {
       for await (const task of this._orchestrate()) {
+        if (!this._tasks.includes(task)) {
+          this.add(task);
+        }
+
         manager.add(task);
       }
-    } else {
-      this._logger.verbose(`no tasks in group ${this.name}`);
-      this.status = 'done';
+    } catch (err) {
+      this._logger.error(`An error happened in group task ${this.name}. Stopping it`, err);
+
+      this.status = 'failed';
+      this.stop();
     }
   }
 
