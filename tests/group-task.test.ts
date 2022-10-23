@@ -119,3 +119,27 @@ describe('GroupTask.start', () => {
     );
   });
 });
+
+describe('GroupTask.stats', () => {
+  let task: TestTask;
+  
+  beforeEach(() => {
+    task = new TestTask('test-1');
+    group.add(task);
+  });
+
+  for (const status of ['blocked', 'ready', 'running', 'done', 'failed'] as const) {
+    it(`should return 1 for ${status} and 0 for other statuses`, () => {
+      task.status = status;
+
+      expect(group.stats).toEqual({
+        blocked: 0,
+        ready: 0,
+        running: 0,
+        done: 0,
+        failed: 0,
+        [status]: 1,
+      });
+    });
+  }
+});
