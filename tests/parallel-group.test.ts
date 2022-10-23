@@ -28,6 +28,7 @@ describe('ParallelGroup.start', () => {
     jest.spyOn(manager, 'add');
     await flushPromises();
 
+    expect(manager.add).toHaveBeenCalledTimes(3);
     expect(manager.add).toHaveBeenCalledWith(tasks[0]);
     expect(manager.add).toHaveBeenCalledWith(tasks[1]);
     expect(manager.add).toHaveBeenCalledWith(tasks[2]);

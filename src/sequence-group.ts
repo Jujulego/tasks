@@ -13,7 +13,8 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
   protected async* _orchestrate(): AsyncGenerator<Task> {
     for (const task of this.tasks) {
       if (this._stopped) {
-        break;
+        this.status = 'failed';
+        return;
       }
 
       // Start task
@@ -25,9 +26,11 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
 
       if (result.status === 'failed') {
         this.status = 'failed';
-        break;
+        return;
       }
     }
+
+    this.status = 'done';
   }
 
   protected _stop(): void {
