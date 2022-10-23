@@ -42,13 +42,6 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
     }
   }
 
-  protected _stop() {
-    // Stop all tasks
-    for (const task of this._tasks) {
-      task.stop();
-    }
-  }
-
   add(task: AnyTask) {
     assertIsTask(task);
 

@@ -17,4 +17,11 @@ export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTas
       });
     }
   }
+
+  protected _stop() {
+    // Stop all tasks
+    for (const task of this.tasks) {
+      task.stop();
+    }
+  }
 }
