@@ -47,13 +47,25 @@ describe('TaskManager.add', () => {
     );
   });
 
-  it('should only start #jobs tasks a the same time (here 1)', () => {
+  it('should only start 1 task a the same time (sum of task weight < jobs options)', () => {
     manager.add(tasks[0]);
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
     expect(tasks[0].status).toBe('running');
     expect(tasks[1].status).toBe('ready');
+    expect(tasks[2].status).toBe('ready');
+  });
+
+  it('should only start 2 task a the same time (sum of task weight < jobs options)', () => {
+    const lightWeight = new TestTask('light weight', { weight: 0 });
+
+    manager.add(lightWeight);
+    manager.add(tasks[1]);
+    manager.add(tasks[2]);
+
+    expect(lightWeight.status).toBe('running');
+    expect(tasks[1].status).toBe('running');
     expect(tasks[2].status).toBe('ready');
   });
 

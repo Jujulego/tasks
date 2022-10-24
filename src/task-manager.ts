@@ -2,7 +2,7 @@ import { EventSource } from '@jujulego/event-tree';
 import os from 'node:os';
 
 import { ILogger, logger } from './logger';
-import { Task, TaskContext, TaskEventMap } from './task';
+import { AnyTask, Task } from './task';
 
 // Types
 export interface TaskManagerOpts {
@@ -10,20 +10,21 @@ export interface TaskManagerOpts {
   logger?: ILogger;
 }
 
-export type TaskManagerEventMap<C extends TaskContext = TaskContext> = {
-  added: Task<C>;
-  started: Task<C>;
-  completed: Task<C>;
+export type TaskManagerEventMap = {
+  added: Task;
+  started: Task;
+  completed: Task;
 }
 
 // Class
-export class TaskManager<C extends TaskContext = TaskContext> extends EventSource<TaskManagerEventMap<C>> {
+export class TaskManager extends EventSource<TaskManagerEventMap> {
   // Attributes
   private _jobs: number;
+  private _runningWeight = 0;
 
-  private readonly _tasks: Task<C>[] = [];
-  private readonly _index = new Set<Task<C>>();
-  private readonly _running = new Set<Task<C>>();
+  private readonly _tasks: Task[] = [];
+  private readonly _index = new Set<Task>();
+  private readonly _running = new Set<Task>();
 
   protected readonly _logger: ILogger;
 
@@ -38,11 +39,11 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
 
   // Methods
   private _sortByComplexity() {
-    const cache = new Map<Task<C>, number>();
+    const cache = new Map<string, number>();
     this._tasks.sort((a, b) => a.complexity(cache) - b.complexity(cache));
   }
 
-  private _add(task: Task<C>) {
+  private _add(task: Task) {
     if (this._index.has(task)) {
       return;
     }
@@ -59,38 +60,40 @@ export class TaskManager<C extends TaskContext = TaskContext> extends EventSourc
     }
   }
 
-  private _startNext(previous?: Task<C>) {
+  private _startNext(previous?: Task) {
     // Emit completed for previous task
     if (previous) {
       this._running.delete(previous);
       this.emit('completed', previous);
+      this._runningWeight -= previous.weight;
     }
 
     // Start other tasks
-    for (const t of this._tasks) {
-      if (this._running.size >= this._jobs) {
+    for (const task of this._tasks) {
+      if (this._runningWeight >= this._jobs) {
         break;
       }
 
-      if (t.status === 'ready') {
-        t.subscribe('completed', () => this._startNext(t));
+      if (task.status === 'ready') {
+        task.subscribe('completed', () => this._startNext(task));
 
-        t.start();
-        this._running.add(t);
+        task.start(this);
+        this._running.add(task);
+        this._runningWeight += task.weight;
 
-        this.emit('started', t);
+        this.emit('started', task);
       }
     }
   }
 
-  add<M extends TaskEventMap>(task: Task<C, M>): void {
+  add(task: AnyTask): void {
     this._add(task);
     this._sortByComplexity();
     this._startNext();
   }
 
   // Properties
-  get tasks(): readonly Task<C>[] {
+  get tasks(): readonly Task[] {
     return this._tasks;
   }
 

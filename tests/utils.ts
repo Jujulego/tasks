@@ -1,6 +1,6 @@
-import { ILogger, Task, TaskOptions, TaskStatus } from '../src';
+import { GroupTask, ILogger, Task, TaskOptions, TaskStatus } from '../src';
 
-// Class
+// Classes
 export class TestTask extends Task {
   // Constructor
   constructor(readonly name: string, opts: TaskOptions = {}) {
@@ -21,9 +21,26 @@ export class TestTask extends Task {
   }
 }
 
+export class TestGroupTask extends GroupTask {
+  // Constructor
+  constructor(name: string, opts: TaskOptions = {}) {
+    super(name, {}, { logger: spyLogger, ...opts });
+  }
+
+  // Methods
+  _orchestrate = jest.fn();
+  _stop = jest.fn();
+}
+
 // Logger
 export const spyLogger: ILogger = {
   debug: jest.fn(),
   verbose: jest.fn(),
   warn: jest.fn(),
+  error: jest.fn(),
 };
+
+// Utils
+export function flushPromises(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}

@@ -1,13 +1,19 @@
 import { EventSource } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
+import { GroupTask } from './group-task';
 import { ILogger, logger } from './logger';
+import { TaskManager } from './task-manager';
 
 // Types
-export type TaskContext = Record<string, unknown>;
+export type TaskContext = Record<string, unknown> & {
+  groupTask?: GroupTask;
+};
+
 export interface TaskOptions {
   id?: string;
   logger?: ILogger;
+  weight?: number;
 }
 
 export type TaskStatus = 'blocked' | 'ready' | 'running' | 'done' | 'failed';
@@ -25,28 +31,39 @@ export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
   completed: TaskCompletedEvent;
 };
 
+export type AnyTask = Task<any, any>;
+
+// Utils
+export function assertIsTask(task: AnyTask): asserts task is Task {
+  return;
+}
+
 // Class
 export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends EventSource<M> {
   // Attributes
   private _status: TaskStatus = 'ready';
-  private _dependencies: Task<C>[] = [];
+  private _dependencies: Task[] = [];
   private _startTime = 0;
   private _endTime = 0;
 
+  readonly context: C;
   readonly id: string;
+  readonly weight: number;
   protected readonly _logger: ILogger;
 
   // Constructor
-  protected constructor(readonly context: Readonly<C>, opts: TaskOptions = {}) {
+  protected constructor(context: C, opts: TaskOptions = {}) {
     super();
 
     // Parse options
+    this.context = context;
     this.id = opts.id ?? crypto.randomUUID();
+    this.weight = opts.weight ?? 1;
     this._logger = opts.logger ?? logger;
   }
 
   // Methods
-  protected abstract _start(): void;
+  protected abstract _start(manager?: TaskManager): void;
   protected abstract _stop(): void;
 
   private _recomputeStatus(): void {
@@ -70,16 +87,18 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param task the dependency to add
    */
-  dependsOn<M extends TaskEventMap>(task: Task<C, M>): void {
+  dependsOn(task: AnyTask): void {
+    assertIsTask(task);
+
     if (['blocked', 'ready'].includes(this._status)) {
       this._dependencies.push(task);
       this._recomputeStatus();
 
-      (task as Task<C>).subscribe('status.done', () => {
+      task.subscribe('status.done', () => {
         this._recomputeStatus();
       });
 
-      (task as Task<C>).subscribe('status.failed', () => {
+      task.subscribe('status.failed', () => {
         this._recomputeStatus();
       });
     } else {
@@ -93,8 +112,8 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param cache stores all computed complexities, to not recompute complexities while running threw the whole graph.
    */
-  complexity(cache: Map<Task<C>, number> = new Map()): number {
-    let complexity = cache.get(this);
+  complexity(cache: Map<string, number> = new Map()): number {
+    let complexity = cache.get(this.id);
 
     if (complexity === undefined) {
       complexity = 1;
@@ -103,7 +122,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
         complexity += dep.complexity(cache);
       }
 
-      cache.set(this, complexity);
+      cache.set(this.id, complexity);
     }
 
     return complexity;
@@ -114,7 +133,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    * The task will be started only if it's status is "ready".
    * In other cases, it will throw an error.
    */
-  start(): void {
+  start(manager?: TaskManager): void {
     if (this._status !== 'ready') {
       throw Error(`Cannot start a ${this._status} task`);
     }
@@ -122,7 +141,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     this._logger.verbose(`Running ${this.name}`);
     this._startTime = Date.now();
     this.status = 'running';
-    this._start();
+    this._start(manager);
   }
 
   /**
@@ -142,7 +161,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   // Properties
   abstract get name(): string;
 
-  get dependencies(): ReadonlyArray<Task<C>> {
+  get dependencies(): ReadonlyArray<Task> {
     return this._dependencies;
   }
 
