@@ -19,7 +19,7 @@ export interface SpawnTaskStreamEvent<S extends SpawnTaskStream = SpawnTaskStrea
   data: Buffer;
 }
 
-export interface SpawnTaskEventMap extends TaskEventMap {
+export type SpawnTaskEventMap = TaskEventMap & {
   'stream.stdout': SpawnTaskStreamEvent<'stdout'>;
   'stream.stderr': SpawnTaskStreamEvent<'stderr'>;
 }

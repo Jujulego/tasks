@@ -2,7 +2,7 @@ import { AnyTask, assertIsTask, Task, TaskContext, TaskEventMap, TaskOptions, Ta
 import { TaskManager } from './task-manager';
 
 // Types
-export interface GroupTaskEventMap extends TaskEventMap {
+export type GroupTaskEventMap = TaskEventMap & {
   'task.added': Task;
   'task.started': Task;
   'task.completed': Task;

@@ -41,13 +41,13 @@ describe('TaskSet.add', () => {
     set.add(tasks[0]);
     set.start();
 
-    expect(() => set.add(tasks[1])).toThrowError('Cannot add a task to a started task set');
+    expect(() => set.add(tasks[1])).toThrow('Cannot add a task to a started task set');
   });
 
   it('should throw if set is already finished', () => {
     set.start();
 
-    expect(() => set.add(tasks[0])).toThrowError('Cannot add a task to a finished task set');
+    expect(() => set.add(tasks[0])).toThrow('Cannot add a task to a finished task set');
   });
 
   it('should emit a started event when a task starts', () => {
@@ -122,13 +122,13 @@ describe('TaskSet.start', () => {
     set.add(tasks[0]);
     set.start();
 
-    expect(() => set.start()).toThrowError('Cannot start a started task set');
+    expect(() => set.start()).toThrow('Cannot start a started task set');
   });
 
   it('should throw if set is already finished', () => {
     set.start();
 
-    expect(() => set.start()).toThrowError('Cannot start a finished task set');
+    expect(() => set.start()).toThrow('Cannot start a finished task set');
   });
 });
 
