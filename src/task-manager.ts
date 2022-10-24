@@ -103,6 +103,8 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
 
   set jobs(jobs: number) {
     this._jobs = jobs;
+    this._logger.verbose(`Run up to ${this._jobs} tasks at the same time`);
+
     this._startNext();
   }
 }
