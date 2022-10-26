@@ -12,8 +12,8 @@
   },
   "sideEffects": false,
   "browserslist": [
-    "defaults",
-    "not ie 11"
+    "maintained node versions",
+    "not node < 16"
   ],
   "files": [
     "dist"
@@ -50,7 +50,6 @@
     "@types/node": "16.18.0",
     "@typescript-eslint/eslint-plugin": "5.40.1",
     "@typescript-eslint/parser": "5.40.1",
-    "browserslist": "4.21.4",
     "del": "6.1.1",
     "eslint": "8.26.0",
     "eslint-plugin-jest": "27.1.3",
