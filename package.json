@@ -46,7 +46,7 @@
     "@swc/jest": "0.2.23",
     "@types/gulp": "4.0.9",
     "@types/gulp-sourcemaps": "0.0.35",
-    "@types/jest": "29.2.2",
+    "@types/jest": "29.2.4",
     "@types/node": "16.18.3",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
