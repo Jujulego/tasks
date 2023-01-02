@@ -117,3 +117,30 @@ describe('SequenceGroup.stop', () => {
     expect(group.status).toBe('failed');
   });
 });
+
+describe('SequenceGroup.complexity', () => {
+  it('should be the 1st task complexity', async () => {
+    group.add(tasks[0]);
+    group.add(tasks[1]);
+    group.add(tasks[2]);
+
+    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+
+    expect(group.complexity()).toBe(5);
+  });
+
+  it('should be the 1st task complexity added to group dependencies', async () => {
+    group.add(tasks[0]);
+
+    group.dependsOn(tasks[1]);
+    group.dependsOn(tasks[2]);
+
+    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+
+    expect(group.complexity()).toBe(15);
+  });
+});

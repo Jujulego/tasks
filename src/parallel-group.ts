@@ -24,4 +24,22 @@ export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTas
       task.stop();
     }
   }
+
+  complexity(cache: Map<string, number> = new Map()): number {
+    let complexity = cache.get(this.id);
+
+    if (complexity === undefined) {
+      complexity = 0;
+
+      for (const task of this.tasks) {
+        complexity = Math.max(complexity, task.complexity(cache));
+      }
+
+      complexity += super.complexity(cache);
+
+      cache.set(this.id, complexity);
+    }
+
+    return complexity;
+  }
 }

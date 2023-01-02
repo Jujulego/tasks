@@ -116,7 +116,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     let complexity = cache.get(this.id);
 
     if (complexity === undefined) {
-      complexity = 1;
+      complexity = this.weight;
 
       for (const dep of this._dependencies) {
         complexity += dep.complexity(cache);
