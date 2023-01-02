@@ -39,4 +39,13 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
     // Stop current task
     this._currentTask?.stop();
   }
+
+  complexity(cache: Map<string, number> = new Map()): number {
+    let complexity = super.complexity(cache);
+
+    complexity += this.tasks[0].complexity(cache);
+    cache.set(this.id, complexity);
+
+    return complexity;
+  }
 }
