@@ -81,3 +81,30 @@ describe('ParallelGroup.stop', () => {
     expect(tasks[2]._stop).toHaveBeenCalled();
   });
 });
+
+describe('ParallelGroup.complexity', () => {
+  it('should be the maximum child task complexity', async () => {
+    group.add(tasks[0]);
+    group.add(tasks[1]);
+    group.add(tasks[2]);
+
+    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+
+    expect(group.complexity()).toBe(7);
+  });
+
+  it('should be the maximum task complexity added to group dependencies', async () => {
+    group.add(tasks[0]);
+
+    group.dependsOn(tasks[1]);
+    group.dependsOn(tasks[2]);
+
+    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+
+    expect(group.complexity()).toBe(15);
+  });
+});
