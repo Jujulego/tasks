@@ -28,7 +28,7 @@ describe('GroupTask.add', () => {
     group.add(task);
     
     expect(group.tasks).toContain(task);
-    expect(task.context.groupTask).toBe(group);
+    expect(task.group).toBe(group);
 
     expect(taskAddedEventSpy).toHaveBeenCalledWith(task, {
       key: 'task.added',

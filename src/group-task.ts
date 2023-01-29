@@ -1,4 +1,4 @@
-import { AnyTask, assertIsTask, Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus } from './task';
+import { AnyTask, Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
@@ -53,15 +53,13 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
   }
 
   add(task: AnyTask) {
-    assertIsTask(task);
-
-    if (task.context.groupTask) {
-      throw new Error(`Cannot add task ${task.name} to group ${this.name}, it's already in group ${task.context.groupTask.name}`);
+    if (task.group) {
+      throw new Error(`Cannot add task ${task.name} to group ${this.name}, it's already in group ${task.group.name}`);
     }
 
     // Register task
     this._tasks.push(task);
-    task.context.groupTask = this;
+    task.setGroup(this);
 
     // Listen to task events
     task.subscribe('status.running', () => {

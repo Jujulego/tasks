@@ -6,9 +6,7 @@ import { ILogger, logger } from './logger';
 import { TaskManager } from './task-manager';
 
 // Types
-export type TaskContext = Record<string, unknown> & {
-  groupTask?: GroupTask;
-};
+export type TaskContext = Record<string, unknown>;
 
 export interface TaskOptions {
   id?: string;
@@ -32,6 +30,7 @@ export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
 };
 
 export type AnyTask = Task<any, any>;
+export type AnyGroupTask = GroupTask<any, any>;
 
 // Utils
 export function assertIsTask(task: AnyTask): asserts task is Task {
@@ -43,6 +42,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   // Attributes
   private _status: TaskStatus = 'ready';
   private _dependencies: Task[] = [];
+  private _group?: GroupTask;
   private _startTime = 0;
   private _endTime = 0;
 
@@ -107,6 +107,13 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   }
 
   /**
+   * @internal
+   */
+  setGroup(group: AnyGroupTask): void {
+    this._group = group;
+  }
+
+  /**
    * Computes task complexity.
    * The task complexity equals to the count of all it's direct and indirect dependencies.
    *
@@ -163,6 +170,10 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
 
   get dependencies(): ReadonlyArray<Task> {
     return this._dependencies;
+  }
+
+  get group(): GroupTask | undefined {
+    return this._group;
   }
 
   get completed(): boolean {
