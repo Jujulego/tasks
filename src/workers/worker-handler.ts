@@ -1,6 +1,6 @@
 import wt from 'node:worker_threads';
 
-import { EventMessage, ReadyMessage, SuccessMessage, RunMessage, FailureMessage } from './messages';
+import { TaskMessage, HandlerMessage } from './messages';
 
 // Class
 export abstract class WorkerHandler {
@@ -18,7 +18,7 @@ export abstract class WorkerHandler {
     }
 
     // Handle incoming messages
-    wt.parentPort.on('message', async (msg: RunMessage) => {
+    wt.parentPort.on('message', async (msg: TaskMessage) => {
       if (msg.type === 'run') {
         try {
           await this._run(msg.payload);
@@ -33,7 +33,7 @@ export abstract class WorkerHandler {
     this._sendMessage({ type: 'ready' });
   }
 
-  private _sendMessage(msg: ReadyMessage | EventMessage | SuccessMessage | FailureMessage) {
+  private _sendMessage(msg: HandlerMessage) {
     if (!wt.parentPort) {
       throw new Error('Should not be running in main thread');
     }

@@ -1,8 +1,8 @@
 import wt from 'node:worker_threads';
 
 import { Task, TaskContext, TaskEventMap, TaskOptions } from '../task';
+import { HandlerMessage, TaskMessage } from './messages';
 import { WorkerPool } from './worker-pool';
-import { EventMessage, ReadyMessage, SuccessMessage, RunMessage, FailureMessage } from './messages';
 
 // Class
 export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends Task<C, M> {
@@ -26,7 +26,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends 
     const worker = await this.pool.reserveWorker();
     this._worker = worker;
 
-    worker.on('message', (message: ReadyMessage | EventMessage | SuccessMessage | FailureMessage) => {
+    worker.on('message', (message: HandlerMessage) => {
       switch (message.type) {
         case 'success':
           this.pool.freeWorker(worker);
@@ -69,7 +69,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends 
     this._sendMessage({ type: 'run', payload: this.payload });
   }
 
-  private _sendMessage(msg: RunMessage) {
+  private _sendMessage(msg: TaskMessage) {
     if (!wt.parentPort) {
       throw new Error('Should not be running in main thread');
     }

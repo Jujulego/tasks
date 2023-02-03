@@ -1,23 +1,22 @@
 // Types
-export interface ReadyMessage {
-  readonly type: 'ready';
+export interface Message<T extends string> {
+  readonly type: T;
 }
 
-export interface RunMessage {
-  readonly type: 'run';
+export type TaskMessage = RunMessage;
+export type HandlerMessage = ReadyMessage | EventMessage | SuccessMessage | FailureMessage;
+
+export type ReadyMessage = Message<'ready'>;
+export type SuccessMessage = Message<'success'>;
+
+export interface RunMessage extends Message<'run'> {
   readonly payload: unknown;
 }
 
-export interface EventMessage {
-  readonly type: 'event';
+export interface EventMessage extends Message<'event'> {
   readonly payload: unknown;
 }
 
-export interface SuccessMessage {
-  readonly type: 'success';
-}
-
-export interface FailureMessage {
-  readonly type: 'failure';
+export interface FailureMessage extends Message<'failure'> {
   readonly error: unknown;
 }

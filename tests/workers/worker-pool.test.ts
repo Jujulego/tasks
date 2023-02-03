@@ -1,8 +1,8 @@
 import { EventEmitter } from 'node:events';
 import wt from 'node:worker_threads';
+import * as util from 'util';
 
 import { WorkerPool } from '../../src/workers/worker-pool';
-import * as util from 'util';
 
 // Test class
 class WorkerPoolTest extends WorkerPool {
@@ -12,6 +12,8 @@ class WorkerPoolTest extends WorkerPool {
 
     jest.spyOn(worker, 'on');
     jest.spyOn(worker, 'removeAllListeners');
+
+    setTimeout(() => worker.emit('message', { type: 'ready' }), 0);
 
     return worker as wt.Worker;
   }

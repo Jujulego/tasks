@@ -1,6 +1,7 @@
 import wt from 'node:worker_threads';
 
 import { Condition } from '../utils/condition';
+import { HandlerMessage } from './messages';
 
 // Class
 export abstract class WorkerPool {
@@ -25,6 +26,19 @@ export abstract class WorkerPool {
     });
   }
 
+  private _waitForReady(worker: wt.Worker): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const listener = (msg: HandlerMessage) => {
+        if (msg.type === 'ready') {
+          resolve();
+          worker.removeListener('on', listener);
+        }
+      };
+
+      worker.on('message', listener);
+    });
+  }
+
   private _startWorker(): wt.Worker {
     const worker = this._start();
     this._watchWorker(worker);
@@ -35,10 +49,15 @@ export abstract class WorkerPool {
   async reserveWorker(): Promise<wt.Worker> {
     await this._hasFreeWorkers.waitFor(true);
 
+    const isNew = this._available.length === 0;
     const worker = this._available.pop() ?? this._startWorker();
-    this._running.add(worker);
 
+    this._running.add(worker);
     this._hasFreeWorkers.check();
+
+    if (isNew) {
+      await this._waitForReady(worker);
+    }
 
     return worker;
   }
