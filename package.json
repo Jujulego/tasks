@@ -11,10 +11,6 @@
     "access": "public"
   },
   "sideEffects": false,
-  "browserslist": [
-    "maintained node versions",
-    "not node < 16"
-  ],
   "files": [
     "dist"
   ],

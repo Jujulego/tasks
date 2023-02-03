@@ -10,8 +10,7 @@
   },
   "env": {
     "targets": [
-      "maintained node versions",
-      "not node < 16"
+      "node >= 16"
     ]
   }
 }
