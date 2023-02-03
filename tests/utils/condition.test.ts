@@ -1,5 +1,6 @@
 import { Condition, ConditionEventMap } from '../../src/utils/condition';
 import { EventGroupListener } from '@jujulego/event-tree';
+import util from 'util';
 
 // Setup
 let value: number;
@@ -49,6 +50,9 @@ describe('Condition.check', () => {
 describe('Condition.waitFor', () => {
   it('should resolve when condition result matches value', async () => {
     const prom = condition.waitFor(true);
+
+    // prom should still be pending
+    expect(util.inspect(prom)).toMatch(/pending/);
 
     value = 1;
     condition.check();

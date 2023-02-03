@@ -5,7 +5,7 @@ import { Condition } from '../utils/condition';
 // Class
 export abstract class WorkerPool {
   // Attributes
-  private _available: wt.Worker[];
+  private _available: wt.Worker[] = [];
   private readonly _running = new Set<wt.Worker>();
 
   private readonly _hasFreeWorkers = new Condition(() => this._running.size < this.max);
