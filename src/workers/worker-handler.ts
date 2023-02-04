@@ -4,16 +4,21 @@ import { TaskMessage, HandlerMessage } from './messages';
 
 // Class
 export abstract class WorkerHandler {
+  // Attributes
+  private _port: wt.MessagePort;
+
   // Methods
   protected abstract _run(payload: unknown): void | Promise<void>;
 
-  init() {
-    if (!wt.parentPort) {
+  init(port = wt.parentPort) {
+    if (!port) {
       throw new Error('Should not be running in main thread');
     }
 
+    this._port = port;
+
     // Handle incoming messages
-    wt.parentPort.on('message', async (msg: TaskMessage) => {
+    this._port.on('message', async (msg: TaskMessage) => {
       if (msg.type === 'run') {
         try {
           await this._run(msg.payload);
@@ -29,11 +34,11 @@ export abstract class WorkerHandler {
   }
 
   private _sendMessage(msg: HandlerMessage) {
-    if (!wt.parentPort) {
-      throw new Error('Should not be running in main thread');
+    if (!this._port) {
+      throw new Error('Cannot send message, handler not yet initialized');
     }
 
-    wt.parentPort.postMessage(msg);
+    this._port.postMessage(msg);
   }
 
   /**
