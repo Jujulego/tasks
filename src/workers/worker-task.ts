@@ -20,7 +20,9 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends 
   }
 
   // Methods
-  abstract _handleMessage(payload: unknown): void;
+  protected _handleEvent(payload: unknown): void {
+    return;
+  }
 
   protected async _start(): Promise<void> {
     const worker = await this.pool.reserveWorker();
@@ -41,7 +43,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends 
           break;
 
         case 'event':
-          this._handleMessage(message.payload);
+          this._handleEvent(message.payload);
           break;
       }
     });
@@ -52,10 +54,9 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends 
 
     worker.on('exit', (code) => {
       this.pool.freeWorker(worker);
-      if (code && this.status === 'running') {
-        this.status = 'failed';
-      } else {
-        this.status = 'done';
+
+      if (this.status === 'running') {
+        this.status = code ? 'failed' : 'done';
       }
     });
 
@@ -70,11 +71,11 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends 
   }
 
   private _sendMessage(msg: TaskMessage) {
-    if (!wt.parentPort) {
-      throw new Error('Should not be running in main thread');
+    if (!this._worker) {
+      throw new Error('Worker thread is not ready yet');
     }
 
-    wt.parentPort.postMessage(msg);
+    this._worker.postMessage(msg);
   }
 
   protected _stop(): void {

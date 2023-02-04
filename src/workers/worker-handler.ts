@@ -4,15 +4,10 @@ import { TaskMessage, HandlerMessage } from './messages';
 
 // Class
 export abstract class WorkerHandler {
-  // Constructor
-  constructor() {
-    this._init();
-  }
-
   // Methods
   protected abstract _run(payload: unknown): void | Promise<void>;
 
-  protected _init() {
+  init() {
     if (!wt.parentPort) {
       throw new Error('Should not be running in main thread');
     }

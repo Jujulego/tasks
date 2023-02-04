@@ -1,6 +1,6 @@
+import { Condition } from '@jujulego/utils';
 import wt from 'node:worker_threads';
 
-import { Condition } from '../utils/condition';
 import { HandlerMessage } from './messages';
 
 // Class

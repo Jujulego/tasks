@@ -6,3 +6,4 @@ export * from './spawn-task';
 export * from './task';
 export * from './task-manager';
 export * from './task-set';
+export * from './workers';

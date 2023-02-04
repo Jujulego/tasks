@@ -33,6 +33,7 @@
   "packageManager": "yarn@3.4.1",
   "dependencies": {
     "@jujulego/event-tree": "^1.1.1",
+    "@jujulego/utils": "^1.0.1",
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {
