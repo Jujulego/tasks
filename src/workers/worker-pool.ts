@@ -57,6 +57,8 @@ export abstract class WorkerPool {
 
     if (isNew) {
       await this._waitForReady(worker);
+    } else {
+      worker.ref();
     }
 
     return worker;
@@ -67,6 +69,7 @@ export abstract class WorkerPool {
       this._available.unshift(worker);
       this._running.delete(worker);
 
+      worker.unref();
       worker.removeAllListeners();
       this._watchWorker(worker);
 

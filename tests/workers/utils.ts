@@ -10,6 +10,11 @@ export class WorkerPoolTest extends WorkerPool {
   public _start(): wt.Worker {
     const worker = new EventEmitter();
 
+    Object.assign(worker, {
+      ref: jest.fn(),
+      unref: jest.fn(),
+    });
+
     jest.spyOn(worker, 'on');
     jest.spyOn(worker, 'removeAllListeners');
 

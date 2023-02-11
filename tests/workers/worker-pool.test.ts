@@ -37,10 +37,13 @@ describe('WorkerPool', () => {
 
     // Free worker
     pool.freeWorker(worker);
+
     expect(pool.size).toBe(1);
+    expect(worker.unref).toHaveBeenCalled();
 
     await expect(prom).resolves.toBe(worker);
 
+    expect(worker.ref).toHaveBeenCalled();
     expect(pool._start).toHaveBeenCalledTimes(1);
   });
 
