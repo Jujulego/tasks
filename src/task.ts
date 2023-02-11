@@ -47,6 +47,7 @@ export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
 
 export type AnyTask = Task<any, any>;
 export type AnyGroupTask = GroupTask<any, any>;
+export type AnyTaskSummary = TaskSummary<any>;
 
 // Utils
 export function assertIsTask(task: AnyTask): asserts task is Task {
