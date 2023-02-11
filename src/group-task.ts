@@ -1,4 +1,4 @@
-import { AnyTask, Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus } from './task';
+import { AnyTask, Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
@@ -92,5 +92,11 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
     }
 
     return stats;
+  }
+
+  get summary(): TaskSummary<C> {
+    return Object.assign(super.summary, {
+      isGroup: true,
+    });
   }
 }

@@ -26,6 +26,7 @@ export interface TaskSummary<C extends TaskContext> {
   readonly duration: number;
 
   // relations
+  readonly isGroup: boolean;
   readonly groupId?: string;
   readonly dependenciesIds: string[];
 }
@@ -246,6 +247,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
       duration: this.duration,
 
       // relations
+      isGroup: false,
       groupId: this.group?.id,
       dependenciesIds: this._dependencies.map((tsk) => tsk.id),
     };
