@@ -14,6 +14,22 @@ export interface TaskOptions {
   weight?: number;
 }
 
+export interface TaskSummary<C extends TaskContext> {
+  // metadata
+  readonly id: string;
+  readonly name: string;
+  readonly context: C;
+
+  // status
+  readonly status: TaskStatus;
+  readonly completed: boolean;
+  readonly duration: number;
+
+  // relations
+  readonly groupId?: string;
+  readonly dependenciesIds: string[];
+}
+
 export type TaskStatus = 'blocked' | 'ready' | 'running' | 'done' | 'failed';
 export interface TaskStatusEvent {
   previous: TaskStatus;
@@ -214,5 +230,23 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
         duration: this._endTime - this._startTime,
       });
     }
+  }
+
+  get summary(): TaskSummary<C> {
+    return {
+      // metadata
+      id: this.id,
+      name: this.name,
+      context: this.context,
+
+      // status
+      status: this.status,
+      completed: this.completed,
+      duration: this.duration,
+
+      // relations
+      groupId: this.group?.id,
+      dependenciesIds: this._dependencies.map((tsk) => tsk.id),
+    };
   }
 }

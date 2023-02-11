@@ -17,7 +17,7 @@ export type TaskSetEventMap = {
 }
 
 // Class
-export class TaskSet extends EventSource<TaskSetEventMap> {
+export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Task> {
   // Attributes
   private readonly _tasks = new Set<Task>();
 
@@ -92,6 +92,10 @@ export class TaskSet extends EventSource<TaskSetEventMap> {
         this.manager.add(t);
       }
     }
+  }
+
+  [Symbol.iterator](): Iterator<Task> {
+    return this._tasks.values();
   }
 
   // Properties
