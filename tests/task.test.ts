@@ -281,3 +281,40 @@ describe('Task.status', () => {
     expect(statusEventSpy).not.toHaveBeenCalled();
   });
 });
+
+describe('Task.summary', () => {
+  let dep: TestTask;
+
+  beforeEach(() => {
+    dep = new TestTask('test2');
+  });
+
+  // Tests
+  it('should return a summary of the task', () => {
+    expect(task.summary).toEqual({
+      id: task.id,
+      name: 'test',
+      context: {},
+      status: 'ready',
+      completed: false,
+      duration: 0,
+      isGroup: false,
+      dependenciesIds: [],
+    });
+  });
+
+  it('should return a summary of the task with dependencies', () => {
+    task.dependsOn(dep);
+
+    expect(task.summary).toEqual({
+      id: task.id,
+      name: 'test',
+      context: {},
+      status: 'blocked',
+      completed: false,
+      duration: 0,
+      isGroup: false,
+      dependenciesIds: [dep.id],
+    });
+  });
+});

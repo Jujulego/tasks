@@ -143,3 +143,18 @@ describe('GroupTask.stats', () => {
     });
   }
 });
+
+describe('GroupTask.summary', () => {
+  it('should return task summary', () => {
+    expect(group.summary).toEqual({
+      id: group.id,
+      name: 'test',
+      context: {},
+      status: 'ready',
+      completed: false,
+      duration: 0,
+      isGroup: true,
+      dependenciesIds: [],
+    });
+  });
+});
