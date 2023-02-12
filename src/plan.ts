@@ -12,15 +12,15 @@ export function* _plan(task: AnyTask, marks: Set<AnyTask>): Generator<AnyTaskSum
     yield* _plan(dep, marks);
   }
 
+  // Handle task it self
+  yield task.summary;
+
   // Handle group's children
   if (task instanceof GroupTask) {
     for (const child of task.tasks) {
       yield* _plan(child, marks);
     }
   }
-
-  // Handle task it self
-  yield task.summary;
 }
 
 export function* plan(tasks: AnyTask | Iterable<AnyTask>): Generator<AnyTaskSummary, void, undefined> {
