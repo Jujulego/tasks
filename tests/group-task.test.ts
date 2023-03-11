@@ -16,9 +16,9 @@ beforeEach(() => {
   jest.resetAllMocks();
   jest.restoreAllMocks();
 
-  group.subscribe('task.added', taskAddedEventSpy);
-  group.subscribe('task.started', taskStartedEventSpy);
-  group.subscribe('task.completed', taskCompletedEventSpy);
+  group.on('task.added', taskAddedEventSpy);
+  group.on('task.started', taskStartedEventSpy);
+  group.on('task.completed', taskCompletedEventSpy);
 });
 
 // Tests
@@ -30,10 +30,7 @@ describe('GroupTask.add', () => {
     expect(group.tasks).toContain(task);
     expect(task.group).toBe(group);
 
-    expect(taskAddedEventSpy).toHaveBeenCalledWith(task, {
-      key: 'task.added',
-      origin: group,
-    });
+    expect(taskAddedEventSpy).toHaveBeenCalledWith(task);
   });
 
   it('should emit task.started when a task is started', () => {
@@ -42,10 +39,7 @@ describe('GroupTask.add', () => {
 
     task.status = 'running';
 
-    expect(taskStartedEventSpy).toHaveBeenCalledWith(task, {
-      key: 'task.started',
-      origin: group,
-    });
+    expect(taskStartedEventSpy).toHaveBeenCalledWith(task);
   });
 
   it('should emit task.completed when a task is completed', () => {
@@ -54,10 +48,7 @@ describe('GroupTask.add', () => {
 
     task.emit('completed', { status: 'done', duration: 1000 });
 
-    expect(taskCompletedEventSpy).toHaveBeenCalledWith(task, {
-      key: 'task.completed',
-      origin: group,
-    });
+    expect(taskCompletedEventSpy).toHaveBeenCalledWith(task);
   });
 
   it('should throw if task is already within a other group', () => {

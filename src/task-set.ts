@@ -1,6 +1,6 @@
-import { EventSource } from '@jujulego/event-tree';
+import { multiplexer, source } from '@jujulego/event-tree';
 
-import { AnyTask, assertIsTask, Task } from './task';
+import { Task } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
@@ -10,16 +10,16 @@ export interface TaskSetResults {
 }
 
 export type TaskSetStatus = 'created' | 'started' | 'finished';
-export type TaskSetEventMap = {
-  started: Task,
-  completed: Task,
-  finished: Readonly<TaskSetResults>
-}
 
 // Class
-export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Task> {
+export class TaskSet implements Iterable<Task> {
   // Attributes
   private readonly _tasks = new Set<Task>();
+  private readonly _events = multiplexer({
+    started: source<Task>(),
+    completed: source<Task>(),
+    finished: source<Readonly<TaskSetResults>>(),
+  });
 
   private _status: TaskSetStatus = 'created';
   private readonly _results: TaskSetResults = {
@@ -30,13 +30,11 @@ export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Ta
   // Constructor
   constructor(
     readonly manager: TaskManager
-  ) {
-    super();
-  }
+  ) {}
 
   // Methods
   private _handleComplete(task: Task, success: boolean): void {
-    this.emit('completed', task);
+    this._events.emit('completed', task);
 
     // Trigger finished
     if (success) {
@@ -47,13 +45,11 @@ export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Ta
 
     if (this._results.success + this._results.failed === this._tasks.size) {
       this._status = 'finished';
-      this.emit('finished', this._results);
+      this._events.emit('finished', this._results);
     }
   }
 
-  add(task: AnyTask): void {
-    assertIsTask(task);
-
+  add(task: Task): void {
     if (this._status !== 'created') {
       throw Error(`Cannot add a task to a ${this._status} task set`);
     }
@@ -63,9 +59,9 @@ export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Ta
     }
 
     // Listen to task's status
-    task.subscribe('status', ({ status }) => {
+    task.on('status', ({ status }) => {
       if (status === 'running') {
-        this.emit('started', task);
+        this._events.emit('started', task);
       } else if (status === 'done' || status === 'failed') {
         this._handleComplete(task, status === 'done');
       }
@@ -82,7 +78,7 @@ export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Ta
 
     if (this._tasks.size === 0) {
       this._status = 'finished';
-      this.emit('finished', this._results);
+      this._events.emit('finished', this._results);
     } else {
       // Update status
       this._status = 'started';
@@ -99,6 +95,14 @@ export class TaskSet extends EventSource<TaskSetEventMap> implements Iterable<Ta
   }
 
   // Properties
+  get on() {
+    return this._events.on;
+  }
+
+  get off() {
+    return this._events.off;
+  }
+
   get status(): TaskSetStatus {
     return this._status;
   }

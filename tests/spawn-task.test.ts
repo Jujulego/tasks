@@ -21,7 +21,7 @@ beforeEach(() => {
   jest.resetAllMocks();
   jest.restoreAllMocks();
 
-  task.subscribe('stream', streamEventSpy);
+  task.on('stream', streamEventSpy);
 
   // Mock execFile
   proc = new EventEmitter() as cp.ChildProcess;
@@ -53,10 +53,7 @@ describe('SpawnTask.start', () => {
     const buf = Buffer.from('test stdout');
     proc.stdout?.emit('data', buf);
 
-    expect(streamEventSpy).toHaveBeenCalledWith(
-      { stream: 'stdout', data: buf },
-      { key: 'stream.stdout', origin: task }
-    );
+    expect(streamEventSpy).toHaveBeenCalledWith({ stream: 'stdout', data: buf });
   });
 
   it('should emit data from process\'s stderr', () => {
@@ -65,10 +62,7 @@ describe('SpawnTask.start', () => {
     const buf = Buffer.from('test stderr');
     proc.stderr?.emit('data', buf);
 
-    expect(streamEventSpy).toHaveBeenCalledWith(
-      { stream: 'stderr', data: buf },
-      { key: 'stream.stderr', origin: task }
-    );
+    expect(streamEventSpy).toHaveBeenCalledWith({ stream: 'stderr', data: buf });
   });
 
   it('should put task into done status when process completes with 0 exit code', () => {

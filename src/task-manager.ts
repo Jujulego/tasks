@@ -1,8 +1,8 @@
-import { EventSource } from '@jujulego/event-tree';
+import { multiplexer, once, source } from '@jujulego/event-tree';
 import os from 'node:os';
 
 import { ILogger, logger } from './logger';
-import { AnyTask, Task } from './task';
+import { Task } from './task';
 
 // Types
 export interface TaskManagerOpts {
@@ -10,14 +10,8 @@ export interface TaskManagerOpts {
   logger?: ILogger;
 }
 
-export type TaskManagerEventMap = {
-  added: Task;
-  started: Task;
-  completed: Task;
-}
-
 // Class
-export class TaskManager extends EventSource<TaskManagerEventMap> {
+export class TaskManager {
   // Attributes
   private _jobs: number;
   private _runningWeight = 0;
@@ -27,11 +21,14 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
   private readonly _running = new Set<Task>();
 
   protected readonly _logger: ILogger;
+  protected readonly _events = multiplexer({
+    added: source<Task>(),
+    started: source<Task>(),
+    completed: source<Task>(),
+  });
 
   // Constructor
   constructor(opts: TaskManagerOpts = {}) {
-    super();
-
     this._logger = opts.logger ?? logger;
     this._jobs = (opts.jobs && opts.jobs > 0) ? opts.jobs : os.cpus().length;
     this._logger.verbose(`Run up to ${this._jobs} tasks at the same time`);
@@ -52,7 +49,7 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
     this._tasks.push(task);
     this._index.add(task);
 
-    this.emit('added', task);
+    this._events.emit('added', task);
 
     // Add task's dependencies
     for (const t of task.dependencies) {
@@ -64,7 +61,7 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
     // Emit completed for previous task
     if (previous) {
       this._running.delete(previous);
-      this.emit('completed', previous);
+      this._events.emit('completed', previous);
       this._runningWeight -= previous.weight;
     }
 
@@ -75,24 +72,32 @@ export class TaskManager extends EventSource<TaskManagerEventMap> {
       }
 
       if (task.status === 'ready') {
-        task.subscribe('completed', () => this._startNext(task));
+        once(task, 'completed', () => this._startNext(task));
 
         task.start(this);
         this._running.add(task);
         this._runningWeight += task.weight;
 
-        this.emit('started', task);
+        this._events.emit('started', task);
       }
     }
   }
 
-  add(task: AnyTask): void {
+  add(task: Task): void {
     this._add(task);
     this._sortByComplexity();
     this._startNext();
   }
 
   // Properties
+  get on() {
+    return this._events.on;
+  }
+
+  get off() {
+    return this._events.off;
+  }
+
   get tasks(): readonly Task[] {
     return this._tasks;
   }

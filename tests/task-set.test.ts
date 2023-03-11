@@ -23,9 +23,9 @@ beforeEach(() => {
   jest.resetAllMocks();
   jest.restoreAllMocks();
 
-  set.subscribe('started', startedEventSpy);
-  set.subscribe('completed', completedEventSpy);
-  set.subscribe('finished', finishedEventSpy);
+  set.on('started', startedEventSpy);
+  set.on('completed', completedEventSpy);
+  set.on('finished', finishedEventSpy);
 });
 
 // Tests
@@ -55,10 +55,7 @@ describe('TaskSet.add', () => {
     set.add(tasks[1]);
     tasks[0].status = 'running';
 
-    expect(startedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'started', origin: set }
-    );
+    expect(startedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
   it('should emit a completed event when a task is done', () => {
@@ -66,10 +63,7 @@ describe('TaskSet.add', () => {
     set.add(tasks[1]);
     tasks[0].status = 'done';
 
-    expect(completedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'completed', origin: set }
-    );
+    expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
   it('should emit a completed event when a task is failed', () => {
@@ -77,10 +71,7 @@ describe('TaskSet.add', () => {
     set.add(tasks[1]);
     tasks[0].status = 'failed';
 
-    expect(completedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'completed', origin: set }
-    );
+    expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
   it('should emit a finished event when all tasks are completed', () => {
@@ -90,10 +81,7 @@ describe('TaskSet.add', () => {
     tasks[1].status = 'failed';
 
     expect(set.status).toBe('finished');
-    expect(finishedEventSpy).toHaveBeenCalledWith(
-      { success: 1, failed: 1 },
-      { key: 'finished', origin: set }
-    );
+    expect(finishedEventSpy).toHaveBeenCalledWith({ success: 1, failed: 1 });
   });
 });
 
