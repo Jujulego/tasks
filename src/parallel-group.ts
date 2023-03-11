@@ -1,3 +1,5 @@
+import { once } from '@jujulego/event-tree';
+
 import { GroupTask } from './group-task';
 import { Task, TaskContext } from './task';
 
@@ -8,7 +10,7 @@ export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTas
     for (const task of this.tasks) {
       yield task;
 
-      task.subscribe('completed', () => {
+      once(task, 'completed', () => {
         const stats = this.stats;
 
         if (stats.done + stats.failed === this.tasks.length) {

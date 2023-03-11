@@ -8,6 +8,7 @@ export class TestTask extends Task {
   }
 
   // Methods
+  emit = this._taskEvents.emit;
   _start = jest.fn();
   _stop = jest.fn();
 

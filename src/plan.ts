@@ -1,8 +1,8 @@
-import { AnyTask, AnyTaskSummary, Task } from './task';
+import { Task, TaskSummary } from './task';
 import { GroupTask } from './group-task';
 
 // Utils
-export function* _plan(task: AnyTask, marks: Set<AnyTask>): Generator<AnyTaskSummary, void, undefined> {
+export function* _plan(task: Task, marks: Set<Task>): Generator<TaskSummary, void, undefined> {
   // Ensure task is treated only once
   if (marks.has(task)) return;
   marks.add(task);
@@ -23,13 +23,13 @@ export function* _plan(task: AnyTask, marks: Set<AnyTask>): Generator<AnyTaskSum
   }
 }
 
-export function* plan(tasks: AnyTask | Iterable<AnyTask>): Generator<AnyTaskSummary, void, undefined> {
+export function* plan(tasks: Task | Iterable<Task>): Generator<TaskSummary, void, undefined> {
   if (tasks instanceof Task) {
     tasks = [tasks];
   }
 
   // Recursively pass on all tasks
-  const marks = new Set<AnyTask>();
+  const marks = new Set<Task>();
 
   for (const task of tasks) {
     yield* _plan(task, marks);

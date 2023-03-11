@@ -16,8 +16,8 @@ beforeEach(() => {
   jest.restoreAllMocks();
   jest.useRealTimers();
 
-  task.subscribe('completed', completedEventSpy);
-  task.subscribe('status', statusEventSpy);
+  task.on('completed', completedEventSpy);
+  task.on('status', statusEventSpy);
 });
 
 // Tests
@@ -239,10 +239,7 @@ describe('Task.status', () => {
 
       expect(task.status).toBe(status);
       expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
-      expect(statusEventSpy).toHaveBeenCalledWith(
-        { previous: 'ready', status },
-        { origin: task, key: `status.${status}` }
-      );
+      expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'ready', status });
 
       expect(completedEventSpy).not.toHaveBeenCalled();
     });
@@ -261,15 +258,9 @@ describe('Task.status', () => {
 
       expect(task.status).toBe(status);
       expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
-      expect(statusEventSpy).toHaveBeenCalledWith(
-        { previous: 'running', status },
-        { origin: task, key: `status.${status}` }
-      );
+      expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'running', status });
 
-      expect(completedEventSpy).toHaveBeenCalledWith(
-        { status, duration: 1000 },
-        { origin: task, key: 'completed' }
-      );
+      expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 1000 });
     });
   }
 

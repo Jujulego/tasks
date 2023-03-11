@@ -1,11 +1,11 @@
 import wt from 'node:worker_threads';
 
-import { Task, TaskContext, TaskEventMap, TaskOptions } from '../task';
+import { Task, TaskContext, TaskOptions } from '../task';
 import { HandlerMessage, TaskMessage } from './messages';
 import { WorkerPool } from './worker-pool';
 
 // Class
-export abstract class WorkerTask<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends Task<C, M> {
+export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Task<C> {
   // Attributes
   private _worker?: wt.Worker;
 

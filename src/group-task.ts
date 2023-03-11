@@ -1,19 +1,23 @@
-import { AnyTask, Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from './task';
+import { inherit, multiplexer, source } from '@jujulego/event-tree';
+
+import { Task, TaskContext, TaskOptions, TaskStatus, TaskSummary } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
-export type GroupTaskEventMap = TaskEventMap & {
-  'task.added': Task;
-  'task.started': Task;
-  'task.completed': Task;
-}
-
 export type GroupTaskStats = Record<TaskStatus, number>;
 
 // Class
-export abstract class GroupTask<C extends TaskContext = TaskContext, M extends GroupTaskEventMap = GroupTaskEventMap> extends Task<C, M> {
+export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> {
   // Attributes
   private readonly _tasks: Task[] = [];
+
+  protected readonly _groupEvents = inherit(this._taskEvents,  {
+    task: multiplexer({
+      added: source<Task>(),
+      started: source<Task>(),
+      completed: source<Task>(),
+    })
+  });
 
   // Constructor
   constructor(
@@ -52,7 +56,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
     this._loop(manager);
   }
 
-  add(task: AnyTask) {
+  add(task: Task) {
     if (task.group) {
       throw new Error(`Cannot add task ${task.name} to group ${this.name}, it's already in group ${task.group.name}`);
     }
@@ -62,18 +66,26 @@ export abstract class GroupTask<C extends TaskContext = TaskContext, M extends G
     task.setGroup(this);
 
     // Listen to task events
-    task.subscribe('status.running', () => {
-      this.emit('task.started', task);
+    task.on('status.running', () => {
+      this._groupEvents.emit('task.started', task);
     });
 
-    task.subscribe('completed', () => {
-      this.emit('task.completed', task);
+    task.on('completed', () => {
+      this._groupEvents.emit('task.completed', task);
     });
 
-    this.emit('task.added', task);
+    this._groupEvents.emit('task.added', task);
   }
 
   // Properties
+  get on() {
+    return this._groupEvents.on;
+  }
+
+  get off() {
+    return this._groupEvents.off;
+  }
+
   get tasks(): readonly Task[] {
     return this._tasks;
   }

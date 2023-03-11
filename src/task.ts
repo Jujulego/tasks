@@ -1,4 +1,4 @@
-import { EventSource } from '@jujulego/event-tree';
+import { group, multiplexer, source } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
 import { GroupTask } from './group-task';
@@ -14,7 +14,7 @@ export interface TaskOptions {
   weight?: number;
 }
 
-export interface TaskSummary<C extends TaskContext> {
+export interface TaskSummary<C extends TaskContext = TaskContext> {
   // metadata
   readonly id: string;
   readonly name: string;
@@ -32,9 +32,9 @@ export interface TaskSummary<C extends TaskContext> {
 }
 
 export type TaskStatus = 'blocked' | 'ready' | 'running' | 'done' | 'failed';
-export interface TaskStatusEvent {
+export interface TaskStatusEvent<S extends TaskStatus = TaskStatus> {
   previous: TaskStatus;
-  status: TaskStatus;
+  status: S;
 }
 
 export interface TaskCompletedEvent {
@@ -42,21 +42,8 @@ export interface TaskCompletedEvent {
   duration: number;
 }
 
-export type TaskEventMap = Record<`status.${TaskStatus}`, TaskStatusEvent> & {
-  completed: TaskCompletedEvent;
-};
-
-export type AnyTask = Task<any, any>;
-export type AnyGroupTask = GroupTask<any, any>;
-export type AnyTaskSummary = TaskSummary<any>;
-
-// Utils
-export function assertIsTask(task: AnyTask): asserts task is Task {
-  return;
-}
-
 // Class
-export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEventMap = TaskEventMap> extends EventSource<M> {
+export abstract class Task<C extends TaskContext = TaskContext> {
   // Attributes
   private _status: TaskStatus = 'ready';
   private _dependencies: Task[] = [];
@@ -67,12 +54,21 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   readonly context: C;
   readonly id: string;
   readonly weight: number;
+
   protected readonly _logger: ILogger;
+  protected readonly _taskEvents = multiplexer({
+    completed: source<TaskCompletedEvent>(),
+    status: group({
+      'blocked': source<TaskStatusEvent<'blocked'>>(),
+      'ready': source<TaskStatusEvent<'ready'>>(),
+      'running': source<TaskStatusEvent<'running'>>(),
+      'done': source<TaskStatusEvent<'done'>>(),
+      'failed': source<TaskStatusEvent<'failed'>>(),
+    }),
+  });
 
   // Constructor
   protected constructor(context: C, opts: TaskOptions = {}) {
-    super();
-
     // Parse options
     this.context = context;
     this.id = opts.id ?? crypto.randomUUID();
@@ -105,18 +101,16 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
    *
    * @param task the dependency to add
    */
-  dependsOn(task: AnyTask): void {
-    assertIsTask(task);
-
+  dependsOn(task: Task): void {
     if (['blocked', 'ready'].includes(this._status)) {
       this._dependencies.push(task);
       this._recomputeStatus();
 
-      task.subscribe('status.done', () => {
+      task.on('status.done', () => {
         this._recomputeStatus();
       });
 
-      task.subscribe('status.failed', () => {
+      task.on('status.failed', () => {
         this._recomputeStatus();
       });
     } else {
@@ -127,7 +121,7 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   /**
    * @internal
    */
-  setGroup(group: AnyGroupTask): void {
+  setGroup(group: GroupTask): void {
     this._group = group;
   }
 
@@ -186,6 +180,14 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
   // Properties
   abstract get name(): string;
 
+  get on() {
+    return this._taskEvents.on;
+  }
+
+  get off() {
+    return this._taskEvents.off;
+  }
+
   get dependencies(): ReadonlyArray<Task> {
     return this._dependencies;
   }
@@ -221,13 +223,13 @@ export abstract class Task<C extends TaskContext = TaskContext, M extends TaskEv
     this._status = status;
 
     this._logger.debug(`${this.name} is ${status}`);
-    this.emit(`status.${status}`, { previous, status });
+    this._taskEvents.emit(`status.${status}`, { previous, status });
 
     // Emit completed
     if (status === 'done' || status === 'failed') {
       this._endTime = Date.now();
 
-      this.emit('completed', {
+      this._taskEvents.emit('completed', {
         status,
         duration: this._endTime - this._startTime,
       });

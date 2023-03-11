@@ -23,9 +23,9 @@ beforeEach(() => {
   jest.resetAllMocks();
   jest.restoreAllMocks();
 
-  manager.subscribe('added', addedEventSpy);
-  manager.subscribe('started', startedEventSpy);
-  manager.subscribe('completed', completedEventSpy);
+  manager.on('added', addedEventSpy);
+  manager.on('started', startedEventSpy);
+  manager.on('completed', completedEventSpy);
 });
 
 // Tests
@@ -36,15 +36,8 @@ describe('TaskManager.add', () => {
     expect(manager.tasks).toContain(tasks[0]);
     expect(tasks[0].status).toBe('running');
 
-    expect(startedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'started', origin: manager },
-    );
-
-    expect(addedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'added', origin: manager },
-    );
+    expect(startedEventSpy).toHaveBeenCalledWith(tasks[0]);
+    expect(addedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
   it('should only start 1 task a the same time (sum of task weight < jobs options)', () => {
@@ -91,10 +84,7 @@ describe('TaskManager.add', () => {
     expect(tasks[1].status).toBe('running');
     expect(tasks[2].status).toBe('ready');
 
-    expect(completedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'completed', origin: manager }
-    );
+    expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
   it('should start next task when current is failed', () => {
@@ -108,10 +98,7 @@ describe('TaskManager.add', () => {
     expect(tasks[1].status).toBe('running');
     expect(tasks[2].status).toBe('ready');
 
-    expect(completedEventSpy).toHaveBeenCalledWith(
-      tasks[0],
-      { key: 'completed', origin: manager }
-    );
+    expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 });
 

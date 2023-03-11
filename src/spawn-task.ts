@@ -1,9 +1,10 @@
+import { group, inherit, source } from '@jujulego/event-tree';
 import cp from 'node:child_process';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import kill from 'tree-kill';
 
-import { Task, TaskContext, TaskEventMap, TaskOptions } from './task';
+import { Task, TaskContext, TaskOptions } from './task';
 
 // Types
 export type SpawnTaskStream = 'stdout' | 'stderr';
@@ -19,19 +20,21 @@ export interface SpawnTaskStreamEvent<S extends SpawnTaskStream = SpawnTaskStrea
   data: Buffer;
 }
 
-export type SpawnTaskEventMap = TaskEventMap & {
-  'stream.stdout': SpawnTaskStreamEvent<'stdout'>;
-  'stream.stderr': SpawnTaskStreamEvent<'stderr'>;
-}
-
 // Class
-export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskEventMap = SpawnTaskEventMap> extends Task<C, M> {
+export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> {
   // Attributes
   private _process?: cp.ChildProcess;
   private _exitCode: number | null = null;
 
   readonly cwd: string;
   readonly env: SpawnTaskEnv;
+
+  protected readonly _spawnEvents = inherit(this._taskEvents,  {
+    stream: group({
+      stdout: source<SpawnTaskStreamEvent<'stdout'>>(),
+      stderr: source<SpawnTaskStreamEvent<'stderr'>>(),
+    })
+  });
 
   // Statics
   private static _buildId(cmd: string, args: readonly string[], cwd?: string): string {
@@ -77,11 +80,11 @@ export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskE
     });
 
     this._process.stdout?.on('data', (data: Buffer) => {
-      this.emit('stream.stdout', { stream: 'stdout', data });
+      this._spawnEvents.emit('stream.stdout', { stream: 'stdout', data });
     });
 
     this._process.stderr?.on('data', (data: Buffer) => {
-      this.emit('stream.stderr', { stream: 'stderr', data });
+      this._spawnEvents.emit('stream.stderr', { stream: 'stderr', data });
     });
 
     this._process.on('close', (code, signal) => {
@@ -117,6 +120,14 @@ export class SpawnTask<C extends TaskContext = TaskContext, M extends SpawnTaskE
   }
 
   // Properties
+  get on() {
+    return this._spawnEvents.on;
+  }
+
+  get off() {
+    return this._spawnEvents.off;
+  }
+
   get name(): string {
     return [this.cmd, ...this.args].join(' ');
   }
