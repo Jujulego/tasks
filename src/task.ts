@@ -231,7 +231,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
 
       this._taskEvents.emit('completed', {
         status,
-        duration: this._endTime - this._startTime,
+        duration: this.duration,
       });
     }
   }

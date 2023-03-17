@@ -246,7 +246,7 @@ describe('Task.status', () => {
   }
 
   for (const status of ['done', 'failed'] as const) {
-    it(`should emit and log status change (ready => ${status})`, () => {
+    it(`should emit and log status change (running => ${status})`, () => {
       // Start task to store current date then "wait" for 1s
       jest.useFakeTimers();
 
@@ -261,6 +261,16 @@ describe('Task.status', () => {
       expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'running', status });
 
       expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 1000 });
+    });
+
+    it(`should emit completed with 0 duration (ready => ${status})`, () => {
+      // Start task to store current date then "wait" for 1s
+      jest.useFakeTimers();
+
+      jest.advanceTimersByTime(1000);
+      task.status = status;
+
+      expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 0 });
     });
   }
 
