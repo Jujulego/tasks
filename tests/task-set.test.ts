@@ -18,7 +18,7 @@ beforeEach(() => {
   ];
 
   manager = new TaskManager({ logger: spyLogger });
-  set = new TaskSet(manager);
+  set = new TaskSet();
 
   jest.resetAllMocks();
   jest.restoreAllMocks();
@@ -39,13 +39,13 @@ describe('TaskSet.add', () => {
 
   it('should throw if set has already started', () => {
     set.add(tasks[0]);
-    set.start();
+    set.start(manager);
 
     expect(() => set.add(tasks[1])).toThrow('Cannot add a task to a started task set');
   });
 
   it('should throw if set is already finished', () => {
-    set.start();
+    set.start(manager);
 
     expect(() => set.add(tasks[0])).toThrow('Cannot add a task to a finished task set');
   });
@@ -88,35 +88,35 @@ describe('TaskSet.add', () => {
 describe('TaskSet.start', () => {
   it('should put set into started status', () => {
     set.add(tasks[0]);
-    set.start();
+    set.start(manager);
 
     expect(set.status).toBe('started');
   });
 
   it('should put set into finished status if set is empty', () => {
-    set.start();
+    set.start(manager);
 
     expect(set.status).toBe('finished');
   });
 
   it('should start tasks by dispatching them to the manager', () => {
     set.add(tasks[0]);
-    set.start();
+    set.start(manager);
 
     expect(manager.tasks).toContain(tasks[0]);
   });
 
   it('should throw if set has already started', () => {
     set.add(tasks[0]);
-    set.start();
+    set.start(manager);
 
-    expect(() => set.start()).toThrow('Cannot start a started task set');
+    expect(() => set.start(manager)).toThrow('Cannot start a started task set');
   });
 
   it('should throw if set is already finished', () => {
-    set.start();
+    set.start(manager);
 
-    expect(() => set.start()).toThrow('Cannot start a finished task set');
+    expect(() => set.start(manager)).toThrow('Cannot start a finished task set');
   });
 });
 

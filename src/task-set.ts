@@ -1,4 +1,4 @@
-import { multiplexer, source } from '@jujulego/event-tree';
+import { IListenable, multiplexer, source } from '@jujulego/event-tree';
 
 import { Task } from './task';
 import { TaskManager } from './task-manager';
@@ -11,8 +11,14 @@ export interface TaskSetResults {
 
 export type TaskSetStatus = 'created' | 'started' | 'finished';
 
+export type TaskSetEventMap = {
+  started: Task;
+  completed: Task;
+  finished: Readonly<TaskSetResults>;
+}
+
 // Class
-export class TaskSet implements Iterable<Task> {
+export class TaskSet implements Iterable<Task>, IListenable<TaskSetEventMap> {
   // Attributes
   private readonly _tasks = new Set<Task>();
   private readonly _events = multiplexer({
@@ -27,12 +33,10 @@ export class TaskSet implements Iterable<Task> {
     failed: 0,
   };
 
-  // Constructor
-  constructor(
-    readonly manager: TaskManager
-  ) {}
-
   // Methods
+  readonly on = this._events.on;
+  readonly off = this._events.off;
+
   private _handleComplete(task: Task, success: boolean): void {
     this._events.emit('completed', task);
 
@@ -71,7 +75,7 @@ export class TaskSet implements Iterable<Task> {
     this._tasks.add(task);
   }
 
-  start(): void {
+  start(manager: TaskManager): void {
     if (this._status !== 'created') {
       throw Error(`Cannot start a ${this._status} task set`);
     }
@@ -85,7 +89,7 @@ export class TaskSet implements Iterable<Task> {
 
       // Add tasks to task manager
       for (const t of this._tasks) {
-        this.manager.add(t);
+        manager.add(t);
       }
     }
   }
@@ -95,14 +99,6 @@ export class TaskSet implements Iterable<Task> {
   }
 
   // Properties
-  get on() {
-    return this._events.on;
-  }
-
-  get off() {
-    return this._events.off;
-  }
-
   get status(): TaskSetStatus {
     return this._status;
   }
