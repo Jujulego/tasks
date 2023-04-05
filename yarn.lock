@@ -880,17 +880,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@jujulego/event-tree@npm:2.0.0"
-  checksum: 89151832e7259295947d793e7fe2f4948cb1b188fc2dab986df217058af395aa65d1e358d05420ac372bbe30770d41025c297894079f83b6573371d523a25143
-  languageName: node
-  linkType: hard
-
-"@jujulego/event-tree@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "@jujulego/event-tree@npm:2.1.1"
-  checksum: ac2fa1147f8f1de5aa63367c1b06b53ba0abd53c2fa1f33b02684f37b3a2d660c8759a775454b8f0c49d977449086f7a282868b98f8a806a1f7d99691dcfc247
+"@jujulego/event-tree@npm:^2.0.0, @jujulego/event-tree@npm:^2.1.1":
+  version: 2.2.0
+  resolution: "@jujulego/event-tree@npm:2.2.0"
+  checksum: 40149103c9d90570fecb31668e54e9ad226c8cc9def006c7285cbd06f96ed905aa439d14b16b14be7d868e430fb4f5e3e9f16243626379f201ac59a3ee66d259
   languageName: node
   linkType: hard
 
