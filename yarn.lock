@@ -880,7 +880,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^2.1.1, @jujulego/event-tree@npm:^2.5.0":
+"@jujulego/event-tree@npm:^2.5.0, @jujulego/event-tree@npm:^2.5.1":
   version: 2.5.1
   resolution: "@jujulego/event-tree@npm:2.5.1"
   checksum: 62ee3a95d52e8c5558ee9d6cb8adc716c4861208e172027e835f9a8202853da945fff45f9e6424f59a91d794c4af56496c87feb976bdd5146d48d058c1ff3014
@@ -900,7 +900,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
-    "@jujulego/event-tree": ^2.1.1
+    "@jujulego/event-tree": ^2.5.1
     "@jujulego/flow": 1.1.0
     "@jujulego/utils": ^1.2.0
     "@swc/cli": 0.1.62

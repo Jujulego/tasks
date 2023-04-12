@@ -36,6 +36,7 @@ export class TaskSet implements Iterable<Task>, IListenable<TaskSetEventMap> {
   // Methods
   readonly on = this._events.on;
   readonly off = this._events.off;
+  readonly clear = this._events.clear;
 
   private _handleComplete(task: Task, success: boolean): void {
     this._events.emit('completed', task);
