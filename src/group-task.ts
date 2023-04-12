@@ -1,13 +1,19 @@
-import { inherit, multiplexer, source } from '@jujulego/event-tree';
+import { IListenable, inherit, InheritEventMap, multiplexer, source } from '@jujulego/event-tree';
 
-import { Task, TaskContext, TaskOptions, TaskStatus, TaskSummary } from './task';
+import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from './task';
 import { TaskManager } from './task-manager';
 
 // Types
 export type GroupTaskStats = Record<TaskStatus, number>;
 
+export type GroupTaskEventMap = InheritEventMap<TaskEventMap, {
+  'task.added': Task;
+  'task.started': Task;
+  'task.completed': Task;
+}>;
+
 // Class
-export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> {
+export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> implements IListenable<GroupTaskEventMap> {
   // Attributes
   private readonly _tasks: Task[] = [];
 
@@ -29,6 +35,10 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
   }
 
   // Methods
+  readonly on = this._groupEvents.on;
+  readonly off = this._groupEvents.off;
+  readonly clear = this._groupEvents.clear;
+
   protected abstract _orchestrate(): AsyncGenerator<Task>;
 
   private async _loop(manager: TaskManager): Promise<void> {
@@ -78,14 +88,6 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
   }
 
   // Properties
-  get on() {
-    return this._groupEvents.on;
-  }
-
-  get off() {
-    return this._groupEvents.off;
-  }
-
   get tasks(): readonly Task[] {
     return this._tasks;
   }

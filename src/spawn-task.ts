@@ -1,10 +1,10 @@
-import { group, inherit, source } from '@jujulego/event-tree';
+import { group, IListenable, inherit, InheritEventMap, source } from '@jujulego/event-tree';
 import cp from 'node:child_process';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import kill from 'tree-kill';
 
-import { Task, TaskContext, TaskOptions } from './task';
+import { Task, TaskContext, TaskEventMap, TaskOptions } from './task';
 
 // Types
 export type SpawnTaskStream = 'stdout' | 'stderr';
@@ -20,8 +20,14 @@ export interface SpawnTaskStreamEvent<S extends SpawnTaskStream = SpawnTaskStrea
   data: Buffer;
 }
 
+export type SpawnTaskEventMap = InheritEventMap<TaskEventMap, {
+  stream: SpawnTaskStreamEvent;
+  'stream.stdout': SpawnTaskStreamEvent<'stdout'>;
+  'stream.stderr': SpawnTaskStreamEvent<'stderr'>;
+}>;
+
 // Class
-export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> {
+export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> implements IListenable<SpawnTaskEventMap> {
   // Attributes
   private _process?: cp.ChildProcess;
   private _exitCode: number | null = null;
@@ -68,6 +74,10 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> {
   }
 
   // Methods
+  readonly on = this._spawnEvents.on;
+  readonly off = this._spawnEvents.off;
+  readonly clear = this._spawnEvents.clear;
+
   protected _start(): void {
     this._process = cp.execFile(this.cmd, this.args, {
       cwd: this.cwd,
@@ -120,14 +130,6 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> {
   }
 
   // Properties
-  get on() {
-    return this._spawnEvents.on;
-  }
-
-  get off() {
-    return this._spawnEvents.off;
-  }
-
   get name(): string {
     return [this.cmd, ...this.args].join(' ');
   }

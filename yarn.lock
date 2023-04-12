@@ -880,17 +880,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^2.1.1":
-  version: 2.2.0
-  resolution: "@jujulego/event-tree@npm:2.2.0"
-  checksum: 40149103c9d90570fecb31668e54e9ad226c8cc9def006c7285cbd06f96ed905aa439d14b16b14be7d868e430fb4f5e3e9f16243626379f201ac59a3ee66d259
-  languageName: node
-  linkType: hard
-
-"@jujulego/event-tree@npm:^2.5.0":
-  version: 2.5.0
-  resolution: "@jujulego/event-tree@npm:2.5.0"
-  checksum: 93237c1b8c83fb2b69d69d6a93009e331d70b74e38b6dfde6e500fe871555105493bd68b6e03fd528834710b1d925443f1f1322f18fe59e78c00aecd9a6df973
+"@jujulego/event-tree@npm:^2.5.0, @jujulego/event-tree@npm:^2.5.1":
+  version: 2.5.1
+  resolution: "@jujulego/event-tree@npm:2.5.1"
+  checksum: 62ee3a95d52e8c5558ee9d6cb8adc716c4861208e172027e835f9a8202853da945fff45f9e6424f59a91d794c4af56496c87feb976bdd5146d48d058c1ff3014
   languageName: node
   linkType: hard
 
@@ -907,7 +900,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
-    "@jujulego/event-tree": ^2.1.1
+    "@jujulego/event-tree": ^2.5.1
     "@jujulego/flow": 1.1.0
     "@jujulego/utils": ^1.2.0
     "@swc/cli": 0.1.62

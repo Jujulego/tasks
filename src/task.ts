@@ -1,4 +1,4 @@
-import { group, multiplexer, source } from '@jujulego/event-tree';
+import { group, IListenable, multiplexer, source } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
 import { GroupTask } from './group-task';
@@ -42,8 +42,18 @@ export interface TaskCompletedEvent {
   duration: number;
 }
 
+export type TaskEventMap = {
+  completed: TaskCompletedEvent;
+  status: TaskStatusEvent;
+  'status.blocked': TaskStatusEvent<'blocked'>;
+  'status.ready': TaskStatusEvent<'ready'>;
+  'status.running': TaskStatusEvent<'running'>;
+  'status.done': TaskStatusEvent<'done'>;
+  'status.failed': TaskStatusEvent<'failed'>;
+};
+
 // Class
-export abstract class Task<C extends TaskContext = TaskContext> {
+export abstract class Task<C extends TaskContext = TaskContext> implements IListenable<TaskEventMap> {
   // Attributes
   private _status: TaskStatus = 'ready';
   private _dependencies: Task[] = [];
@@ -77,6 +87,10 @@ export abstract class Task<C extends TaskContext = TaskContext> {
   }
 
   // Methods
+  readonly on = this._taskEvents.on;
+  readonly off = this._taskEvents.off;
+  readonly clear = this._taskEvents.clear;
+
   protected abstract _start(manager?: TaskManager): void;
   protected abstract _stop(): void;
 
@@ -179,14 +193,6 @@ export abstract class Task<C extends TaskContext = TaskContext> {
 
   // Properties
   abstract get name(): string;
-
-  get on() {
-    return this._taskEvents.on;
-  }
-
-  get off() {
-    return this._taskEvents.off;
-  }
 
   get dependencies(): ReadonlyArray<Task> {
     return this._dependencies;
