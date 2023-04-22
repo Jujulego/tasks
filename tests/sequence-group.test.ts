@@ -1,4 +1,6 @@
-import { SequenceGroup, TaskManager } from '../src';
+import { SequenceGroup } from '@/src/sequence-group';
+import { TaskManager } from '@/src/task-manager';
+
 import { flushPromises, spyLogger, TestTask } from './utils';
 
 // Setup

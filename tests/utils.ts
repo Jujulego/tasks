@@ -1,4 +1,6 @@
-import { GroupTask, ILogger, Task, TaskOptions, TaskStatus } from '../src';
+import { GroupTask } from '@/src/group-task';
+import { ILogger } from '@/src/logger';
+import { Task, TaskOptions, TaskStatus } from '@/src/task';
 
 // Classes
 export class TestTask extends Task {

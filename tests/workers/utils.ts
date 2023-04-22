@@ -1,7 +1,10 @@
 import wt from 'node:worker_threads';
 import { EventEmitter } from 'node:events';
 
-import { WorkerHandler, WorkerPool, WorkerTask } from '../../src';
+import { WorkerHandler } from '@/src/workers/worker-handler';
+import { WorkerPool } from '@/src/workers/worker-pool';
+import { WorkerTask } from '@/src/workers/worker-task';
+
 import { spyLogger } from '../utils';
 
 // Test pool

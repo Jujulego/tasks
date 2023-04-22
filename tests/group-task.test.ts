@@ -1,4 +1,6 @@
-import { Task, TaskManager } from '../src';
+import { Task } from '@/src/task';
+import { TaskManager } from '@/src/task-manager';
+
 import { spyLogger, TestGroupTask, TestTask } from './utils';
 
 // Setup

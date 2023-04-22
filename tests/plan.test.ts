@@ -1,4 +1,6 @@
-import { ParallelGroup, plan } from '../src';
+import { ParallelGroup } from '@/src/parallel-group';
+import { plan } from '@/src/plan';
+
 import { spyLogger, TestTask } from './utils';
 
 // Setup

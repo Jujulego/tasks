@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import wt from 'node:worker_threads';
 
-import { WorkerPool } from '../../src';
+import { WorkerPool } from '@/src/workers/worker-pool';
 import { WorkerPoolTest, WorkerTaskTest } from './utils';
 
 // Setup

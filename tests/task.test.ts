@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 
-import { TaskCompletedEvent, TaskStatusEvent } from '../src';
+import { TaskCompletedEvent, TaskStatusEvent } from '@/src/task';
+
 import { spyLogger, TestTask } from './utils';
 
 // Setup

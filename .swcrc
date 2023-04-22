@@ -1,12 +1,17 @@
 {
-  "module": {
-    "type": "es6"
-  },
   "jsc": {
+    "target": "es2022",
     "parser": {
       "syntax": "typescript"
     },
-    "target": "es2022"
+    "baseUrl": "./",
+    "paths": {
+     "@/src": ["./src"],
+     "@/src/*": ["./src/*"]
+    }
+  },
+  "module": {
+    "type": "es6"
   },
   "env": {
     "targets": [

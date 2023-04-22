@@ -3,7 +3,8 @@ import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import kill from 'tree-kill';
 
-import { SpawnTask, SpawnTaskStreamEvent } from '../src';
+import { SpawnTask, SpawnTaskStreamEvent } from '@/src/spawn-task';
+
 import { spyLogger } from './utils';
 
 // Mocks

@@ -1,6 +1,8 @@
 import os from 'node:os';
 
-import { Task, TaskManager } from '../src';
+import { Task } from '@/src/task';
+import { TaskManager } from '@/src/task-manager';
+
 import { spyLogger, TestTask } from './utils';
 
 // Setup

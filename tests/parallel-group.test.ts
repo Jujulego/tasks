@@ -1,4 +1,6 @@
-import { ParallelGroup, TaskManager } from '../src';
+import { ParallelGroup } from '@/src/parallel-group';
+import { TaskManager } from '@/src/task-manager';
+
 import { flushPromises, spyLogger, TestTask } from './utils';
 
 // Setup
