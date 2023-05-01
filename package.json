@@ -30,7 +30,7 @@
     "watch": "gulp watch",
     "test": "jest"
   },
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@3.5.1",
   "dependencies": {
     "@jujulego/event-tree": "^2.5.1",
     "@jujulego/utils": "^1.2.0",
