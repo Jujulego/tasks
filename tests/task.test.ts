@@ -145,11 +145,11 @@ describe('Task.stop', () => {
 
 describe('Task.id', () => {
   it('should be a random uuid', () => {
-    jest.spyOn(crypto, 'randomUUID').mockReturnValue('uuid');
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue('000000000000-0000-0000-0000-00000000');
 
     const task = new TestTask('test');
 
-    expect(task.id).toBe('uuid');
+    expect(task.id).toBe('000000000000-0000-0000-0000-00000000');
     expect(crypto.randomUUID).toHaveBeenCalled();
   });
 
