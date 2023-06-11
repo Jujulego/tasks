@@ -13,6 +13,6 @@
     }
   ],
   "js": {
-    "labels": ["dependencies", "javascript"]
+    "addLabels": ["javascript"]
   }
 }
