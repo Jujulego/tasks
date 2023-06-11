@@ -9,10 +9,12 @@ export abstract class WorkerPool {
   private _available: wt.Worker[] = [];
   private readonly _running = new Set<wt.Worker>();
 
-  private readonly _hasFreeWorkers = new Condition(() => this._running.size < this.max);
+  private readonly _hasFreeWorkers: Condition;
 
   // Constructor
-  constructor(readonly max: number) {}
+  constructor(readonly max: number) {
+    this._hasFreeWorkers = new Condition(() => this._running.size < this.max);
+  }
 
   // Methods
   protected abstract _start(): wt.Worker;
