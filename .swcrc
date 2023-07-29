@@ -12,10 +12,5 @@
   },
   "module": {
     "type": "es6"
-  },
-  "env": {
-    "targets": [
-      "maintained node versions and not node < 16"
-    ]
   }
 }
