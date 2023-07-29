@@ -21,7 +21,8 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
   }
 
   // Methods
-  protected _handleEvent(payload: unknown): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected _handleEvent(_payload: unknown): void {
     return;
   }
 
