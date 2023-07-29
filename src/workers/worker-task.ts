@@ -21,7 +21,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
   }
 
   // Methods
-  protected _handleEvent(payload: unknown): void {
+  protected _handleEvent(): void {
     return;
   }
 
