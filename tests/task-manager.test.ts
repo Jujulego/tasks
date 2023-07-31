@@ -80,7 +80,7 @@ describe('TaskManager.add', () => {
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
-    tasks[0].status = 'done';
+    tasks[0].setStatus('done');
 
     expect(tasks[0].status).toBe('done');
     expect(tasks[1].status).toBe('running');
@@ -94,7 +94,7 @@ describe('TaskManager.add', () => {
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
-    tasks[0].status = 'failed';
+    tasks[0].setStatus('failed');
 
     expect(tasks[0].status).toBe('failed');
     expect(tasks[1].status).toBe('running');

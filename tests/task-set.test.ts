@@ -56,7 +56,7 @@ describe('TaskSet.add', () => {
   it('should emit a started event when a task starts', () => {
     set.add(tasks[0]);
     set.add(tasks[1]);
-    tasks[0].status = 'running';
+    tasks[0].setStatus('running');
 
     expect(startedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
@@ -64,7 +64,7 @@ describe('TaskSet.add', () => {
   it('should emit a completed event when a task is done', () => {
     set.add(tasks[0]);
     set.add(tasks[1]);
-    tasks[0].status = 'done';
+    tasks[0].setStatus('done');
 
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
@@ -72,7 +72,7 @@ describe('TaskSet.add', () => {
   it('should emit a completed event when a task is failed', () => {
     set.add(tasks[0]);
     set.add(tasks[1]);
-    tasks[0].status = 'failed';
+    tasks[0].setStatus('failed');
 
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
@@ -80,8 +80,8 @@ describe('TaskSet.add', () => {
   it('should emit a finished event when all tasks are completed', () => {
     set.add(tasks[0]);
     set.add(tasks[1]);
-    tasks[0].status = 'done';
-    tasks[1].status = 'failed';
+    tasks[0].setStatus('done');
+    tasks[1].setStatus('failed');
 
     expect(set.status).toBe('finished');
     expect(finishedEventSpy).toHaveBeenCalledWith({ success: 1, failed: 1 });
@@ -138,17 +138,17 @@ describe('TaskSet.results', () => {
     expect(set.results).toEqual({ success: 0, failed: 0 });
 
     // one task succeed
-    tasks[0].status = 'done';
+    tasks[0].setStatus('done');
 
     expect(set.results).toEqual({ success: 1, failed: 0 });
 
     // another task fails
-    tasks[1].status = 'failed';
+    tasks[1].setStatus('failed');
 
     expect(set.results).toEqual({ success: 1, failed: 1 });
 
     // a last one task succeed
-    tasks[2].status = 'done';
+    tasks[2].setStatus('done');
 
     expect(set.results).toEqual({ success: 2, failed: 1 });
   });

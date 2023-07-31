@@ -35,7 +35,7 @@ describe('SequenceGroup.start', () => {
     expect(manager.add).toHaveBeenCalledWith(tasks[0]);
 
     // complete first
-    tasks[0].status = 'done';
+    tasks[0].setStatus('done');
     await flushPromises();
 
     // should have added second
@@ -51,13 +51,13 @@ describe('SequenceGroup.start', () => {
     manager.add(group);
     await flushPromises();
 
-    tasks[0].status = 'done';
+    tasks[0].setStatus('done');
     await flushPromises();
 
-    tasks[1].status = 'done';
+    tasks[1].setStatus('done');
     await flushPromises();
 
-    tasks[2].status = 'done';
+    tasks[2].setStatus('done');
     await flushPromises();
 
     expect(group.status).toBe('done');
@@ -73,7 +73,7 @@ describe('SequenceGroup.start', () => {
     jest.spyOn(manager, 'add');
     await flushPromises();
 
-    tasks[0].status = 'failed';
+    tasks[0].setStatus('failed');
     await flushPromises();
 
     expect(group.status).toBe('failed');
@@ -95,7 +95,7 @@ describe('SequenceGroup.stop', () => {
     await flushPromises();
 
     expect(tasks[0]._stop).toHaveBeenCalled();
-    tasks[0].status = 'done';
+    tasks[0].setStatus('done');
     await flushPromises();
 
     expect(group.status).toBe('failed');
@@ -113,7 +113,7 @@ describe('SequenceGroup.stop', () => {
     await flushPromises();
 
     expect(tasks[0]._stop).toHaveBeenCalled();
-    tasks[0].status = 'failed';
+    tasks[0].setStatus('failed');
     await flushPromises();
 
     expect(group.status).toBe('failed');

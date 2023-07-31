@@ -34,13 +34,13 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
       switch (message.type) {
         case 'success':
           this.pool.freeWorker(worker);
-          this.status = 'done';
+          this.setStatus('done');
           break;
 
         case 'failure':
           this.pool.freeWorker(worker);
           this._logger.error(`Error while running ${this.name}`, message.error);
-          this.status = 'failed';
+          this.setStatus('failed');
 
           break;
 
@@ -58,7 +58,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
       this.pool.freeWorker(worker);
 
       if (this.status === 'running') {
-        this.status = code ? 'failed' : 'done';
+        this.setStatus(code ? 'failed' : 'done');
       }
     });
 
@@ -66,7 +66,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
       this._logger.error(`Error while running ${this.name}`, err);
 
       this.pool.freeWorker(worker);
-      this.status = 'failed';
+      this.setStatus('failed');
     });
 
     this._sendMessage({ type: 'run', payload: this.payload });

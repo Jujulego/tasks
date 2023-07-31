@@ -14,13 +14,13 @@ export class TestTask extends Task {
   _start = jest.fn();
   _stop = jest.fn();
 
+  setStatus(status: TaskStatus) {
+    super.setStatus(status);
+  }
+
   // Properties
   get status() {
     return super.status;
-  }
-
-  set status(status: TaskStatus) {
-    super.status = status;
   }
 }
 

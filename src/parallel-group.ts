@@ -14,7 +14,7 @@ export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTas
         const stats = this.stats;
 
         if (stats.done + stats.failed === this.tasks.length) {
-          this.status = stats.failed > 0 ? 'failed' : 'done';
+          this.setStatus(stats.failed > 0 ? 'failed' : 'done');
         }
       });
     }

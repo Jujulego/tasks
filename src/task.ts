@@ -98,13 +98,42 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
     if (['blocked', 'ready'].includes(this._status)) {
       if (this._dependencies.some(dep => dep.status === 'failed')) {
         // Check if one dependency is failed
-        this.status = 'failed';
+        this.setStatus('failed');
       } else if (this._dependencies.every(dep => dep.status === 'done')) {
         // Check if all dependencies are done
-        this.status = 'ready';
+        this.setStatus('ready');
       } else {
-        this.status = 'blocked';
+        this.setStatus('blocked');
       }
+    }
+  }
+
+  /**
+   * Changes tasks status
+   * @param status
+   * @protected
+   */
+  protected setStatus(status: TaskStatus) {
+    // Ignore no change
+    if (this._status === status) {
+      return;
+    }
+
+    // Update, log and emit
+    const previous = this._status;
+    this._status = status;
+
+    this._logger.debug(`${this.name} is ${status}`);
+    this._taskEvents.emit(`status.${status}`, { previous, status });
+
+    // Emit completed
+    if (status === 'done' || status === 'failed') {
+      this._endTime = Date.now();
+
+      this._taskEvents.emit('completed', {
+        status,
+        duration: this.duration,
+      });
     }
   }
 
@@ -173,7 +202,7 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
 
     this._logger.verbose(`Running ${this.name}`);
     this._startTime = Date.now();
-    this.status = 'running';
+    this.setStatus('running');
     this._start(manager);
   }
 
@@ -218,28 +247,9 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
     return this._status;
   }
 
+  /** @deprecated Use setStatus method instead */
   protected set status(status: TaskStatus) {
-    // Ignore no change
-    if (this._status === status) {
-      return;
-    }
-
-    // Update, log and emit
-    const previous = this._status;
-    this._status = status;
-
-    this._logger.debug(`${this.name} is ${status}`);
-    this._taskEvents.emit(`status.${status}`, { previous, status });
-
-    // Emit completed
-    if (status === 'done' || status === 'failed') {
-      this._endTime = Date.now();
-
-      this._taskEvents.emit('completed', {
-        status,
-        duration: this.duration,
-      });
-    }
+    this.setStatus(status);
   }
 
   get summary(): TaskSummary<C> {

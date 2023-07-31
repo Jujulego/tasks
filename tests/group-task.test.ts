@@ -39,7 +39,7 @@ describe('GroupTask.add', () => {
     const task = new TestTask('test-1');
     group.add(task);
 
-    task.status = 'running';
+    task.setStatus('running');
 
     expect(taskStartedEventSpy).toHaveBeenCalledWith(task);
   });
@@ -123,7 +123,7 @@ describe('GroupTask.stats', () => {
 
   for (const status of ['blocked', 'ready', 'running', 'done', 'failed'] as const) {
     it(`should return 1 for ${status} and 0 for other statuses`, () => {
-      task.status = status;
+      task.setStatus(status);
 
       expect(group.stats).toEqual({
         blocked: 0,
