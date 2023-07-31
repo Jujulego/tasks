@@ -44,9 +44,9 @@ describe('ParallelGroup.start', () => {
     manager.add(group);
     await flushPromises();
 
-    tasks[0].status = 'done';
-    tasks[1].status = 'done';
-    tasks[2].status = 'done';
+    tasks[0].setStatus('done');
+    tasks[1].setStatus('done');
+    tasks[2].setStatus('done');
 
     expect(group.status).toBe('done');
   });
@@ -59,9 +59,9 @@ describe('ParallelGroup.start', () => {
     manager.add(group);
     await flushPromises();
 
-    tasks[0].status = 'done';
-    tasks[1].status = 'done';
-    tasks[2].status = 'failed';
+    tasks[0].setStatus('done');
+    tasks[1].setStatus('done');
+    tasks[2].setStatus('failed');
 
     expect(group.status).toBe('failed');
   });

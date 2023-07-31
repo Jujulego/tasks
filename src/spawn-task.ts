@@ -101,9 +101,9 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
       this._exitCode = code;
 
       if (code) {
-        this.status = 'failed';
+        this.setStatus('failed');
       } else {
-        this.status = 'done';
+        this.setStatus('done');
       }
 
       if (signal) {
@@ -113,7 +113,7 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
 
     this._process.on('error', (err) => {
       this._logger.warn(`Error while spawning ${this.name}: ${err}`);
-      this.status = 'failed';
+      this.setStatus('failed');
     });
   }
 

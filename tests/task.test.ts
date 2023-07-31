@@ -39,21 +39,21 @@ describe('Task.dependsOn', () => {
 
   it('should push task to ready status when dep is done', () => {
     task.dependsOn(dep);
-    dep.status = 'done';
+    dep.setStatus('done');
 
     expect(task.status).toBe('ready');
   });
 
   it('should push task to failed status when dep is failed', () => {
     task.dependsOn(dep);
-    dep.status = 'failed';
+    dep.setStatus('failed');
 
     expect(task.status).toBe('failed');
   });
 
   for (const status of ['running', 'done', 'failed'] as const) {
     it(`should throw if task is ${status}`, () => {
-      task.status = status;
+      task.setStatus(status);
 
       expect(() => task.dependsOn(dep))
         .toThrow(`Cannot add a dependency to a ${status} task`);
@@ -115,7 +115,7 @@ describe('Task.start', () => {
 
   for (const status of ['blocked', 'running', 'done', 'failed'] as const) {
     it(`should throw if task is ${status}`, () => {
-      task.status = status;
+      task.setStatus(status);
 
       expect(() => task.start())
         .toThrow(`Cannot start a ${status} task`);
@@ -125,7 +125,7 @@ describe('Task.start', () => {
 
 describe('Task.stop', () => {
   it('should call inner _stop method', () => {
-    task.status = 'running';
+    task.setStatus('running');
     task.stop();
 
     expect(task._stop).toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe('Task.stop', () => {
 
   for (const status of ['blocked', 'ready', 'done', 'failed'] as const) {
     it(`should do nothing if task is ${status}`, () => {
-      task.status = status;
+      task.setStatus(status);
       task.stop();
 
       expect(task._stop).not.toHaveBeenCalled();
@@ -166,7 +166,7 @@ describe('Task.id', () => {
 describe('Task.completed', () => {
   for (const status of ['blocked', 'ready', 'running'] as const) {
     it(`should be false for ${status}`, () => {
-      task.status = status;
+      task.setStatus(status);
 
       expect(task.completed).toBe(false);
     });
@@ -174,7 +174,7 @@ describe('Task.completed', () => {
 
   for (const status of ['done', 'failed'] as const) {
     it(`should be true for ${status}`, () => {
-      task.status = status;
+      task.setStatus(status);
 
       expect(task.completed).toBe(true);
     });
@@ -205,7 +205,7 @@ describe('Task.duration', () => {
 
     // "wait" and complete
     jest.advanceTimersByTime(500);
-    task.status = 'done';
+    task.setStatus('done');
 
     expect(task.duration).toBe(500);
 
@@ -219,7 +219,7 @@ describe('Task.duration', () => {
 
     // "wait" and complete
     jest.advanceTimersByTime(500);
-    task.status = 'failed';
+    task.setStatus('failed');
 
     expect(task.duration).toBe(500);
 
@@ -236,7 +236,7 @@ describe('Task.status', () => {
 
   for (const status of ['blocked', 'running'] as const) {
     it(`should emit and log status change (ready => ${status})`, () => {
-      task.status = status;
+      task.setStatus(status);
 
       expect(task.status).toBe(status);
       expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
@@ -255,7 +255,7 @@ describe('Task.status', () => {
       jest.advanceTimersByTime(1000);
 
       // Set completed status
-      task.status = status;
+      task.setStatus(status);
 
       expect(task.status).toBe(status);
       expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
@@ -269,14 +269,14 @@ describe('Task.status', () => {
       jest.useFakeTimers();
 
       jest.advanceTimersByTime(1000);
-      task.status = status;
+      task.setStatus(status);
 
       expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 0 });
     });
   }
 
   it('should not emit no effective change', () => {
-    task.status = 'ready';
+    task.setStatus('ready');
 
     expect(task.status).toBe('ready');
     expect(spyLogger.debug).not.toHaveBeenCalled();
