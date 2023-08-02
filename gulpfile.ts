@@ -2,6 +2,8 @@ import { flow, steps } from '@jujulego/flow';
 
 import del from 'del';
 import gulp from 'gulp';
+import rename from 'gulp-rename';
+import replace from 'gulp-replace';
 import sourcemaps from 'gulp-sourcemaps';
 import typescript from 'gulp-typescript';
 import path from 'path';
@@ -49,6 +51,8 @@ gulp.task('clean', () => del(options.output));
 gulp.task('build:esm', () => flow(
   src(options.src, { since: gulp.lastRun('build:esm') }),
   swc({ module: { type: 'es6' } }),
+  rename({ extname: '.mjs' }),
+  replace(/(import|export) (.+ from )?"(\..+)";/g, '$1 $2"$3.mjs";'),
   dest(path.join(options.output, 'esm'))
 ));
 
