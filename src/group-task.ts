@@ -31,7 +31,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     context: C,
     opts?: TaskOptions
   ) {
-    super(context, { weight: 0, ...opts });
+    super(context, { weight: 0, startStatus: 'ready', ...opts });
   }
 
   // Methods
@@ -77,6 +77,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
 
     // Listen to task events
     task.on('status.running', () => {
+      this.setStatus('running');
       this._groupEvents.emit('task.started', task);
     });
 

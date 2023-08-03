@@ -12,6 +12,11 @@ export interface TaskOptions {
   id?: string;
   logger?: ILogger;
   weight?: number;
+
+  /**
+   * Status set when task is started
+   */
+  startStatus?: TaskStatus;
 }
 
 export interface TaskSummary<C extends TaskContext = TaskContext> {
@@ -55,6 +60,7 @@ export type TaskEventMap = {
 // Class
 export abstract class Task<C extends TaskContext = TaskContext> implements IListenable<TaskEventMap> {
   // Attributes
+  private readonly _startStatus: TaskStatus;
   private _status: TaskStatus = 'ready';
   private _dependencies: Task[] = [];
   private _group?: GroupTask;
@@ -84,6 +90,7 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
     this.id = opts.id ?? crypto.randomUUID();
     this.weight = opts.weight ?? 1;
     this._logger = opts.logger ?? logger;
+    this._startStatus = opts.startStatus ?? 'running';
   }
 
   // Methods
@@ -202,7 +209,7 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
 
     this._logger.verbose(`Running ${this.name}`);
     this._startTime = Date.now();
-    this.setStatus('running');
+    this.setStatus(this._startStatus);
     this._start(manager);
   }
 
