@@ -917,7 +917,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^3.0.0":
+"@jujulego/event-tree@npm:^3.0.0, @jujulego/event-tree@npm:^3.1.2":
   version: 3.1.2
   resolution: "@jujulego/event-tree@npm:3.1.2"
   checksum: 9a7ca8a23c2bd9a463a7223088269e04bdb752c73eed4825f8176bcfe6ccac0cf927fc4a5eae42bf5a59a5e8610b382ce13f491d6c9b9742e87454870b3b677c
@@ -937,7 +937,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
-    "@jujulego/event-tree": ^3.0.0
+    "@jujulego/event-tree": ^3.1.2
     "@jujulego/flow": 1.1.0
     "@jujulego/utils": ^1.4.5
     "@microsoft/eslint-formatter-sarif": 3.0.0
