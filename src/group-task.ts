@@ -31,7 +31,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     context: C,
     opts?: TaskOptions
   ) {
-    super(context, { weight: 0, startStatus: 'ready', ...opts });
+    super(context, { weight: 0, ...opts });
   }
 
   // Methods
@@ -97,6 +97,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     const stats: GroupTaskStats = {
       blocked: 0,
       ready: 0,
+      starting: 0,
       running: 0,
       done: 0,
       failed: 0,

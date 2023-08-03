@@ -27,6 +27,10 @@ describe('WorkerHandler', () => {
 
     expect(handler._run).toHaveBeenCalledWith({ test: true });
 
+    expect(port.postMessage).toHaveBeenCalledWith({
+      type: 'started',
+    });
+
     // Should have posted success
     await new Promise((resolve) => setTimeout(resolve, 0));
 

@@ -12,11 +12,6 @@ export interface TaskOptions {
   id?: string;
   logger?: ILogger;
   weight?: number;
-
-  /**
-   * Status set when task is started
-   */
-  startStatus?: TaskStatus;
 }
 
 export interface TaskSummary<C extends TaskContext = TaskContext> {
@@ -36,7 +31,7 @@ export interface TaskSummary<C extends TaskContext = TaskContext> {
   readonly dependenciesIds: string[];
 }
 
-export type TaskStatus = 'blocked' | 'ready' | 'running' | 'done' | 'failed';
+export type TaskStatus = 'blocked' | 'ready' | 'starting' | 'running' | 'done' | 'failed';
 export interface TaskStatusEvent<S extends TaskStatus = TaskStatus> {
   previous: TaskStatus;
   status: S;
@@ -52,6 +47,7 @@ export type TaskEventMap = {
   status: TaskStatusEvent;
   'status.blocked': TaskStatusEvent<'blocked'>;
   'status.ready': TaskStatusEvent<'ready'>;
+  'status.starting': TaskStatusEvent<'starting'>;
   'status.running': TaskStatusEvent<'running'>;
   'status.done': TaskStatusEvent<'done'>;
   'status.failed': TaskStatusEvent<'failed'>;
@@ -60,7 +56,6 @@ export type TaskEventMap = {
 // Class
 export abstract class Task<C extends TaskContext = TaskContext> implements IListenable<TaskEventMap> {
   // Attributes
-  private readonly _startStatus: TaskStatus;
   private _status: TaskStatus = 'ready';
   private _dependencies: Task[] = [];
   private _group?: GroupTask;
@@ -77,6 +72,7 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
     status: group({
       'blocked': source<TaskStatusEvent<'blocked'>>(),
       'ready': source<TaskStatusEvent<'ready'>>(),
+      'starting': source<TaskStatusEvent<'starting'>>(),
       'running': source<TaskStatusEvent<'running'>>(),
       'done': source<TaskStatusEvent<'done'>>(),
       'failed': source<TaskStatusEvent<'failed'>>(),
@@ -90,7 +86,6 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
     this.id = opts.id ?? crypto.randomUUID();
     this.weight = opts.weight ?? 1;
     this._logger = opts.logger ?? logger;
-    this._startStatus = opts.startStatus ?? 'running';
   }
 
   // Methods
@@ -207,24 +202,23 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
       throw Error(`Cannot start a ${this._status} task`);
     }
 
-    this._logger.verbose(`Running ${this.name}`);
+    this._logger.verbose(`Starting ${this.name}`);
+    this.setStatus('starting');
     this._startTime = Date.now();
-    this.setStatus(this._startStatus);
+
     this._start(manager);
   }
 
   /**
    * Stop the task.
-   * The task will be stopped only if it's status is "running".
+   * The task will be stopped only if it's status is "starting" or "running".
    * In other cases, it won't do anything.
    */
   stop(): void {
-    if (this._status !== 'running') {
-      return;
+    if (['starting', 'running'].includes(this._status)) {
+      this._logger.verbose(`Stopping ${this.name}`);
+      this._stop();
     }
-
-    this._logger.verbose(`Stopping ${this.name}`);
-    this._stop();
   }
 
   // Properties

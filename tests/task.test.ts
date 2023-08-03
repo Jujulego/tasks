@@ -109,11 +109,11 @@ describe('Task.start', () => {
     task.start();
 
     expect(task._start).toHaveBeenCalled();
-    expect(task.status).toBe('running');
-    expect(spyLogger.verbose).toHaveBeenCalledWith('Running test');
+    expect(task.status).toBe('starting');
+    expect(spyLogger.verbose).toHaveBeenCalledWith('Starting test');
   });
 
-  for (const status of ['blocked', 'running', 'done', 'failed'] as const) {
+  for (const status of ['blocked', 'starting', 'running', 'done', 'failed'] as const) {
     it(`should throw if task is ${status}`, () => {
       task.setStatus(status);
 
@@ -247,7 +247,7 @@ describe('Task.status', () => {
   }
 
   for (const status of ['done', 'failed'] as const) {
-    it(`should emit and log status change (running => ${status})`, () => {
+    it(`should emit and log status change (starting => ${status})`, () => {
       // Start task to store current date then "wait" for 1s
       jest.useFakeTimers();
 
@@ -259,7 +259,7 @@ describe('Task.status', () => {
 
       expect(task.status).toBe(status);
       expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
-      expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'running', status });
+      expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'starting', status });
 
       expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 1000 });
     });

@@ -21,8 +21,8 @@ export abstract class WorkerHandler {
     this._port.on('message', async (msg: TaskMessage) => {
       if (msg.type === 'run') {
         try {
+          this._sendMessage({ type: 'started' });
           await this._run(msg.payload);
-
           this._sendMessage({ type: 'success' });
         } catch (error) {
           this._sendMessage({ type: 'failure', error });

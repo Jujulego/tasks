@@ -4,9 +4,10 @@ export interface Message<T extends string> {
 }
 
 export type TaskMessage = RunMessage;
-export type HandlerMessage = ReadyMessage | EventMessage | SuccessMessage | FailureMessage;
+export type HandlerMessage = ReadyMessage | StartedMessage | EventMessage | SuccessMessage | FailureMessage;
 
 export type ReadyMessage = Message<'ready'>;
+export type StartedMessage = Message<'started'>;
 export type SuccessMessage = Message<'success'>;
 
 export interface RunMessage extends Message<'run'> {

@@ -36,7 +36,7 @@ describe('TaskManager.add', () => {
     manager.add(tasks[0]);
 
     expect(manager.tasks).toContain(tasks[0]);
-    expect(tasks[0].status).toBe('running');
+    expect(tasks[0].status).toBe('starting');
 
     expect(startedEventSpy).toHaveBeenCalledWith(tasks[0]);
     expect(addedEventSpy).toHaveBeenCalledWith(tasks[0]);
@@ -47,7 +47,7 @@ describe('TaskManager.add', () => {
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
-    expect(tasks[0].status).toBe('running');
+    expect(tasks[0].status).toBe('starting');
     expect(tasks[1].status).toBe('ready');
     expect(tasks[2].status).toBe('ready');
   });
@@ -59,8 +59,8 @@ describe('TaskManager.add', () => {
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
-    expect(lightWeight.status).toBe('running');
-    expect(tasks[1].status).toBe('running');
+    expect(lightWeight.status).toBe('starting');
+    expect(tasks[1].status).toBe('starting');
     expect(tasks[2].status).toBe('ready');
   });
 
@@ -72,7 +72,7 @@ describe('TaskManager.add', () => {
     expect(manager.tasks).toContain(tasks[2]);
 
     expect(tasks[1].status).toBe('blocked');
-    expect(tasks[2].status).toBe('running');
+    expect(tasks[2].status).toBe('starting');
   });
 
   it('should start next task when current is done', () => {
@@ -83,7 +83,7 @@ describe('TaskManager.add', () => {
     tasks[0].setStatus('done');
 
     expect(tasks[0].status).toBe('done');
-    expect(tasks[1].status).toBe('running');
+    expect(tasks[1].status).toBe('starting');
     expect(tasks[2].status).toBe('ready');
 
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
@@ -97,7 +97,7 @@ describe('TaskManager.add', () => {
     tasks[0].setStatus('failed');
 
     expect(tasks[0].status).toBe('failed');
-    expect(tasks[1].status).toBe('running');
+    expect(tasks[1].status).toBe('starting');
     expect(tasks[2].status).toBe('ready');
 
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
@@ -124,8 +124,8 @@ describe('TaskManager.jobs', () => {
 
     manager.jobs = 2;
 
-    expect(tasks[0].status).toBe('running');
-    expect(tasks[1].status).toBe('running');
+    expect(tasks[0].status).toBe('starting');
+    expect(tasks[1].status).toBe('starting');
     expect(tasks[2].status).toBe('ready');
   });
 });
