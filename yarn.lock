@@ -969,11 +969,11 @@ __metadata:
   linkType: soft
 
 "@jujulego/utils@npm:^1.4.3":
-  version: 1.4.4
-  resolution: "@jujulego/utils@npm:1.4.4"
+  version: 1.4.5
+  resolution: "@jujulego/utils@npm:1.4.5"
   dependencies:
     "@jujulego/event-tree": ^3.0.0
-  checksum: 703aad0bd16a9f4e95fd061c682870df12dcd84ad4af5961535c38ad2e34dfe83f668b52e57f0499c5a8e4c09eebfe6c72945ffdd6ebaa2833df5a712a0a48aa
+  checksum: 9fd68326bb32a78a360c557b00a71816274ab77a9abd555ee6a88b4f55de0f88a6a99c39402f6f197aae4420824115822d1b45f5d2cd2144d97d462e145dd6a0
   languageName: node
   linkType: hard
 
