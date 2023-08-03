@@ -48,6 +48,13 @@ describe('SpawnTask.start', () => {
     });
   });
 
+  it('should put task into running status when process is spawned', () => {
+    task.start();
+    proc.emit('spawn', undefined);
+
+    expect(task.status).toBe('running');
+  });
+
   it('should emit data from process\'s stdout', () => {
     task.start();
 
