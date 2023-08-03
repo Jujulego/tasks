@@ -17,11 +17,6 @@ export class TestTask extends Task {
   setStatus(status: TaskStatus) {
     super.setStatus(status);
   }
-
-  // Properties
-  get status() {
-    return super.status;
-  }
 }
 
 export class TestGroupTask extends GroupTask {

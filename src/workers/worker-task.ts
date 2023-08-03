@@ -32,6 +32,10 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
 
     worker.on('message', (message: HandlerMessage) => {
       switch (message.type) {
+        case 'started':
+          this.setStatus('running');
+          break;
+
         case 'success':
           this.pool.freeWorker(worker);
           this.setStatus('done');
@@ -57,7 +61,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
     worker.on('exit', (code) => {
       this.pool.freeWorker(worker);
 
-      if (this.status === 'running') {
+      if (['starting', 'running'].includes(this.status)) {
         this.setStatus(code ? 'failed' : 'done');
       }
     });

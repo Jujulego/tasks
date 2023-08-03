@@ -43,6 +43,17 @@ describe('WorkerTask.start', () => {
     });
   });
 
+  it('should be runnning when receiving started message', async () => {
+    task.start();
+
+    // wait for pool to return worker
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    worker.emit('message', { type: 'started' });
+
+    expect(task.status).toBe('running');
+  });
+
   it('should be done and free worker when receiving success message', async () => {
     task.start();
 

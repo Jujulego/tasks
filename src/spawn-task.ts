@@ -89,6 +89,10 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
       }
     });
 
+    this._process.on('spawn', () => {
+      this.setStatus('running');
+    });
+
     this._process.stdout?.on('data', (data: Buffer) => {
       this._spawnEvents.emit('stream.stdout', { stream: 'stdout', data });
     });

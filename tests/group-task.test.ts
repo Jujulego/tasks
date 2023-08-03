@@ -41,6 +41,7 @@ describe('GroupTask.add', () => {
 
     task.setStatus('running');
 
+    expect(group.status).toBe('running');
     expect(taskStartedEventSpy).toHaveBeenCalledWith(task);
   });
 
@@ -121,13 +122,14 @@ describe('GroupTask.stats', () => {
     group.add(task);
   });
 
-  for (const status of ['blocked', 'ready', 'running', 'done', 'failed'] as const) {
+  for (const status of ['blocked', 'ready', 'starting', 'running', 'done', 'failed'] as const) {
     it(`should return 1 for ${status} and 0 for other statuses`, () => {
       task.setStatus(status);
 
       expect(group.stats).toEqual({
         blocked: 0,
         ready: 0,
+        starting: 0,
         running: 0,
         done: 0,
         failed: 0,

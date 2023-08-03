@@ -77,6 +77,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
 
     // Listen to task events
     task.on('status.running', () => {
+      this.setStatus('running');
       this._groupEvents.emit('task.started', task);
     });
 
@@ -96,6 +97,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     const stats: GroupTaskStats = {
       blocked: 0,
       ready: 0,
+      starting: 0,
       running: 0,
       done: 0,
       failed: 0,
