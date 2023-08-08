@@ -40,7 +40,7 @@
     "@jujulego/flow": "1.1.0",
     "@microsoft/eslint-formatter-sarif": "3.0.0",
     "@swc/cli": "0.1.62",
-    "@swc/core": "1.3.74",
+    "@swc/core": "1.3.75",
     "@types/gulp": "4.0.13",
     "@types/gulp-rename": "2.0.2",
     "@types/gulp-sourcemaps": "0.0.36",
