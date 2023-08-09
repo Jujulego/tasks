@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { Task } from '@/src/task';
 import { TaskManager } from '@/src/task-manager';
 import { TaskSet, TaskSetResults } from '@/src/task-set';
@@ -9,9 +11,9 @@ let tasks: TestTask[];
 let manager: TaskManager;
 let set: TaskSet;
 
-const startedEventSpy = jest.fn<void, [Task]>();
-const completedEventSpy = jest.fn<void, [Task]>();
-const finishedEventSpy = jest.fn<void, [TaskSetResults]>();
+const startedEventSpy = vi.fn<[Task], void>();
+const completedEventSpy = vi.fn<[Task], void>();
+const finishedEventSpy = vi.fn<[TaskSetResults], void>();
 
 beforeEach(() => {
   tasks = [
@@ -23,8 +25,8 @@ beforeEach(() => {
   manager = new TaskManager({ logger: spyLogger });
   set = new TaskSet();
 
-  jest.resetAllMocks();
-  jest.restoreAllMocks();
+  vi.resetAllMocks();
+  vi.restoreAllMocks();
 
   set.on('started', startedEventSpy);
   set.on('completed', completedEventSpy);

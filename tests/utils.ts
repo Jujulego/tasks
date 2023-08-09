@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { GroupTask } from '@/src/group-task';
 import { ILogger } from '@/src/logger';
 import { Task, TaskOptions, TaskStatus } from '@/src/task';
@@ -11,8 +13,8 @@ export class TestTask extends Task {
 
   // Methods
   emit = this._taskEvents.emit;
-  _start = jest.fn();
-  _stop = jest.fn();
+  _start = vi.fn();
+  _stop = vi.fn();
 
   setStatus(status: TaskStatus) {
     super.setStatus(status);
@@ -26,17 +28,17 @@ export class TestGroupTask extends GroupTask {
   }
 
   // Methods
-  _orchestrate = jest.fn();
-  _stop = jest.fn();
+  _orchestrate = vi.fn();
+  _stop = vi.fn();
 }
 
 // Logger
 export const spyLogger: ILogger = {
-  debug: jest.fn(),
-  verbose: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  debug: vi.fn(),
+  verbose: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
 };
 
 // Utils

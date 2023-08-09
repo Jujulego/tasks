@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events';
 import wt from 'node:worker_threads';
+import { vi } from 'vitest';
 
 import { WorkerHandlerTest } from './utils';
 
@@ -11,7 +12,7 @@ beforeEach(() => {
   port = new EventEmitter() as wt.MessagePort;
 
   Object.assign(port, {
-    postMessage: jest.fn(),
+    postMessage: vi.fn(),
   });
 
   handler = new WorkerHandlerTest();
@@ -43,7 +44,7 @@ describe('WorkerHandler', () => {
     handler.init(port);
 
     // Emit message to initiate work
-    jest.mocked(handler._run).mockRejectedValue(new Error('failed !'));
+    vi.mocked(handler._run).mockRejectedValue(new Error('failed !'));
     port.emit('message', { type: 'run', payload: { test: true } });
 
     expect(handler._run).toHaveBeenCalledWith({ test: true });

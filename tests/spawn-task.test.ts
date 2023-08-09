@@ -2,25 +2,26 @@ import cp from 'node:child_process';
 import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import kill from 'tree-kill';
+import { vi } from 'vitest';
 
 import { SpawnTask, SpawnTaskStreamEvent } from '@/src/spawn-task';
 
 import { spyLogger } from './utils';
 
 // Mocks
-jest.mock('tree-kill');
+vi.mock('tree-kill');
 
 // Setup
 let task: SpawnTask;
 let proc: cp.ChildProcess;
 
-const streamEventSpy = jest.fn<void, [SpawnTaskStreamEvent]>();
+const streamEventSpy = vi.fn<void, [SpawnTaskStreamEvent]>();
 
 beforeEach(() => {
   task = new SpawnTask('test', ['-a', '--arg'], {}, { logger: spyLogger });
 
-  jest.resetAllMocks();
-  jest.restoreAllMocks();
+  vi.resetAllMocks();
+  vi.restoreAllMocks();
 
   task.on('stream', streamEventSpy);
 
@@ -32,7 +33,7 @@ beforeEach(() => {
     stderr: new EventEmitter(),
   });
 
-  jest.spyOn(cp, 'execFile').mockReturnValue(proc);
+  vi.spyOn(cp, 'execFile').mockReturnValue(proc);
 });
 
 // Tests
@@ -119,7 +120,7 @@ describe('SpawnTask.stop', () => {
     expect(kill).toHaveBeenCalledWith(proc.pid, 'SIGTERM', expect.any(Function));
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cb = jest.mocked(kill).mock.calls[0][2]!;
+    const cb = vi.mocked(kill).mock.calls[0][2]!;
     cb();
 
     expect(spyLogger.debug).toHaveBeenCalledWith(`Killed ${task.name}`);
@@ -129,7 +130,7 @@ describe('SpawnTask.stop', () => {
     task.stop();
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cb = jest.mocked(kill).mock.calls[0][2]!;
+    const cb = vi.mocked(kill).mock.calls[0][2]!;
     cb(new Error('Failed !'));
 
     expect(spyLogger.warn).toHaveBeenCalledWith(`Failed to kill ${task.name}: Error: Failed !`);

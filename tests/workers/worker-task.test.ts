@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events';
 import wt from 'node:worker_threads';
+import { vi } from 'vitest';
 
 import { WorkerPool } from '@/src/workers/worker-pool';
 import { WorkerPoolTest, WorkerTaskTest } from './utils';
@@ -17,12 +18,12 @@ beforeEach(() => {
   worker = new EventEmitter() as wt.Worker;
 
   Object.assign(worker, {
-    postMessage: jest.fn(),
-    terminate: jest.fn(),
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
   });
 
-  jest.spyOn(pool, 'reserveWorker').mockResolvedValue(worker);
-  jest.spyOn(pool, 'freeWorker').mockImplementation();
+  vi.spyOn(pool, 'reserveWorker').mockResolvedValue(worker);
+  vi.spyOn(pool, 'freeWorker').mockImplementation();
 });
 
 // Tests

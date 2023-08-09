@@ -1,4 +1,5 @@
 import os from 'node:os';
+import { vi } from 'vitest';
 
 import { Task } from '@/src/task';
 import { TaskManager } from '@/src/task-manager';
@@ -9,9 +10,9 @@ import { spyLogger, TestTask } from './utils';
 let tasks: TestTask[];
 let manager: TaskManager;
 
-const addedEventSpy = jest.fn<void, [Task]>();
-const startedEventSpy = jest.fn<void, [Task]>();
-const completedEventSpy = jest.fn<void, [Task]>();
+const addedEventSpy = vi.fn<[Task], void>();
+const startedEventSpy = vi.fn<[Task], void>();
+const completedEventSpy = vi.fn<[Task], void>();
 
 beforeEach(() => {
   tasks = [
@@ -22,8 +23,8 @@ beforeEach(() => {
 
   manager = new TaskManager({ jobs: 1, logger: spyLogger });
 
-  jest.resetAllMocks();
-  jest.restoreAllMocks();
+  vi.resetAllMocks();
+  vi.restoreAllMocks();
 
   manager.on('added', addedEventSpy);
   manager.on('started', startedEventSpy);
@@ -110,7 +111,7 @@ describe('TaskManager.jobs', () => {
   });
 
   it('should be the number of cpus by default', () => {
-    jest.spyOn(os, 'cpus').mockReturnValue([{}, {}, {}] as os.CpuInfo[]);
+    vi.spyOn(os, 'cpus').mockReturnValue([{}, {}, {}] as os.CpuInfo[]);
     const mng = new TaskManager({ logger: spyLogger });
 
     expect(mng.jobs).toBe(3);
