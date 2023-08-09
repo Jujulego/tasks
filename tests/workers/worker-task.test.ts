@@ -23,7 +23,7 @@ beforeEach(() => {
   });
 
   vi.spyOn(pool, 'reserveWorker').mockResolvedValue(worker);
-  vi.spyOn(pool, 'freeWorker').mockImplementation();
+  vi.spyOn(pool, 'freeWorker').mockReturnValue(undefined);
 });
 
 // Tests

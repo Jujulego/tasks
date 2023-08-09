@@ -15,7 +15,7 @@ vi.mock('tree-kill');
 let task: SpawnTask;
 let proc: cp.ChildProcess;
 
-const streamEventSpy = vi.fn<void, [SpawnTaskStreamEvent]>();
+const streamEventSpy = vi.fn<[SpawnTaskStreamEvent], void>();
 
 beforeEach(() => {
   task = new SpawnTask('test', ['-a', '--arg'], {}, { logger: spyLogger });
