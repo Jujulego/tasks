@@ -1,8 +1,8 @@
 import { multiplexer, once, source } from '@jujulego/event-tree';
 import os from 'node:os';
 
-import { ILogger, logger } from './logger';
-import { Task } from './task';
+import { ILogger, logger } from './logger.js';
+import { Task } from './task.js';
 
 // Types
 export interface TaskManagerOpts {
