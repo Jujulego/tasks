@@ -1,7 +1,7 @@
 import { waitFor } from '@jujulego/event-tree';
 
-import { GroupTask } from './group-task';
-import { Task, TaskContext } from './task';
+import { GroupTask } from './group-task.js';
+import { Task, TaskContext } from './task.js';
 
 // Class
 export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
@@ -43,7 +43,10 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
   complexity(cache: Map<string, number> = new Map()): number {
     let complexity = super.complexity(cache);
 
-    complexity += this.tasks[0].complexity(cache);
+    if (this.tasks.length > 0) {
+      complexity += this.tasks[0]!.complexity(cache);
+    }
+
     cache.set(this.id, complexity);
 
     return complexity;

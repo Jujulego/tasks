@@ -1,9 +1,9 @@
 import { vi } from 'vitest';
 
-import { SequenceGroup } from '@/src/sequence-group';
-import { TaskManager } from '@/src/task-manager';
+import { SequenceGroup } from '@/src/sequence-group.js';
+import { TaskManager } from '@/src/task-manager.js';
 
-import { flushPromises, spyLogger, TestTask } from './utils';
+import { flushPromises, spyLogger, TestTask } from './utils.js';
 
 // Setup
 let manager: TaskManager;

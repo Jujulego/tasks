@@ -1,9 +1,9 @@
 import { vi } from 'vitest';
 
-import { Task } from '@/src/task';
-import { TaskManager } from '@/src/task-manager';
+import { Task } from '@/src/task.js';
+import { TaskManager } from '@/src/task-manager.js';
 
-import { spyLogger, TestGroupTask, TestTask } from './utils';
+import { spyLogger, TestGroupTask, TestTask } from './utils.js';
 
 // Setup
 let group: TestGroupTask;

@@ -1,7 +1,7 @@
 import { IListenable, multiplexer, source } from '@jujulego/event-tree';
 
-import { Task } from './task';
-import { TaskManager } from './task-manager';
+import { Task } from './task.js';
+import { TaskManager } from './task-manager.js';
 
 // Types
 export interface TaskSetResults {

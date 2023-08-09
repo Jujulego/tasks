@@ -1,7 +1,7 @@
 import { once } from '@jujulego/event-tree';
 
-import { GroupTask } from './group-task';
-import { Task, TaskContext } from './task';
+import { GroupTask } from './group-task.js';
+import { Task, TaskContext } from './task.js';
 
 // Class
 export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {

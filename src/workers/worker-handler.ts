@@ -1,6 +1,6 @@
 import wt from 'node:worker_threads';
 
-import { TaskMessage, HandlerMessage } from './messages';
+import { TaskMessage, HandlerMessage } from './messages.js';
 
 // Class
 export abstract class WorkerHandler {

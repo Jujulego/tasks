@@ -1,9 +1,9 @@
 import { group, IListenable, multiplexer, source } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
-import { GroupTask } from './group-task';
-import { ILogger, logger } from './logger';
-import { TaskManager } from './task-manager';
+import { GroupTask } from './group-task.js';
+import { ILogger, logger } from './logger.js';
+import { TaskManager } from './task-manager.js';
 
 // Types
 export type TaskContext = Record<string, unknown>;
@@ -27,7 +27,7 @@ export interface TaskSummary<C extends TaskContext = TaskContext> {
 
   // relations
   readonly isGroup: boolean;
-  readonly groupId?: string;
+  readonly groupId?: string | undefined;
   readonly dependenciesIds: string[];
 }
 

@@ -1,8 +1,8 @@
 import wt from 'node:worker_threads';
 
-import { Task, TaskContext, TaskOptions } from '../task';
-import { HandlerMessage, TaskMessage } from './messages';
-import { WorkerPool } from './worker-pool';
+import { Task, TaskContext, TaskOptions } from '../task.js';
+import { HandlerMessage, TaskMessage } from './messages.js';
+import { WorkerPool } from './worker-pool.js';
 
 // Class
 export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Task<C> {

@@ -2,8 +2,8 @@ import { EventEmitter } from 'node:events';
 import wt from 'node:worker_threads';
 import { vi } from 'vitest';
 
-import { WorkerPool } from '@/src/workers/worker-pool';
-import { WorkerPoolTest, WorkerTaskTest } from './utils';
+import { WorkerPool } from '@/src/workers/worker-pool.js';
+import { WorkerPoolTest, WorkerTaskTest } from './utils.js';
 
 // Setup
 let pool: WorkerPool;

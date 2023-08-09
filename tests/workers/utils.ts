@@ -2,11 +2,11 @@ import wt from 'node:worker_threads';
 import { EventEmitter } from 'node:events';
 import { vi } from 'vitest';
 
-import { WorkerHandler } from '@/src/workers/worker-handler';
-import { WorkerPool } from '@/src/workers/worker-pool';
-import { WorkerTask } from '@/src/workers/worker-task';
+import { WorkerHandler } from '@/src/workers/worker-handler.js';
+import { WorkerPool } from '@/src/workers/worker-pool.js';
+import { WorkerTask } from '@/src/workers/worker-task.js';
 
-import { spyLogger } from '../utils';
+import { spyLogger } from '../utils.js';
 
 // Test pool
 export class WorkerPoolTest extends WorkerPool {
