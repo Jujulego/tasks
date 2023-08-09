@@ -1,8 +1,8 @@
 import { vi } from 'vitest';
 
-import { GroupTask } from '@/src/group-task';
-import { ILogger } from '@/src/logger';
-import { Task, TaskOptions, TaskStatus } from '@/src/task';
+import { GroupTask } from '@/src/group-task.js';
+import { ILogger } from '@/src/logger.js';
+import { Task, TaskOptions, TaskStatus } from '@/src/task.js';
 
 // Classes
 export class TestTask extends Task {

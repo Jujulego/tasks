@@ -1,7 +1,7 @@
 import util from 'util';
 import { vi } from 'vitest';
 
-import { WorkerPoolTest } from './utils';
+import { WorkerPoolTest } from './utils.js';
 
 // Setup
 let pool: WorkerPoolTest;

@@ -1,10 +1,10 @@
 import os from 'node:os';
 import { vi } from 'vitest';
 
-import { Task } from '@/src/task';
-import { TaskManager } from '@/src/task-manager';
+import { Task } from '@/src/task.js';
+import { TaskManager } from '@/src/task-manager.js';
 
-import { spyLogger, TestTask } from './utils';
+import { spyLogger, TestTask } from './utils.js';
 
 // Setup
 let tasks: TestTask[];

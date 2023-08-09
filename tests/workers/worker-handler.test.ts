@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import wt from 'node:worker_threads';
 import { vi } from 'vitest';
 
-import { WorkerHandlerTest } from './utils';
+import { WorkerHandlerTest } from './utils.js';
 
 // Setup
 let port: wt.MessagePort;

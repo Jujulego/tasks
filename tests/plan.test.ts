@@ -1,7 +1,7 @@
-import { ParallelGroup } from '@/src/parallel-group';
-import { plan } from '@/src/plan';
+import { ParallelGroup } from '@/src/parallel-group.js';
+import { plan } from '@/src/plan.js';
 
-import { spyLogger, TestTask } from './utils';
+import { spyLogger, TestTask } from './utils.js';
 
 // Setup
 let tasks: TestTask[];

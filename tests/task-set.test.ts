@@ -1,10 +1,10 @@
 import { vi } from 'vitest';
 
-import { Task } from '@/src/task';
-import { TaskManager } from '@/src/task-manager';
-import { TaskSet, TaskSetResults } from '@/src/task-set';
+import { Task } from '@/src/task.js';
+import { TaskManager } from '@/src/task-manager.js';
+import { TaskSet, TaskSetResults } from '@/src/task-set.js';
 
-import { spyLogger, TestTask } from './utils';
+import { spyLogger, TestTask } from './utils.js';
 
 // Setup
 let tasks: TestTask[];

@@ -4,9 +4,9 @@ import { EventEmitter } from 'node:events';
 import kill from 'tree-kill';
 import { vi } from 'vitest';
 
-import { SpawnTask, SpawnTaskStreamEvent } from '@/src/spawn-task';
+import { SpawnTask, SpawnTaskStreamEvent } from '@/src/spawn-task.js';
 
-import { spyLogger } from './utils';
+import { spyLogger } from './utils.js';
 
 // Mocks
 vi.mock('tree-kill');
