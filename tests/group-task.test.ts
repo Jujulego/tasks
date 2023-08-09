@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { Task } from '@/src/task';
 import { TaskManager } from '@/src/task-manager';
 
@@ -7,16 +9,16 @@ import { spyLogger, TestGroupTask, TestTask } from './utils';
 let group: TestGroupTask;
 let manager: TaskManager;
 
-const taskAddedEventSpy = jest.fn<void, [Task]>();
-const taskStartedEventSpy = jest.fn<void, [Task]>();
-const taskCompletedEventSpy = jest.fn<void, [Task]>();
+const taskAddedEventSpy = vi.fn<[Task], void>();
+const taskStartedEventSpy = vi.fn<[Task], void>();
+const taskCompletedEventSpy = vi.fn<[Task], void>();
 
 beforeEach(() => {
   group = new TestGroupTask('test');
   manager = new TaskManager({ jobs: 1, logger: spyLogger });
 
-  jest.resetAllMocks();
-  jest.restoreAllMocks();
+  vi.resetAllMocks();
+  vi.restoreAllMocks();
 
   group.on('task.added', taskAddedEventSpy);
   group.on('task.started', taskStartedEventSpy);
@@ -77,8 +79,8 @@ describe('GroupTask.start', () => {
     // Start group
     manager.add(group);
 
-    jest.spyOn(manager, 'add');
-    jest.spyOn(group, 'add');
+    vi.spyOn(manager, 'add');
+    vi.spyOn(group, 'add');
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(group._orchestrate).toHaveBeenCalled();

@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { vi } from 'vitest';
 
 import { TaskCompletedEvent, TaskStatusEvent } from '@/src/task';
 
@@ -7,15 +8,15 @@ import { spyLogger, TestTask } from './utils';
 // Setup
 let task: TestTask;
 
-const completedEventSpy = jest.fn<void, [TaskCompletedEvent]>();
-const statusEventSpy = jest.fn<void, [TaskStatusEvent]>();
+const completedEventSpy = vi.fn<[TaskCompletedEvent], void>();
+const statusEventSpy = vi.fn<[TaskStatusEvent], void>();
 
 beforeEach(() => {
   task = new TestTask('test');
 
-  jest.resetAllMocks();
-  jest.restoreAllMocks();
-  jest.useRealTimers();
+  vi.resetAllMocks();
+  vi.restoreAllMocks();
+  vi.useRealTimers();
 
   task.on('completed', completedEventSpy);
   task.on('status', statusEventSpy);
@@ -145,7 +146,7 @@ describe('Task.stop', () => {
 
 describe('Task.id', () => {
   it('should be a random uuid', () => {
-    jest.spyOn(crypto, 'randomUUID').mockReturnValue('000000000000-0000-0000-0000-00000000');
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue('000000000000-0000-0000-0000-00000000');
 
     const task = new TestTask('test');
 
@@ -154,7 +155,7 @@ describe('Task.id', () => {
   });
 
   it('should be given id', () => {
-    jest.spyOn(crypto, 'randomUUID');
+    vi.spyOn(crypto, 'randomUUID');
 
     const task = new TestTask('test', { id: 'test' });
 
@@ -183,7 +184,7 @@ describe('Task.completed', () => {
 
 describe('Task.duration', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   it('should be at 0 if not started', () => {
@@ -193,10 +194,10 @@ describe('Task.duration', () => {
   it('should be at spent time since start', () => {
     task.start();
 
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(task.duration).toBe(500);
 
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(task.duration).toBe(1000);
   });
 
@@ -204,13 +205,13 @@ describe('Task.duration', () => {
     task.start();
 
     // "wait" and complete
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     task.setStatus('done');
 
     expect(task.duration).toBe(500);
 
     // "wait" again
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(task.duration).toBe(500);
   });
 
@@ -218,13 +219,13 @@ describe('Task.duration', () => {
     task.start();
 
     // "wait" and complete
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     task.setStatus('failed');
 
     expect(task.duration).toBe(500);
 
     // "wait" again
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(task.duration).toBe(500);
   });
 });
@@ -249,10 +250,10 @@ describe('Task.status', () => {
   for (const status of ['done', 'failed'] as const) {
     it(`should emit and log status change (starting => ${status})`, () => {
       // Start task to store current date then "wait" for 1s
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       task.start();
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       // Set completed status
       task.setStatus(status);
@@ -266,9 +267,9 @@ describe('Task.status', () => {
 
     it(`should emit completed with 0 duration (ready => ${status})`, () => {
       // Start task to store current date then "wait" for 1s
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       task.setStatus(status);
 
       expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 0 });

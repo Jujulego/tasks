@@ -1,5 +1,6 @@
 import wt from 'node:worker_threads';
 import { EventEmitter } from 'node:events';
+import { vi } from 'vitest';
 
 import { WorkerHandler } from '@/src/workers/worker-handler';
 import { WorkerPool } from '@/src/workers/worker-pool';
@@ -14,12 +15,12 @@ export class WorkerPoolTest extends WorkerPool {
     const worker = new EventEmitter();
 
     Object.assign(worker, {
-      ref: jest.fn(),
-      unref: jest.fn(),
+      ref: vi.fn(),
+      unref: vi.fn(),
     });
 
-    jest.spyOn(worker, 'on');
-    jest.spyOn(worker, 'removeAllListeners');
+    vi.spyOn(worker, 'on');
+    vi.spyOn(worker, 'removeAllListeners');
 
     setTimeout(() => worker.emit('message', { type: 'ready' }), 0);
 
@@ -35,11 +36,11 @@ export class WorkerTaskTest extends WorkerTask {
   }
 
   // Methods
-  _handleEvent = jest.fn();
+  _handleEvent = vi.fn();
 }
 
 // Test handler
 export class WorkerHandlerTest extends WorkerHandler {
   // Methods
-  _run = jest.fn();
+  _run = vi.fn();
 }

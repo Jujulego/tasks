@@ -1,4 +1,5 @@
 import util from 'util';
+import { vi } from 'vitest';
 
 import { WorkerPoolTest } from './utils';
 
@@ -8,7 +9,7 @@ let pool: WorkerPoolTest;
 beforeEach(() => {
   pool = new WorkerPoolTest(1);
 
-  jest.spyOn(pool, '_start');
+  vi.spyOn(pool, '_start');
 });
 
 // Tests

@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { ParallelGroup } from '@/src/parallel-group';
 import { TaskManager } from '@/src/task-manager';
 
@@ -27,7 +29,7 @@ describe('ParallelGroup.start', () => {
 
     manager.add(group);
 
-    jest.spyOn(manager, 'add');
+    vi.spyOn(manager, 'add');
     await flushPromises();
 
     expect(manager.add).toHaveBeenCalledTimes(3);
@@ -90,9 +92,9 @@ describe('ParallelGroup.complexity', () => {
     group.add(tasks[1]);
     group.add(tasks[2]);
 
-    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
-    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
-    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+    vi.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    vi.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    vi.spyOn(tasks[2], 'complexity').mockReturnValue(7);
 
     expect(group.complexity()).toBe(7);
   });
@@ -103,9 +105,9 @@ describe('ParallelGroup.complexity', () => {
     group.dependsOn(tasks[1]);
     group.dependsOn(tasks[2]);
 
-    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
-    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
-    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+    vi.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    vi.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    vi.spyOn(tasks[2], 'complexity').mockReturnValue(7);
 
     expect(group.complexity()).toBe(15);
   });

@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { SequenceGroup } from '@/src/sequence-group';
 import { TaskManager } from '@/src/task-manager';
 
@@ -27,7 +29,7 @@ describe('SequenceGroup.start', () => {
 
     manager.add(group);
 
-    jest.spyOn(manager, 'add');
+    vi.spyOn(manager, 'add');
     await flushPromises();
 
     // should have added first
@@ -70,7 +72,7 @@ describe('SequenceGroup.start', () => {
 
     manager.add(group);
 
-    jest.spyOn(manager, 'add');
+    vi.spyOn(manager, 'add');
     await flushPromises();
 
     tasks[0].setStatus('failed');
@@ -126,9 +128,9 @@ describe('SequenceGroup.complexity', () => {
     group.add(tasks[1]);
     group.add(tasks[2]);
 
-    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
-    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
-    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+    vi.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    vi.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    vi.spyOn(tasks[2], 'complexity').mockReturnValue(7);
 
     expect(group.complexity()).toBe(5);
   });
@@ -139,9 +141,9 @@ describe('SequenceGroup.complexity', () => {
     group.dependsOn(tasks[1]);
     group.dependsOn(tasks[2]);
 
-    jest.spyOn(tasks[0], 'complexity').mockReturnValue(5);
-    jest.spyOn(tasks[1], 'complexity').mockReturnValue(3);
-    jest.spyOn(tasks[2], 'complexity').mockReturnValue(7);
+    vi.spyOn(tasks[0], 'complexity').mockReturnValue(5);
+    vi.spyOn(tasks[1], 'complexity').mockReturnValue(3);
+    vi.spyOn(tasks[2], 'complexity').mockReturnValue(7);
 
     expect(group.complexity()).toBe(15);
   });
