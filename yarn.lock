@@ -427,13 +427,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^3.0.0, @jujulego/event-tree@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "@jujulego/event-tree@npm:3.1.2"
-  checksum: 9a7ca8a23c2bd9a463a7223088269e04bdb752c73eed4825f8176bcfe6ccac0cf927fc4a5eae42bf5a59a5e8610b382ce13f491d6c9b9742e87454870b3b677c
-  languageName: node
-  linkType: hard
-
 "@jujulego/event-tree@npm:^4.0.1":
   version: 4.0.1
   resolution: "@jujulego/event-tree@npm:4.0.1"
@@ -444,13 +437,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/jill@npm:2.3.0":
-  version: 2.3.0
-  resolution: "@jujulego/jill@npm:2.3.0"
+"@jujulego/jill@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@jujulego/jill@npm:2.3.1"
   dependencies:
-    "@jujulego/event-tree": ^3.1.2
-    "@jujulego/tasks": ^1.7.0
-    "@jujulego/utils": ^1.4.5
+    "@jujulego/event-tree": ^4.0.1
+    "@jujulego/tasks": ^2.0.0
+    "@jujulego/utils": ^2.0.0
     ajv: ^8.12.0
     chalk: ^5.3.0
     cosmiconfig: ^8.2.0
@@ -472,18 +465,18 @@ __metadata:
     yargs: ^17.7.2
   bin:
     jill: ./bin/jill.mjs
-  checksum: fed7c2b7da6839439f3de1fa261c5d9d5ffa5fc53de3042d55b3a9136d4435eaac592f09589bd20f72e64ff269b2fa4b2c3be5160f201d1e2bb33a0073a2e14c
+  checksum: dd678b3dfecd4bf9b1486a65b0cd5683eec7109ac50bd4abb36dae7b15bbd74aa0aa37a53edf5c5038b5809010377fa923e12931ffb6abdc068afdfc043a7fd6
   languageName: node
   linkType: hard
 
-"@jujulego/tasks@npm:^1.7.0":
-  version: 1.7.0
-  resolution: "@jujulego/tasks@npm:1.7.0"
+"@jujulego/tasks@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@jujulego/tasks@npm:2.0.0"
   dependencies:
-    "@jujulego/event-tree": ^3.1.2
-    "@jujulego/utils": ^1.4.5
+    "@jujulego/event-tree": ^4.0.1
+    "@jujulego/utils": ^2.0.0
     tree-kill: ^1.2.2
-  checksum: cdd8e9ec5dd40d8b9d3fefed11c27a22fa9297c1f9e577ca1278905cb8d946a6c4e9cca2d42ba98833cb9a137b434d6cd5d3c9b2197154e2f4469b7c1c8ce7be
+  checksum: 89115bc86eb32bd61a887d33b4ba1116fa4d2b4197b69e07517dead3644044b5d5dc93cea553a5cca15c37162b40f6145809ec10c76618741dd6aa98bc6b8233
   languageName: node
   linkType: hard
 
@@ -492,7 +485,7 @@ __metadata:
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
     "@jujulego/event-tree": ^4.0.1
-    "@jujulego/jill": 2.3.0
+    "@jujulego/jill": 2.3.1
     "@jujulego/utils": ^2.0.0
     "@microsoft/eslint-formatter-sarif": 3.0.0
     "@swc/cli": 0.1.62
@@ -509,15 +502,6 @@ __metadata:
     vitest: 0.34.1
   languageName: unknown
   linkType: soft
-
-"@jujulego/utils@npm:^1.4.5":
-  version: 1.4.5
-  resolution: "@jujulego/utils@npm:1.4.5"
-  dependencies:
-    "@jujulego/event-tree": ^3.0.0
-  checksum: 9fd68326bb32a78a360c557b00a71816274ab77a9abd555ee6a88b4f55de0f88a6a99c39402f6f197aae4420824115822d1b45f5d2cd2144d97d462e145dd6a0
-  languageName: node
-  linkType: hard
 
 "@jujulego/utils@npm:^2.0.0":
   version: 2.0.0
