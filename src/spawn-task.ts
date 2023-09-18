@@ -1,4 +1,4 @@
-import { group, IListenable, inherit, InheritEventMap, source } from '@jujulego/event-tree';
+import { group$, Listenable, inherit$, InheritEventMap, source$ } from '@jujulego/event-tree';
 import cp from 'node:child_process';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -27,7 +27,7 @@ export type SpawnTaskEventMap = InheritEventMap<TaskEventMap, {
 }>;
 
 // Class
-export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> implements IListenable<SpawnTaskEventMap> {
+export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> implements Listenable<SpawnTaskEventMap> {
   // Attributes
   private _process?: cp.ChildProcess;
   private _exitCode: number | null = null;
@@ -35,10 +35,10 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
   readonly cwd: string;
   readonly env: SpawnTaskEnv;
 
-  protected readonly _spawnEvents = inherit(this._taskEvents,  {
-    stream: group({
-      stdout: source<SpawnTaskStreamEvent<'stdout'>>(),
-      stderr: source<SpawnTaskStreamEvent<'stderr'>>(),
+  protected readonly _spawnEvents = inherit$(this._taskEvents,  {
+    stream: group$({
+      stdout: source$<SpawnTaskStreamEvent<'stdout'>>(),
+      stderr: source$<SpawnTaskStreamEvent<'stderr'>>(),
     })
   });
 
