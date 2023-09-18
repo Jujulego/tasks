@@ -1,4 +1,4 @@
-import { group, IListenable, multiplexer, source } from '@jujulego/event-tree';
+import { group$, Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
 import crypto from 'node:crypto';
 
 import { GroupTask } from './group-task.js';
@@ -54,7 +54,7 @@ export type TaskEventMap = {
 };
 
 // Class
-export abstract class Task<C extends TaskContext = TaskContext> implements IListenable<TaskEventMap> {
+export abstract class Task<C extends TaskContext = TaskContext> implements Listenable<TaskEventMap> {
   // Attributes
   private _status: TaskStatus = 'ready';
   private _dependencies: Task[] = [];
@@ -67,15 +67,15 @@ export abstract class Task<C extends TaskContext = TaskContext> implements IList
   readonly weight: number;
 
   protected readonly _logger: ILogger;
-  protected readonly _taskEvents = multiplexer({
-    completed: source<TaskCompletedEvent>(),
-    status: group({
-      'blocked': source<TaskStatusEvent<'blocked'>>(),
-      'ready': source<TaskStatusEvent<'ready'>>(),
-      'starting': source<TaskStatusEvent<'starting'>>(),
-      'running': source<TaskStatusEvent<'running'>>(),
-      'done': source<TaskStatusEvent<'done'>>(),
-      'failed': source<TaskStatusEvent<'failed'>>(),
+  protected readonly _taskEvents = multiplexer$({
+    completed: source$<TaskCompletedEvent>(),
+    status: group$({
+      'blocked': source$<TaskStatusEvent<'blocked'>>(),
+      'ready': source$<TaskStatusEvent<'ready'>>(),
+      'starting': source$<TaskStatusEvent<'starting'>>(),
+      'running': source$<TaskStatusEvent<'running'>>(),
+      'done': source$<TaskStatusEvent<'done'>>(),
+      'failed': source$<TaskStatusEvent<'failed'>>(),
     }),
   });
 

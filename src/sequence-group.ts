@@ -1,4 +1,4 @@
-import { waitFor } from '@jujulego/event-tree';
+import { waitFor$ } from '@jujulego/event-tree';
 
 import { GroupTask } from './group-task.js';
 import { Task, TaskContext } from './task.js';
@@ -22,7 +22,7 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
       yield task;
 
       // Wait task end
-      const result = await waitFor(task, 'completed');
+      const result = await waitFor$(task, 'completed');
 
       if (result.status === 'failed') {
         this.setStatus('failed');

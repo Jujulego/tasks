@@ -1,4 +1,4 @@
-import { IListenable, multiplexer, source } from '@jujulego/event-tree';
+import { Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
 
 import { Task } from './task.js';
 import { TaskManager } from './task-manager.js';
@@ -18,13 +18,13 @@ export type TaskSetEventMap = {
 }
 
 // Class
-export class TaskSet implements Iterable<Task>, IListenable<TaskSetEventMap> {
+export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
   // Attributes
   private readonly _tasks = new Set<Task>();
-  private readonly _events = multiplexer({
-    started: source<Task>(),
-    completed: source<Task>(),
-    finished: source<Readonly<TaskSetResults>>(),
+  private readonly _events = multiplexer$({
+    started: source$<Task>(),
+    completed: source$<Task>(),
+    finished: source$<Readonly<TaskSetResults>>(),
   });
 
   private _status: TaskSetStatus = 'created';

@@ -1,4 +1,4 @@
-import { IListenable, inherit, InheritEventMap, multiplexer, source } from '@jujulego/event-tree';
+import { Listenable, inherit$, InheritEventMap, multiplexer$, source$ } from '@jujulego/event-tree';
 
 import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from './task.js';
 import { TaskManager } from './task-manager.js';
@@ -13,15 +13,15 @@ export type GroupTaskEventMap = InheritEventMap<TaskEventMap, {
 }>;
 
 // Class
-export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> implements IListenable<GroupTaskEventMap> {
+export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> implements Listenable<GroupTaskEventMap> {
   // Attributes
   private readonly _tasks: Task[] = [];
 
-  protected readonly _groupEvents = inherit(this._taskEvents,  {
-    task: multiplexer({
-      added: source<Task>(),
-      started: source<Task>(),
-      completed: source<Task>(),
+  protected readonly _groupEvents = inherit$(this._taskEvents,  {
+    task: multiplexer$({
+      added: source$<Task>(),
+      started: source$<Task>(),
+      completed: source$<Task>(),
     })
   });
 

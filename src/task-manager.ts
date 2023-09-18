@@ -1,4 +1,4 @@
-import { multiplexer, once, source } from '@jujulego/event-tree';
+import { multiplexer$, once$, source$ } from '@jujulego/event-tree';
 import os from 'node:os';
 
 import { ILogger, logger } from './logger.js';
@@ -21,10 +21,10 @@ export class TaskManager {
   private readonly _running = new Set<Task>();
 
   protected readonly _logger: ILogger;
-  protected readonly _events = multiplexer({
-    added: source<Task>(),
-    started: source<Task>(),
-    completed: source<Task>(),
+  protected readonly _events = multiplexer$({
+    added: source$<Task>(),
+    started: source$<Task>(),
+    completed: source$<Task>(),
   });
 
   // Constructor
@@ -72,7 +72,7 @@ export class TaskManager {
       }
 
       if (task.status === 'ready') {
-        once(task, 'completed', () => this._startNext(task));
+        once$(task, 'completed', () => this._startNext(task));
 
         task.start(this);
         this._running.add(task);
