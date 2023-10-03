@@ -31,7 +31,7 @@
     "test": "vitest run",
     "test:types": "vitest typecheck"
   },
-  "packageManager": "yarn@3.6.3",
+  "packageManager": "yarn@3.6.4",
   "dependencies": {
     "@jujulego/event-tree": "^4.1.0",
     "@jujulego/utils": "^2.0.0",
