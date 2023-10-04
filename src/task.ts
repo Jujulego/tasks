@@ -91,6 +91,7 @@ export abstract class Task<C extends TaskContext = TaskContext> implements Liste
   // Methods
   readonly on = this._taskEvents.on;
   readonly off = this._taskEvents.off;
+  readonly keys = this._taskEvents.keys;
   readonly clear = this._taskEvents.clear;
 
   protected abstract _start(manager?: TaskManager): void;
