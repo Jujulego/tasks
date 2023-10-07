@@ -507,7 +507,7 @@ __metadata:
     "@vitest/coverage-v8": 0.34.6
     eslint: 8.51.0
     eslint-plugin-vitest: 0.3.2
-    rollup-plugin-swc3: 0.10.1
+    rollup-plugin-swc3: 0.10.2
     tree-kill: ^1.2.2
     typescript: 5.2.2
     vitest: 0.34.6
@@ -2644,12 +2644,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-tsconfig@npm:^4.6.2":
-  version: 4.6.2
-  resolution: "get-tsconfig@npm:4.6.2"
+"get-tsconfig@npm:^4.7.2":
+  version: 4.7.2
+  resolution: "get-tsconfig@npm:4.7.2"
   dependencies:
     resolve-pkg-maps: ^1.0.0
-  checksum: e791e671a9b55e91efea3ca819ecd7a25beae679e31c83234bf3dd62ddd93df070c1b95ae7e29d206358ebb6408f6f79ac6d83a32a3bbd6a6d217babe23de077
+  checksum: 172358903250eff0103943f816e8a4e51d29b8e5449058bdf7266714a908a48239f6884308bd3a6ff28b09f692b9533dbebfd183ab63e4e14f073cda91f1bca9
   languageName: node
   linkType: hard
 
@@ -4241,18 +4241,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-plugin-swc3@npm:0.10.1":
-  version: 0.10.1
-  resolution: "rollup-plugin-swc3@npm:0.10.1"
+"rollup-plugin-swc3@npm:0.10.2":
+  version: 0.10.2
+  resolution: "rollup-plugin-swc3@npm:0.10.2"
   dependencies:
     "@fastify/deepmerge": ^1.3.0
     "@rollup/pluginutils": ^4.2.1
-    get-tsconfig: ^4.6.2
+    get-tsconfig: ^4.7.2
     rollup-swc-preserve-directives: ^0.3.2
   peerDependencies:
     "@swc/core": ">=1.2.165"
-    rollup: ^2.0.0 || ^3.0.0
-  checksum: 286b8ccf04a7ad2588e821ed199849c5c5189703562ea4a684dc3c49fb7a23a211eab596ce53f25dae063c07ecde13b7cef8e3a4a5d8202837b87d867b375cef
+    rollup: ^2.0.0 || ^3.0.0 || ^4.0.0
+  checksum: 308e71ae7e6ecfa4544008319bce7b2d6537d952d31ee06e74c47c1a7004f1a079fab1430f8f90f5c5b87f78a13411b004b6cb4806a80c8df4838787adcde053
   languageName: node
   linkType: hard
 
