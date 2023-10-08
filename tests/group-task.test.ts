@@ -17,8 +17,7 @@ beforeEach(() => {
   group = new TestGroupTask('test');
   manager = new TaskManager({ jobs: 1, logger: spyLogger });
 
-  vi.resetAllMocks();
-  vi.restoreAllMocks();
+  vi.clearAllMocks();
 
   group.on('task.added', taskAddedEventSpy);
   group.on('task.started', taskStartedEventSpy);

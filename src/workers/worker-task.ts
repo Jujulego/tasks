@@ -42,7 +42,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
 
         case 'failure':
           this.pool.freeWorker(worker);
-          this._logger.error(`Error while running ${this.name}`, message.error);
+          this._logger.error(`Error while running ${this.name}`, message.error as Error);
           this.setStatus('failed');
 
           break;
@@ -54,7 +54,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
     });
 
     worker.on('messageerror', (err) => {
-      this._logger.warn(`Error while receiving a message from ${this.name}`, err);
+      this._logger.warning(`Error while receiving a message from ${this.name}`, err);
     });
 
     worker.on('exit', (code) => {

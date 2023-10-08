@@ -1,8 +1,9 @@
 import { group$, Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
+import { Logger } from '@jujulego/logger';
 import crypto from 'node:crypto';
 
 import { GroupTask } from './group-task.js';
-import { ILogger, logger } from './logger.js';
+import { logger } from './logger.js';
 import { TaskManager } from './task-manager.js';
 
 // Types
@@ -10,7 +11,7 @@ export type TaskContext = Record<string, unknown>;
 
 export interface TaskOptions {
   id?: string;
-  logger?: ILogger;
+  logger?: Logger;
   weight?: number;
 }
 
@@ -66,7 +67,7 @@ export abstract class Task<C extends TaskContext = TaskContext> implements Liste
   readonly id: string;
   readonly weight: number;
 
-  protected readonly _logger: ILogger;
+  protected readonly _logger: Logger;
   protected readonly _taskEvents = multiplexer$({
     completed: source$<TaskCompletedEvent>(),
     status: group$({
