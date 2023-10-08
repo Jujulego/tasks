@@ -1,7 +1,7 @@
+import { logger$ } from '@jujulego/logger';
 import { vi } from 'vitest';
 
 import { GroupTask } from '@/src/group-task.js';
-import { ILogger } from '@/src/logger.js';
 import { Task, TaskOptions, TaskStatus } from '@/src/task.js';
 
 // Classes
@@ -33,13 +33,12 @@ export class TestGroupTask extends GroupTask {
 }
 
 // Logger
-export const spyLogger: ILogger = {
-  debug: vi.fn(),
-  verbose: vi.fn(),
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-};
+export const spyLogger = logger$();
+vi.spyOn(spyLogger, 'debug');
+vi.spyOn(spyLogger, 'verbose');
+vi.spyOn(spyLogger, 'info');
+vi.spyOn(spyLogger, 'warning');
+vi.spyOn(spyLogger, 'error');
 
 // Utils
 export function flushPromises(): Promise<void> {

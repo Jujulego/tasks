@@ -20,8 +20,7 @@ const streamEventSpy = vi.fn<[SpawnTaskStreamEvent], void>();
 beforeEach(() => {
   task = new SpawnTask('test', ['-a', '--arg'], {}, { logger: spyLogger });
 
-  vi.resetAllMocks();
-  vi.restoreAllMocks();
+  vi.clearAllMocks();
 
   task.on('stream', streamEventSpy);
 
@@ -105,7 +104,7 @@ describe('SpawnTask.start', () => {
 
     expect(task.status).toBe('failed');
     expect(task.exitCode).toBeNull();
-    expect(spyLogger.warn).toHaveBeenCalledWith(`Error while spawning ${task.name}: Failed !`);
+    expect(spyLogger.warning).toHaveBeenCalledWith(`Error while spawning ${task.name}`, 'Failed !');
   });
 });
 
@@ -133,7 +132,7 @@ describe('SpawnTask.stop', () => {
     const cb = vi.mocked(kill).mock.calls[0][2]!;
     cb(new Error('Failed !'));
 
-    expect(spyLogger.warn).toHaveBeenCalledWith(`Failed to kill ${task.name}: Error: Failed !`);
+    expect(spyLogger.warning).toHaveBeenCalledWith(`Failed to kill ${task.name}`, new Error('Failed !'));
   });
 });
 

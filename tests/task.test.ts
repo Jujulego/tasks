@@ -14,8 +14,7 @@ const statusEventSpy = vi.fn<[TaskStatusEvent], void>();
 beforeEach(() => {
   task = new TestTask('test');
 
-  vi.resetAllMocks();
-  vi.restoreAllMocks();
+  vi.clearAllMocks();
   vi.useRealTimers();
 
   task.on('completed', completedEventSpy);

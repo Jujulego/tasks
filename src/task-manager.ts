@@ -1,13 +1,14 @@
 import { multiplexer$, once$, source$ } from '@jujulego/event-tree';
+import { Logger } from '@jujulego/logger';
 import os from 'node:os';
 
-import { ILogger, logger } from './logger.js';
+import { logger } from './logger.js';
 import { Task } from './task.js';
 
 // Types
 export interface TaskManagerOpts {
   jobs?: number;
-  logger?: ILogger;
+  logger?: Logger;
 }
 
 // Class
@@ -20,7 +21,7 @@ export class TaskManager {
   private readonly _index = new Set<Task>();
   private readonly _running = new Set<Task>();
 
-  protected readonly _logger: ILogger;
+  protected readonly _logger: Logger;
   protected readonly _events = multiplexer$({
     added: source$<Task>(),
     started: source$<Task>(),

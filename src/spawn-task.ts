@@ -116,7 +116,7 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
     });
 
     this._process.on('error', (err) => {
-      this._logger.warn(`Error while spawning ${this.name}: ${err}`);
+      this._logger.warning(`Error while spawning ${this.name}`, err);
       this.setStatus('failed');
     });
   }
@@ -125,7 +125,7 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
     if (this._process?.pid) {
       kill(this._process.pid, 'SIGTERM', (err) => {
         if (err) {
-          this._logger.warn(`Failed to kill ${this.name}: ${err}`);
+          this._logger.warning(`Failed to kill ${this.name}`, err);
         } else {
           this._logger.debug(`Killed ${this.name}`);
         }
