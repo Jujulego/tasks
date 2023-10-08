@@ -438,19 +438,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/aegis@npm:2.0.0-beta.5":
-  version: 2.0.0-beta.5
-  resolution: "@jujulego/aegis@npm:2.0.0-beta.5"
-  dependencies:
-    "@jujulego/event-tree": ^4.1.1
-    "@jujulego/utils": ^2.0.0
-  dependenciesMeta:
-    vitest@0.34.5:
-      unplugged: true
-  checksum: a7cb6086a92a8b2e2d2dc2b1feacca516809bed4a63fcbe56907611719e182ab73b65b00c015cca7de7729a0c27f25cd44263c9770834bcebca42e7316d7fb88
-  languageName: node
-  linkType: hard
-
 "@jujulego/event-tree@npm:^4.1.0, @jujulego/event-tree@npm:^4.1.1, @jujulego/event-tree@npm:^4.2.0":
   version: 4.2.0
   resolution: "@jujulego/event-tree@npm:4.2.0"
@@ -494,15 +481,14 @@ __metadata:
   linkType: hard
 
 "@jujulego/logger@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "@jujulego/logger@npm:0.2.2"
+  version: 0.2.4
+  resolution: "@jujulego/logger@npm:0.2.4"
   dependencies:
-    "@jujulego/aegis": 2.0.0-beta.5
     "@jujulego/event-tree": ^4.1.1
     "@jujulego/quick-tag": ^0.3.3
     chalk: ^5.3.0
     chalk-template: ^1.1.0
-  checksum: b1f7861af258f88ae576b9125ef35611c6dc7e31ab0a3596c3febcd83a00910aa61e1a840d3cbdb407bb3298f6fbd2325aca7e248e4445df37d2b9f42f7d25b1
+  checksum: d8f43a627d374fbc8a23393a14929e3fc15381e09e397bc05192b5965d7a354b9b7067e0f6cfeea8b2989b9ef1082494c81582a4a626d3123f87cdfcc200d711
   languageName: node
   linkType: hard
 
