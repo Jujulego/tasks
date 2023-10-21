@@ -2,10 +2,10 @@ name: 'Javascript'
 
 on:
   push:
-    branches: [ master ]
+    branches: [ latest, next ]
 
   pull_request:
-    branches: [ master ]
+    branches: [ latest, next ]
 
 concurrency:
   group: javascript-${{ github.ref }}
@@ -117,7 +117,7 @@ jobs:
           path: dist
 
       - name: Publish
-        run: yarn npm publish --access public --tolerate-republish
+        run: yarn npm publish --access public --tag ${{ github.ref_name }} --tolerate-republish
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

@@ -2,6 +2,7 @@
   "extends": [
     "config:base"
   ],
+  "baseBranches": ["latest"],
   "labels": ["dependencies"],
   "packageRules": [
     {
@@ -13,6 +14,10 @@
     }
   ],
   "js": {
-    "addLabels": ["javascript"]
+    "addLabels": ["javascript"],
+    "postUpdateOptions": ["yarnDedupeHighest"]
+  },
+  "github-actions": {
+    "addLabels": ["github-actions"]
   }
 }
