@@ -1,7 +1,7 @@
 import { Listenable, inherit$, InheritEventMap, multiplexer$, source$ } from '@jujulego/event-tree';
 
-import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from './task.js';
-import { TaskManager } from './task-manager.js';
+import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from '../task.js';
+import { TaskManager } from '../task-manager.js';
 
 // Types
 export type GroupTaskStats = Record<TaskStatus, number>;

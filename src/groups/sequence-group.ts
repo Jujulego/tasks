@@ -1,7 +1,7 @@
 import { waitFor$ } from '@jujulego/event-tree';
 
 import { GroupTask } from './group-task.js';
-import { Task, TaskContext } from './task.js';
+import { Task, TaskContext } from '../task.js';
 
 // Class
 export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
