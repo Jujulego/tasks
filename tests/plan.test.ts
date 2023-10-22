@@ -1,4 +1,4 @@
-import { ParallelGroup } from '@/src/parallel-group.js';
+import { ParallelGroup } from '@/src/groups/parallel-group.js';
 import { plan } from '@/src/plan.js';
 
 import { spyLogger, TestTask } from './utils.js';

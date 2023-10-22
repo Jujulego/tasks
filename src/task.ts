@@ -2,7 +2,7 @@ import { group$, Listenable, multiplexer$, source$ } from '@jujulego/event-tree'
 import { Logger } from '@jujulego/logger';
 import crypto from 'node:crypto';
 
-import { GroupTask } from './group-task.js';
+import { GroupTask } from './groups/index.js';
 import { logger } from './logger.js';
 import { TaskManager } from './task-manager.js';
 

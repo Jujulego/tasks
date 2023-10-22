@@ -1,5 +1,5 @@
 import { Task, TaskSummary } from './task.js';
-import { GroupTask } from './group-task.js';
+import { GroupTask } from './groups/index.js';
 
 // Utils
 export function* _plan(task: Task, marks: Set<Task>): Generator<TaskSummary, void, undefined> {

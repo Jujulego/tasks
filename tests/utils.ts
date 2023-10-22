@@ -1,7 +1,7 @@
 import { logger$ } from '@jujulego/logger';
 import { vi } from 'vitest';
 
-import { GroupTask } from '@/src/group-task.js';
+import { GroupTask } from '@/src/groups/group-task.js';
 import { Task, TaskOptions, TaskStatus } from '@/src/task.js';
 
 // Classes
