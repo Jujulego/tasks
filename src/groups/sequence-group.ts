@@ -10,7 +10,7 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
   private _currentTask?: Task;
 
   // Methods
-  protected async* _orchestrate(): AsyncGenerator<Task> {
+  protected* _runInOrder(): Generator<Task> {
     for (const task of this.tasks) {
       if (this._stopped) {
         this.setStatus('failed');
@@ -19,6 +19,12 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
 
       // Start task
       this._currentTask = task;
+      yield task;
+    }
+  }
+
+  protected async* _orchestrate(): AsyncGenerator<Task> {
+    for (const task of this._runInOrder()) {
       yield task;
 
       // Wait task end
@@ -30,7 +36,9 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
       }
     }
 
-    this.setStatus('done');
+    if (!this._stopped) {
+      this.setStatus('done');
+    }
   }
 
   protected _stop(): void {

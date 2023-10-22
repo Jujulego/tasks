@@ -1,24 +1,13 @@
 import { waitFor$ } from '@jujulego/event-tree';
 
-import { GroupTask } from './group-task.js';
 import { Task, TaskContext } from '../task.js';
+import { SequenceGroup } from './sequence-group.js';
 
 // Class
-export class FallbackGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
-  // Attributes
-  private _stopped = false;
-  private _currentTask?: Task;
-
+export class FallbackGroup<C extends TaskContext = TaskContext> extends SequenceGroup<C> {
   // Methods
   protected async* _orchestrate(): AsyncGenerator<Task> {
-    for (const task of this.tasks) {
-      if (this._stopped) {
-        this.setStatus('failed');
-        return;
-      }
-
-      // Start task
-      this._currentTask = task;
+    for (const task of this._runInOrder()) {
       yield task;
 
       // Wait task end
@@ -31,24 +20,5 @@ export class FallbackGroup<C extends TaskContext = TaskContext> extends GroupTas
     }
 
     this.setStatus('failed');
-  }
-
-  protected _stop(): void {
-    this._stopped = true;
-
-    // Stop current task
-    this._currentTask?.stop();
-  }
-
-  complexity(cache: Map<string, number> = new Map()): number {
-    let complexity = super.complexity(cache);
-
-    if (this.tasks.length > 0) {
-      complexity += this.tasks[0]!.complexity(cache);
-    }
-
-    cache.set(this.id, complexity);
-
-    return complexity;
   }
 }
