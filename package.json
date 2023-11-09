@@ -39,7 +39,7 @@
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {
-    "@jujulego/jill": "2.3.3",
+    "@jujulego/jill": "2.3.4",
     "@jujulego/vite-plugin-swc": "1.1.0",
     "@microsoft/eslint-formatter-sarif": "3.0.0",
     "@swc/cli": "0.1.62",
