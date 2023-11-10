@@ -395,9 +395,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/jill@npm:2.3.4":
-  version: 2.3.4
-  resolution: "@jujulego/jill@npm:2.3.4"
+"@jujulego/jill@npm:2.3.5":
+  version: 2.3.5
+  resolution: "@jujulego/jill@npm:2.3.5"
   dependencies:
     "@jujulego/event-tree": ^4.1.0
     "@jujulego/tasks": ^2.0.1
@@ -424,7 +424,7 @@ __metadata:
     yargs: ^17.7.2
   bin:
     jill: ./bin/jill.mjs
-  checksum: 245c7a3f86a7b0ed0525ef102c6529a4ef68db9bb029f8bbbee3cd30c07fdca7127b8e914278915cb2c20e66e5ddbf7daa8de78f307f17a4ab49b23df8572b3c
+  checksum: 045e44692878452bf1f4e34200f7b93cd01e4b69a58b353eeee4ebdca16b9aeaf31547b0aaab2a95bb0813ef741f719b521bd84e78dfb2423f03c52abfbca45d
   languageName: node
   linkType: hard
 
@@ -466,7 +466,7 @@ __metadata:
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
     "@jujulego/event-tree": ^4.2.0
-    "@jujulego/jill": 2.3.4
+    "@jujulego/jill": 2.3.5
     "@jujulego/logger": ^0.2.2
     "@jujulego/utils": ^2.0.0
     "@jujulego/vite-plugin-swc": 1.1.0
