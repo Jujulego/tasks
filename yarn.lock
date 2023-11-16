@@ -481,7 +481,7 @@ __metadata:
     eslint-plugin-vitest: 0.3.9
     tree-kill: ^1.2.2
     typescript: 5.2.2
-    vite: 5.0.0-beta.20
+    vite: 5.0.0
     vite-tsconfig-paths: 4.2.1
     vitest: 0.34.6
   languageName: unknown
@@ -4834,9 +4834,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:5.0.0-beta.20, vite@npm:^3.0.0 || ^4.0.0 || ^5.0.0-0, vite@npm:^3.1.0 || ^4.0.0 || ^5.0.0-0":
-  version: 5.0.0-beta.20
-  resolution: "vite@npm:5.0.0-beta.20"
+"vite@npm:5.0.0, vite@npm:^3.0.0 || ^4.0.0 || ^5.0.0-0, vite@npm:^3.1.0 || ^4.0.0 || ^5.0.0-0":
+  version: 5.0.0
+  resolution: "vite@npm:5.0.0"
   dependencies:
     esbuild: ^0.19.3
     fsevents: ~2.3.3
@@ -4870,7 +4870,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: a6096ef50530efafd698c0c4124932c6fded49a878083caee09a72df1834ff1fbdae36573c188f2d9f6cc7a35417352c5ed3420ac258b5d9f18fb4f12557781d
+  checksum: 1f953b062593b072f0e718384e1ff3307b548235ff8c4016fcaa85c09568eb0ba8cd8cfd80e99d940d3bea296b4661b1d0384fe5cb9a996d3e935feb69259755
   languageName: node
   linkType: hard
 
