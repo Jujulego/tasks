@@ -570,21 +570,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/jill@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@jujulego/jill@npm:2.4.0"
+"@jujulego/jill@npm:2.5.2":
+  version: 2.5.2
+  resolution: "@jujulego/jill@npm:2.5.2"
   dependencies:
     "@jujulego/aegis": ^2.1.0
     "@jujulego/event-tree": ^4.3.0
     "@jujulego/logger": ^0.2.4
     "@jujulego/quick-tag": ^0.3.3
     "@jujulego/tasks": ^2.2.0
-    "@jujulego/utils": ^2.0.2
+    "@jujulego/utils": ^3.0.0
     "@swc/helpers": ^0.5.3
     ajv: ^8.12.0
     chalk: ^5.3.0
     chalk-template: ^1.1.0
-    cosmiconfig: ^8.2.0
+    cosmiconfig: ^9.0.0
     glob: ^10.3.10
     ink: ^4.3.0
     ink-spinner: ^5.0.0
@@ -594,15 +594,15 @@ __metadata:
     moo: ^0.5.2
     normalize-package-data: ^6.0.0
     path-scurry: ^1.10.1
-    pretty-ms: ^8.0.0
+    pretty-ms: ^9.0.0
     react: ^18.2.0
-    reflect-metadata: ^0.1.13
+    reflect-metadata: ^0.2.0
     semver: ^7.5.4
     slugify: ^1.6.6
     yargs: ^17.7.2
   bin:
     jill: ./bin/jill.js
-  checksum: ff1b96cf0fc969fb93a6b8129e727edef3940096a75a8b7aebb71e94d39c3111e68b5830d31a799488772d487d7b1369e26537de0cfd043570047545dbe84ae7
+  checksum: 877acd7d58efcfaee8e0de7a9adfa1b24aa5c8834a5fa561d46331d8c5eb8504ecdbff030393efd343b8f097ec6e44595c42b2970553397c17f15adb3df7ff45
   languageName: node
   linkType: hard
 
@@ -645,7 +645,7 @@ __metadata:
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
     "@jujulego/event-tree": ^4.2.0
-    "@jujulego/jill": 2.4.0
+    "@jujulego/jill": 2.5.2
     "@jujulego/logger": ^0.2.2
     "@jujulego/utils": ^2.0.0
     "@jujulego/vite-plugin-swc": 1.1.1
@@ -666,12 +666,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@jujulego/utils@npm:^2.0.0, @jujulego/utils@npm:^2.0.2":
+"@jujulego/utils@npm:^2.0.0":
   version: 2.1.1
   resolution: "@jujulego/utils@npm:2.1.1"
   dependencies:
     "@jujulego/event-tree": ^4.1.0
   checksum: 22bb6295c21dcd7b3f370b1adc1fc507fd22a4a9321e2003fa1a893556b4c6f2052c3df708165ba7b283eae6dc2164a9cf1508d60b90c2ee5098f8e8bb03d78c
+  languageName: node
+  linkType: hard
+
+"@jujulego/utils@npm:^3.0.0":
+  version: 3.0.4
+  resolution: "@jujulego/utils@npm:3.0.4"
+  dependencies:
+    "@swc/helpers": ^0.5.3
+    kyrielle: ^0.6.0
+  checksum: 476703d8987de4d1e639e20e3144504c76e8ca11ebcf86a5538020bf33d097dfda23c0c6b656b87e5b3795426bfcb23646950b93d593a225b81677ddf01d76ee
   languageName: node
   linkType: hard
 
@@ -1873,15 +1883,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cosmiconfig@npm:^8.2.0":
-  version: 8.2.0
-  resolution: "cosmiconfig@npm:8.2.0"
+"cosmiconfig@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "cosmiconfig@npm:9.0.0"
   dependencies:
-    import-fresh: ^3.2.1
+    env-paths: ^2.2.1
+    import-fresh: ^3.3.0
     js-yaml: ^4.1.0
-    parse-json: ^5.0.0
-    path-type: ^4.0.0
-  checksum: 836d5d8efa750f3fb17b03d6ca74cd3154ed025dffd045304b3ef59637f662bde1e5dc88f8830080d180ec60841719cf4ea2ce73fb21ec694b16865c478ff297
+    parse-json: ^5.2.0
+  peerDependencies:
+    typescript: ">=4.9.5"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: a30c424b53d442ea0bdd24cb1b3d0d8687c8dda4a17ab6afcdc439f8964438801619cdb66e8e79f63b9caa3e6586b60d8bab9ce203e72df6c5e80179b971fe8f
   languageName: node
   linkType: hard
 
@@ -2020,7 +2035,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"env-paths@npm:^2.2.0":
+"env-paths@npm:^2.2.0, env-paths@npm:^2.2.1":
   version: 2.2.1
   resolution: "env-paths@npm:2.2.1"
   checksum: 65b5df55a8bab92229ab2b40dad3b387fad24613263d103a97f91c9fe43ceb21965cd3392b1ccb5d77088021e525c4e0481adb309625d0cb94ade1d1fb8dc17e
@@ -2945,7 +2960,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"import-fresh@npm:^3.2.1":
+"import-fresh@npm:^3.2.1, import-fresh@npm:^3.3.0":
   version: 3.3.0
   resolution: "import-fresh@npm:3.3.0"
   dependencies:
@@ -3338,6 +3353,18 @@ __metadata:
   dependencies:
     json-buffer: 3.0.1
   checksum: 13ad58303acd2261c0d4831b4658451603fd159e61daea2121fcb15feb623e75ee328cded0572da9ca76b7b3ceaf8e614f1806c6b3af5db73c9c35a345259651
+  languageName: node
+  linkType: hard
+
+"kyrielle@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "kyrielle@npm:0.6.0"
+  dependencies:
+    immer: ^10.0.3
+  dependenciesMeta:
+    vitest@0.34.6:
+      unplugged: true
+  checksum: a124f2a4218a4dccd2209b41a1e72da524fa4c446801921f24620187758b0862205904a81b0105d0c563417f33310cd6271f8f037ffb0105b68cdedaa4ad23db
   languageName: node
   linkType: hard
 
@@ -3916,7 +3943,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parse-json@npm:^5.0.0":
+"parse-json@npm:^5.2.0":
   version: 5.2.0
   resolution: "parse-json@npm:5.2.0"
   dependencies:
@@ -3928,10 +3955,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parse-ms@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "parse-ms@npm:3.0.0"
-  checksum: fc602bba093835562321a67a9d6c8c9687ca4f26a09459a77e07ebd7efddd1a5766725ec60eb0c83a2abe67f7a23808f7deb1c1226727776eaf7f9607ae09db2
+"parse-ms@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "parse-ms@npm:4.0.0"
+  checksum: 673c801d9f957ff79962d71ed5a24850163f4181a90dd30c4e3666b3a804f53b77f1f0556792e8b2adbb5d58757907d1aa51d7d7dc75997c2a56d72937cbc8b7
   languageName: node
   linkType: hard
 
@@ -4054,12 +4081,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-ms@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "pretty-ms@npm:8.0.0"
+"pretty-ms@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "pretty-ms@npm:9.0.0"
   dependencies:
-    parse-ms: ^3.0.0
-  checksum: b7d2a8182887af0e5ab93f9df331f10db9b8eda86855e2de115eb01a6c501bde5631a8813b1b0abdd7d045e79b08ae875369a8fd279a3dacd6d9e572bdd3bfa6
+    parse-ms: ^4.0.0
+  checksum: 072b17547e09cb232e8e4c7be0281e256b6d8acd18dfb2fdd715d50330d1689fdaa877f53cf90c62ed419ef842f0f5fb94a2cd8ed1aa6d7608ad48834219435d
   languageName: node
   linkType: hard
 
@@ -4159,10 +4186,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:^0.1.13":
-  version: 0.1.13
-  resolution: "reflect-metadata@npm:0.1.13"
-  checksum: 798d379a7b6f6455501145419505c97dd11cbc23857a386add2b9ef15963ccf15a48d9d15507afe01d4cd74116df8a213247200bac00320bd7c11ddeaa5e8fb4
+"reflect-metadata@npm:^0.2.0":
+  version: 0.2.2
+  resolution: "reflect-metadata@npm:0.2.2"
+  checksum: a66c7b583e4efdd8f3c3124fbff33da2d0c86d8280617516308b32b2159af7a3698c961db3246387f56f6316b1d33a608f39bb2b49d813316dfc58f6d3bf3210
   languageName: node
   linkType: hard
 
