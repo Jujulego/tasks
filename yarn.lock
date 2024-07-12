@@ -618,6 +618,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jujulego/logger@npm:^0.4.0":
+  version: 0.4.2
+  resolution: "@jujulego/logger@npm:0.4.2"
+  dependencies:
+    "@jujulego/quick-tag": ^0.4.0
+    "@swc/helpers": ^0.5.3
+    chalk: ^5.3.0
+    chalk-template: ^1.1.0
+    kyrielle: ^0.9.0
+  checksum: 7254e525387a02895cc88f27c27395c369b36d67a9e1a63b5210bec77064a09404a7e93bbe2df9a0a86823a8b8a69593c3505d1a45136e09e55a78ed27a65804
+  languageName: node
+  linkType: hard
+
 "@jujulego/quick-tag@npm:^0.3.3":
   version: 0.3.3
   resolution: "@jujulego/quick-tag@npm:0.3.3"
@@ -625,6 +638,18 @@ __metadata:
     vitest@0.34.6:
       unplugged: true
   checksum: 4e92934a0cf8cc1dd783c42885067317b702826f1d4042a5a976802a67dc0bb6ac2784b23e3d2c97b0e0abece3d4d6720005b1f4be2db0a4dd6f64902057b2ee
+  languageName: node
+  linkType: hard
+
+"@jujulego/quick-tag@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@jujulego/quick-tag@npm:0.4.0"
+  dependencies:
+    "@swc/helpers": ^0.5.3
+  dependenciesMeta:
+    vitest@1.1.1:
+      unplugged: true
+  checksum: 36852c93391d54e78c9ae995fde5693012e4e3deeeaf45954ed13764775dade2cb1d11c09df3b4e8002aac58e6d2cabc22bb8d0ed8365a3e1a451d0d5e5a898b
   languageName: node
   linkType: hard
 
@@ -646,7 +671,7 @@ __metadata:
   dependencies:
     "@jujulego/event-tree": ^4.2.0
     "@jujulego/jill": 2.5.2
-    "@jujulego/logger": ^0.2.2
+    "@jujulego/logger": ^0.4.0
     "@jujulego/utils": ^2.0.0
     "@jujulego/vite-plugin-swc": 1.1.1
     "@microsoft/eslint-formatter-sarif": 3.0.0
@@ -3365,6 +3390,19 @@ __metadata:
     vitest@0.34.6:
       unplugged: true
   checksum: a124f2a4218a4dccd2209b41a1e72da524fa4c446801921f24620187758b0862205904a81b0105d0c563417f33310cd6271f8f037ffb0105b68cdedaa4ad23db
+  languageName: node
+  linkType: hard
+
+"kyrielle@npm:^0.9.0":
+  version: 0.9.3
+  resolution: "kyrielle@npm:0.9.3"
+  dependencies:
+    "@swc/helpers": ^0.5.3
+    immer: ^10.0.3
+  dependenciesMeta:
+    vitest@1.1.3:
+      unplugged: true
+  checksum: e10a7ae1b4bb5093d45f94edcebcf5f2022c5b0e2afeaec7d6ed9c1069cf881bb3fb76ab4a522b9320461e7e896637d3dfdc168865b035e925be66fc6c298fbc
   languageName: node
   linkType: hard
 
