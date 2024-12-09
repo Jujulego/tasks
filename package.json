@@ -43,7 +43,7 @@
     "@jujulego/vite-plugin-swc": "1.2.0",
     "@microsoft/eslint-formatter-sarif": "3.1.0",
     "@swc/cli": "0.5.2",
-    "@swc/core": "1.10.0",
+    "@swc/core": "1.10.1",
     "@types/node": "16.18.121",
     "@typescript-eslint/eslint-plugin": "6.21.0",
     "@typescript-eslint/parser": "6.21.0",
