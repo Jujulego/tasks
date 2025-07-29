@@ -1,4 +1,4 @@
-name: 'Javascript'
+name: 'CI'
 
 on:
   push:
@@ -13,15 +13,20 @@ concurrency:
 
 jobs:
   build:
+    name: 'Build'
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 16.x
+          node-version: 22.x
           cache: yarn
 
       - name: Install
@@ -30,12 +35,13 @@ jobs:
       - name: Build
         run: yarn build
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: build
           path: dist
 
   lint:
+    name: 'Lint'
     runs-on: ubuntu-latest
 
     permissions:
@@ -43,12 +49,13 @@ jobs:
       security-events: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 16.x
+          node-version: 22.x
           cache: yarn
 
       - name: Install
@@ -59,59 +66,81 @@ jobs:
         run: yarn lint -f @microsoft/sarif -o eslint-results.sarif
 
       - name: Upload analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3.29.4
         with:
           sarif_file: eslint-results.sarif
           wait-for-processing: true
 
   tests:
+    name: 'Tests on node ${{ matrix.node }}'
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    permissions:
+      contents: read
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+    strategy:
+      matrix:
+        node: ['18.x', '20.x', '22.x']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 16.x
+          node-version: ${{ matrix.node }}
           cache: yarn
 
       - name: Install
         run: yarn install --immutable
 
-      - name: Type check tests
-        run: yarn test:types --pass-with-no-tests
-
       - name: Run tests
         run: yarn test --coverage
 
-      - uses: actions/upload-artifact@v3
+      - name: Check tests typings
+        run: yarn test:types
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: coverage
-          path: coverage
+          flags: unit,node-${{ matrix.node }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          files: junit-report.xml
+          flags: unit,node-${{ matrix.node }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     if: ${{ github.event_name == 'push' }}
-    name: Publish to npm
+    name: 'Publish to npm'
 
     runs-on: ubuntu-latest
     environment: npm
     needs: [ lint, build, tests ]
+    
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 16.x
+          node-version: 22.x
           registry-url: https://registry.npmjs.org
           cache: yarn
 
       - name: Install
         run: yarn install --immutable
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.3.0
         with:
           name: build
           path: dist
@@ -121,38 +150,9 @@ jobs:
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  sonarcloud:
-    if: ${{ !startsWith(github.head_ref, 'dependabot/') && !startsWith(github.head_ref, 'renovate/') }}
-    runs-on: ubuntu-latest
-    needs: [ tests ]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download test coverage
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: coverage
-          path: coverage
-
-      - name: Load package.json
-        id: info
-        run: echo "version=$(jq -r ".version" package.json)" >> $GITHUB_OUTPUT
-
-      - name: Sonarcloud
-        uses: sonarsource/sonarcloud-github-action@v2.0.2
-        with:
-          args: >
-            -Dsonar.projectVersion=${{ steps.info.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   release:
     if: ${{ github.event_name == 'push' }}
+    name: 'Publish release'
 
     runs-on: ubuntu-latest
     needs: [ publish ]
@@ -161,7 +161,8 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
 
       - name: Read package.json
         id: info
@@ -192,9 +193,8 @@ jobs:
 
       - name: Release notes
         if: ${{ steps.tag.outputs.notes }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.info.outputs.version }}
           tag_name: v${{ steps.info.outputs.version }}
-          draft: true
           generate_release_notes: true
