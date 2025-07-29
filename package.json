@@ -19,40 +19,48 @@
   "types": "./dist/index.d.ts",
   "exports": {
     "types": "./dist/index.d.ts",
-    "import": "./dist/index.js",
     "default": "./dist/index.js"
   },
   "scripts": {
     "lint": "eslint .",
     "clean": "shx rm -r dist",
-    "build": "jill group 'build:esm // build:types'",
-    "build:esm": "swc -d dist src",
+    "build": "jill run 'build:esm // build:types'",
+    "build:esm": "swc src -d dist --strip-leading-paths",
     "build:types": "tsc --project tsconfig.build.json",
-    "test": "vitest run",
-    "test:types": "vitest typecheck"
+    "test": "vitest run --typecheck",
+    "test:types": "tsc --project tests"
   },
-  "packageManager": "yarn@4.9.2",
   "dependencies": {
     "@jujulego/event-tree": "^4.2.0",
     "@jujulego/logger": "^0.2.2",
     "@jujulego/utils": "^2.0.0",
+    "@swc/helpers": "^0.5.3",
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {
+    "@eslint/js": "9.32.0",
     "@jujulego/jill": "2.5.2",
     "@jujulego/vite-plugin-swc": "1.2.0",
     "@microsoft/eslint-formatter-sarif": "3.1.0",
-    "@swc/cli": "0.5.2",
-    "@swc/core": "1.10.1",
-    "@types/node": "16.18.121",
-    "@typescript-eslint/eslint-plugin": "6.21.0",
-    "@typescript-eslint/parser": "6.21.0",
-    "@vitest/coverage-v8": "2.1.8",
-    "eslint": "8.57.1",
-    "eslint-plugin-vitest": "0.3.16",
-    "typescript": "5.2.2",
-    "vite": "5.4.11",
-    "vite-tsconfig-paths": "4.3.2",
-    "vitest": "2.1.8"
-  }
+    "@swc/cli": "0.7.8",
+    "@swc/core": "1.13.3",
+    "@types/node": "22.16.5",
+    "@typescript-eslint/utils": "8.38.0",
+    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/eslint-plugin": "1.3.4",
+    "eslint": "9.32.0",
+    "jiti": "2.5.1",
+    "shx": "0.4.0",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.38.0",
+    "vite": "7.0.6",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "3.2.4"
+  },
+  "dependenciesMeta": {
+    "vitest@3.2.4": {
+      "unplugged": true
+    }
+  },
+  "packageManager": "yarn@4.9.2"
 }
