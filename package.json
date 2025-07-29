@@ -24,7 +24,7 @@
   "scripts": {
     "lint": "eslint .",
     "clean": "shx rm -r dist",
-    "build": "jill run 'build:esm // build:types'",
+    "build": "yarn run build:esm && yarn run build:types",
     "build:esm": "swc src -d dist --strip-leading-paths",
     "build:types": "tsc --project tsconfig.build.json",
     "test": "vitest run --typecheck",
@@ -39,7 +39,6 @@
   },
   "devDependencies": {
     "@eslint/js": "9.32.0",
-    "@jujulego/jill": "2.5.2",
     "@jujulego/vite-plugin-swc": "1.2.0",
     "@microsoft/eslint-formatter-sarif": "3.1.0",
     "@swc/cli": "0.7.8",
