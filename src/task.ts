@@ -1,14 +1,15 @@
-import { group$, Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
-import { Logger } from '@jujulego/logger';
+import { group$, type Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
+import type { Logger } from '@jujulego/logger';
 import crypto from 'node:crypto';
-
-import { GroupTask } from './groups/index.js';
+import type { GroupTask } from './groups/index.js';
 import { logger } from './logger.js';
-import { TaskManager } from './task-manager.js';
+import type { TaskManager } from './task-manager.js';
 
 // Types
+/** @deprecated */
 export type TaskContext = Record<string, unknown>;
 
+/** @deprecated */
 export interface TaskOptions {
   id?: string;
   logger?: Logger;
@@ -32,12 +33,16 @@ export interface TaskSummary<C extends TaskContext = TaskContext> {
   readonly dependenciesIds: string[];
 }
 
+/** @deprecated */
 export type TaskStatus = 'blocked' | 'ready' | 'starting' | 'running' | 'done' | 'failed';
+
+/** @deprecated */
 export interface TaskStatusEvent<S extends TaskStatus = TaskStatus> {
   previous: TaskStatus;
   status: S;
 }
 
+/** @deprecated */
 export interface TaskCompletedEvent {
   status: 'done' | 'failed';
   duration: number;
@@ -55,6 +60,7 @@ export type TaskEventMap = {
 };
 
 // Class
+/** @deprecated */
 export abstract class Task<C extends TaskContext = TaskContext> implements Listenable<TaskEventMap> {
   // Attributes
   private _status: TaskStatus = 'ready';
