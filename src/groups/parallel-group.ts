@@ -1,6 +1,6 @@
 import { once$ } from '@jujulego/event-tree';
 
-import { GroupTask } from './group-task.js';
+import { GroupTask } from './group-task.legacy.js';
 import { Task, TaskContext } from '../task.legacy.js';
 
 // Class

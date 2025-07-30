@@ -1,11 +1,19 @@
-import { Listenable, inherit$, InheritEventMap, multiplexer$, source$ } from '@jujulego/event-tree';
-
-import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from '../task.legacy.js';
-import { TaskManager } from '../task-manager.legacy.js';
+import { inherit$, type InheritEventMap, type Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
+import type { TaskManager } from '../task-manager.legacy.js';
+import {
+  Task,
+  type TaskContext,
+  type TaskEventMap,
+  type TaskOptions,
+  type TaskStatus,
+  type TaskSummary
+} from '../task.legacy.js';
 
 // Types
+/** @deprecated */
 export type GroupTaskStats = Record<TaskStatus, number>;
 
+/** @deprecated */
 export type GroupTaskEventMap = InheritEventMap<TaskEventMap, {
   'task.added': Task;
   'task.started': Task;
@@ -13,6 +21,7 @@ export type GroupTaskEventMap = InheritEventMap<TaskEventMap, {
 }>;
 
 // Class
+/** @deprecated */
 export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> implements Listenable<GroupTaskEventMap> {
   // Attributes
   private readonly _tasks: Task[] = [];

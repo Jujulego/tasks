@@ -1,4 +1,4 @@
-import { GroupTask } from '@/src/groups/group-task.js';
+import { GroupTask } from '@/src/groups/group-task.legacy.js';
 import { Task, TaskOptions, TaskStatus } from '@/src/task.js';
 import { logger$ } from '@kyrielle/logger';
 import { vi } from 'vitest';
