@@ -1,6 +1,6 @@
 import { waitFor$ } from '@jujulego/event-tree';
 
-import { Task, TaskContext } from '../task.js';
+import { Task, TaskContext } from '../task.legacy.js';
 import { SequenceGroup } from './sequence-group.js';
 
 // Class

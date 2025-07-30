@@ -1,11 +1,10 @@
 import wt from 'node:worker_threads';
-
-import { TaskMessage, HandlerMessage } from './messages.js';
+import type { TaskMessage, HandlerMessage } from './messages.js';
 
 // Class
 export abstract class WorkerHandler {
   // Attributes
-  private _port: wt.MessagePort;
+  private _port?: wt.MessagePort;
 
   // Methods
   protected abstract _run(payload: unknown): void | Promise<void>;

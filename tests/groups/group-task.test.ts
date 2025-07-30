@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { Task } from '@/src/task.js';
+import { Task } from '@/src/task.legacy.js';
 import { TaskManager } from '@/src/task-manager.js';
 
 import { spyLogger, TestGroupTask, TestTask } from '../utils.js';

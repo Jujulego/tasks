@@ -1,7 +1,7 @@
 import os from 'node:os';
 import { vi } from 'vitest';
 
-import { Task } from '@/src/task.js';
+import { Task } from '@/src/task.legacy.js';
 import { TaskManager } from '@/src/task-manager.js';
 
 import { spyLogger, TestTask } from './utils.js';

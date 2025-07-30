@@ -1,6 +1,6 @@
 import { Listenable, inherit$, InheritEventMap, multiplexer$, source$ } from '@jujulego/event-tree';
 
-import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from '../task.js';
+import { Task, TaskContext, TaskEventMap, TaskOptions, TaskStatus, TaskSummary } from '../task.legacy.js';
 import { TaskManager } from '../task-manager.js';
 
 // Types

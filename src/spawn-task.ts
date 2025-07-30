@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import kill from 'tree-kill';
 
-import { Task, TaskContext, TaskEventMap, TaskOptions } from './task.js';
+import { Task, TaskContext, TaskEventMap, TaskOptions } from './task.legacy.js';
 
 // Types
 export type SpawnTaskStream = 'stdout' | 'stderr';
