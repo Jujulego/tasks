@@ -82,7 +82,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
     const previous = this._status;
     this._status = status;
 
-    this.logger$.debug`${this.name} status changed to ${status} (was ${previous})`;
+    this.logger$.debug(`${this.name} status changed to ${status} (was ${previous})`);
     this.events$.emit(`status.${status}`, { previous, status });
 
     // Emit completed
@@ -155,7 +155,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
       throw Error(`Cannot start a ${this._status} task`);
     }
 
-    this.logger$.verbose`starting ${this.name}`;
+    this.logger$.verbose(`starting ${this.name}`);
     this.setStatus('starting');
     this._startTime = Date.now();
 
@@ -169,7 +169,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
    */
   stop(): void {
     if (['starting', 'running'].includes(this._status)) {
-      this.logger$.verbose`stopping ${this.name}`;
+      this.logger$.verbose(`stopping ${this.name}`);
       this.onStop();
     }
   }

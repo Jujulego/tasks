@@ -1,15 +1,13 @@
 import crypto from 'node:crypto';
-import { vi } from 'vitest';
-
-import { TaskCompletedEvent, TaskStatusEvent } from '@/src/task.legacy.js';
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { TaskEventCompleted, TaskEventStatus } from '@/src/task.js';
 import { spyLogger, TestTask } from './utils.js';
 
 // Setup
 let task: TestTask;
 
-const completedEventSpy = vi.fn<[TaskCompletedEvent], void>();
-const statusEventSpy = vi.fn<[TaskStatusEvent], void>();
+const completedEventSpy = vi.fn<(event: TaskEventCompleted) => void>();
+const statusEventSpy = vi.fn<(event: TaskEventStatus) => void>();
 
 beforeEach(() => {
   task = new TestTask('test');
@@ -17,8 +15,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.useRealTimers();
 
-  task.on('completed', completedEventSpy);
-  task.on('status', statusEventSpy);
+  task.events$.on('completed', completedEventSpy);
+  task.events$.on('status', statusEventSpy);
 });
 
 // Tests
@@ -51,14 +49,12 @@ describe('Task.dependsOn', () => {
     expect(task.status).toBe('failed');
   });
 
-  for (const status of ['running', 'done', 'failed'] as const) {
-    it(`should throw if task is ${status}`, () => {
-      task.setStatus(status);
+  it.each(['running', 'done', 'failed'] as const)('should throw if task is %s', (status) => {
+    task.setStatus(status);
 
-      expect(() => task.dependsOn(dep))
-        .toThrow(`Cannot add a dependency to a ${status} task`);
-    });
-  }
+    expect(() => task.dependsOn(dep))
+      .toThrow(`Cannot add a dependency to a ${status} task`);
+  });
 });
 
 describe('Task.complexity', () => {
@@ -105,42 +101,38 @@ describe('Task.complexity', () => {
 });
 
 describe('Task.start', () => {
-  it('should call inner _start method', () => {
+  it('should call inner onStart method', () => {
     task.start();
 
-    expect(task._start).toHaveBeenCalled();
+    expect(task.onStart).toHaveBeenCalled();
     expect(task.status).toBe('starting');
-    expect(spyLogger.verbose).toHaveBeenCalledWith('Starting test');
+    expect(spyLogger.verbose).toHaveBeenCalledWith('starting test');
   });
 
-  for (const status of ['blocked', 'starting', 'running', 'done', 'failed'] as const) {
-    it(`should throw if task is ${status}`, () => {
-      task.setStatus(status);
+  it.each(['blocked', 'starting', 'running', 'done', 'failed'] as const)('should throw if task is %s', (status) => {
+    task.setStatus(status);
 
-      expect(() => task.start())
-        .toThrow(`Cannot start a ${status} task`);
-    });
-  }
+    expect(() => task.start())
+      .toThrow(`Cannot start a ${status} task`);
+  });
 });
 
 describe('Task.stop', () => {
-  it('should call inner _stop method', () => {
+  it('should call inner onStop method', () => {
     task.setStatus('running');
     task.stop();
 
-    expect(task._stop).toHaveBeenCalled();
-    expect(spyLogger.verbose).toHaveBeenCalledWith('Stopping test');
+    expect(task.onStop).toHaveBeenCalled();
+    expect(spyLogger.verbose).toHaveBeenCalledWith('stopping test');
   });
 
-  for (const status of ['blocked', 'ready', 'done', 'failed'] as const) {
-    it(`should do nothing if task is ${status}`, () => {
-      task.setStatus(status);
-      task.stop();
+  it.each(['blocked', 'ready', 'done', 'failed'] as const)('should do nothing if task is %s', (status) => {
+    task.setStatus(status);
+    task.stop();
 
-      expect(task._stop).not.toHaveBeenCalled();
-      expect(spyLogger.verbose).not.toHaveBeenCalled();
-    });
-  }
+    expect(task.onStop).not.toHaveBeenCalled();
+    expect(spyLogger.verbose).not.toHaveBeenCalled();
+  });
 });
 
 describe('Task.id', () => {
@@ -164,21 +156,17 @@ describe('Task.id', () => {
 });
 
 describe('Task.completed', () => {
-  for (const status of ['blocked', 'ready', 'running'] as const) {
-    it(`should be false for ${status}`, () => {
-      task.setStatus(status);
+  it.each(['blocked', 'ready', 'running'] as const)('should be false for %s', (status) => {
+    task.setStatus(status);
 
-      expect(task.completed).toBe(false);
-    });
-  }
+    expect(task.completed).toBe(false);
+  });
 
-  for (const status of ['done', 'failed'] as const) {
-    it(`should be true for ${status}`, () => {
-      task.setStatus(status);
+  it.each(['done', 'failed'] as const)('should be true for %s', (status) => {
+    task.setStatus(status);
 
-      expect(task.completed).toBe(true);
-    });
-  }
+    expect(task.completed).toBe(true);
+  });
 });
 
 describe('Task.duration', () => {
@@ -234,46 +222,42 @@ describe('Task.status', () => {
     expect(task.status).toBe('ready');
   });
 
-  for (const status of ['blocked', 'running'] as const) {
-    it(`should emit and log status change (ready => ${status})`, () => {
-      task.setStatus(status);
+  it.each(['blocked', 'running'] as const)('should emit and log status change (ready => %s)', (status) => {
+    task.setStatus(status);
 
-      expect(task.status).toBe(status);
-      expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
-      expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'ready', status });
+    expect(task.status).toBe(status);
+    expect(spyLogger.debug).toHaveBeenCalledWith(`test status changed to ${status} (was ready)`);
+    expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'ready', status });
 
-      expect(completedEventSpy).not.toHaveBeenCalled();
-    });
-  }
+    expect(completedEventSpy).not.toHaveBeenCalled();
+  });
 
-  for (const status of ['done', 'failed'] as const) {
-    it(`should emit and log status change (starting => ${status})`, () => {
-      // Start task to store current date then "wait" for 1s
-      vi.useFakeTimers();
+  it.each(['done', 'failed'] as const)('should emit and log status change (starting => %s)', (status) => {
+    // Start task to store current date then "wait" for 1s
+    vi.useFakeTimers();
 
-      task.start();
-      vi.advanceTimersByTime(1000);
+    task.start();
+    vi.advanceTimersByTime(1000);
 
-      // Set completed status
-      task.setStatus(status);
+    // Set completed status
+    task.setStatus(status);
 
-      expect(task.status).toBe(status);
-      expect(spyLogger.debug).toHaveBeenCalledWith(`test is ${status}`);
-      expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'starting', status });
+    expect(task.status).toBe(status);
+    expect(spyLogger.debug).toHaveBeenCalledWith(`test status changed to ${status} (was starting)`);
+    expect(statusEventSpy).toHaveBeenCalledWith({ previous: 'starting', status });
 
-      expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 1000 });
-    });
+    expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 1000 });
+  });
 
-    it(`should emit completed with 0 duration (ready => ${status})`, () => {
-      // Start task to store current date then "wait" for 1s
-      vi.useFakeTimers();
+  it.each(['done', 'failed'] as const)('should emit completed with 0 duration (ready => %s)', (status) => {
+    // Start task to store current date then "wait" for 1s
+    vi.useFakeTimers();
 
-      vi.advanceTimersByTime(1000);
-      task.setStatus(status);
+    vi.advanceTimersByTime(1000);
+    task.setStatus(status);
 
-      expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 0 });
-    });
-  }
+    expect(completedEventSpy).toHaveBeenCalledWith({ status, duration: 0 });
+  });
 
   it('should not emit no effective change', () => {
     task.setStatus('ready');

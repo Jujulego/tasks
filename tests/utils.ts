@@ -1,8 +1,7 @@
-import { logger$ } from '@jujulego/logger';
-import { vi } from 'vitest';
-
 import { GroupTask } from '@/src/groups/group-task.js';
-import { Task, TaskOptions, TaskStatus } from '@/src/task.legacy.js';
+import { Task, TaskOptions, TaskStatus } from '@/src/task.js';
+import { logger$ } from '@kyrielle/logger';
+import { vi } from 'vitest';
 
 // Classes
 export class TestTask extends Task {
@@ -12,9 +11,8 @@ export class TestTask extends Task {
   }
 
   // Methods
-  emit = this._taskEvents.emit;
-  _start = vi.fn();
-  _stop = vi.fn();
+  readonly onStart = vi.fn();
+  readonly onStop = vi.fn();
 
   setStatus(status: TaskStatus) {
     super.setStatus(status);
@@ -24,7 +22,7 @@ export class TestTask extends Task {
 export class TestGroupTask extends GroupTask {
   // Constructor
   constructor(name: string, opts: TaskOptions = {}) {
-    super(name, {}, { logger: spyLogger, ...opts });
+    super(name, {}, { logger: spyLogger as any, ...opts });
   }
 
   // Methods
