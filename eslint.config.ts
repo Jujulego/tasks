@@ -31,6 +31,9 @@ export default tsEslint.config(
       '@typescript-eslint/no-empty-object-type': ['error', {
         allowInterfaces: 'with-single-extends'
       }],
+      '@typescript-eslint/no-unused-expressions': ['error', {
+        allowTaggedTemplates: true
+      }],
       quotes: ['error', 'single'],
       semi: ['error', 'always'],
       'no-console': ['error', {

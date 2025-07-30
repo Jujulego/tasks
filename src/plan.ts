@@ -1,4 +1,4 @@
-import { Task, TaskSummary } from './task.js';
+import { Task, TaskSummary } from './task.legacy.js';
 import { GroupTask } from './groups/index.js';
 
 // Utils

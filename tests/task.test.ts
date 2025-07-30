@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { vi } from 'vitest';
 
-import { TaskCompletedEvent, TaskStatusEvent } from '@/src/task.js';
+import { TaskCompletedEvent, TaskStatusEvent } from '@/src/task.legacy.js';
 
 import { spyLogger, TestTask } from './utils.js';
 

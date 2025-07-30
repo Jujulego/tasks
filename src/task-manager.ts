@@ -3,7 +3,7 @@ import { Logger } from '@jujulego/logger';
 import os from 'node:os';
 
 import { logger } from './logger.js';
-import { Task } from './task.js';
+import { Task } from './task.legacy.js';
 
 // Types
 export interface TaskManagerOpts {

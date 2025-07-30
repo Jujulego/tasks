@@ -1,6 +1,6 @@
 import wt from 'node:worker_threads';
 
-import { Task, TaskContext, TaskOptions } from '../task.js';
+import { Task, TaskContext, TaskOptions } from '../task.legacy.js';
 import { HandlerMessage, TaskMessage } from './messages.js';
 import { WorkerPool } from './worker-pool.js';
 

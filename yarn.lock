@@ -501,6 +501,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jujulego/quick-tag@npm:^1.0.1":
+  version: 1.0.3
+  resolution: "@jujulego/quick-tag@npm:1.0.3"
+  dependencies:
+    "@swc/helpers": "npm:^0.5.3"
+    safe-stable-stringify: "npm:^2.4.3"
+  dependenciesMeta:
+    vitest@1.4.0:
+      unplugged: true
+  checksum: 10c0/9300898423719286bb0ca71e1c7f17bee4d7d932dfa29e91fe8a433213a137c625d545ddb21148a73b54e3534445882d9bbea49e201de0d0ecf027b69aa3c5ff
+  languageName: node
+  linkType: hard
+
 "@jujulego/tasks@workspace:.":
   version: 0.0.0-use.local
   resolution: "@jujulego/tasks@workspace:."
@@ -510,6 +523,7 @@ __metadata:
     "@jujulego/logger": "npm:^0.2.2"
     "@jujulego/utils": "npm:^2.0.0"
     "@jujulego/vite-plugin-swc": "npm:1.2.0"
+    "@kyrielle/logger": "npm:^2.0.0"
     "@microsoft/eslint-formatter-sarif": "npm:3.1.0"
     "@swc/cli": "npm:0.7.8"
     "@swc/core": "npm:1.13.3"
@@ -551,6 +565,21 @@ __metadata:
   peerDependencies:
     "@swc/core": ^1.3.0
   checksum: 10c0/220730b4c9c4188d4e076c9fa6466f722eaaa84eb34947555aeabee6b7413e84154c821b80c6974d92ed30ebd21e6b10df7e0d5a9e65eb2685372147112189f0
+  languageName: node
+  linkType: hard
+
+"@kyrielle/logger@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@kyrielle/logger@npm:2.0.0"
+  dependencies:
+    "@jujulego/quick-tag": "npm:^1.0.1"
+    "@swc/helpers": "npm:^0.5.3"
+    kyrielle: "npm:^2.2.1"
+    pretty-ms: "npm:^9.0.0"
+  dependenciesMeta:
+    vitest@2.1.4:
+      unplugged: true
+  checksum: 10c0/7adf1731d5a47f488a75da5ce4b108b5fc64e997df8413385cf2a09814346dba9b404100d7317578c30aec669650dd79dedddf5dbbd2a36b78df65bc2f3ea60d
   languageName: node
   linkType: hard
 
@@ -3146,7 +3175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kyrielle@npm:^2.3.1":
+"kyrielle@npm:^2.2.1, kyrielle@npm:^2.3.1":
   version: 2.3.1
   resolution: "kyrielle@npm:2.3.1"
   dependencies:
@@ -3603,6 +3632,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parse-ms@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "parse-ms@npm:4.0.0"
+  checksum: 10c0/a7900f4f1ebac24cbf5e9708c16fb2fd482517fad353aecd7aefb8c2ba2f85ce017913ccb8925d231770404780df46244ea6fec598b3bde6490882358b4d2d16
+  languageName: node
+  linkType: hard
+
 "path-exists@npm:^4.0.0":
   version: 4.0.0
   resolution: "path-exists@npm:4.0.0"
@@ -3717,6 +3753,15 @@ __metadata:
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
   checksum: 10c0/b00d617431e7886c520a6f498a2e14c75ec58f6d93ba48c3b639cf241b54232d90daa05d83a9e9b9fef6baa63cb7e1e4602c2372fea5bc169668401eb127d0cd
+  languageName: node
+  linkType: hard
+
+"pretty-ms@npm:^9.0.0":
+  version: 9.2.0
+  resolution: "pretty-ms@npm:9.2.0"
+  dependencies:
+    parse-ms: "npm:^4.0.0"
+  checksum: 10c0/ab6d066f90e9f77020426986e1b018369f41575674544c539aabec2e63a20fec01166d8cf6571d0e165ad11cfe5a8134a2a48a36d42ab291c59c6deca5264cbb
   languageName: node
   linkType: hard
 
@@ -3939,6 +3984,13 @@ __metadata:
   version: 5.2.1
   resolution: "safe-buffer@npm:5.2.1"
   checksum: 10c0/6501914237c0a86e9675d4e51d89ca3c21ffd6a31642efeba25ad65720bce6921c9e7e974e5be91a786b25aa058b5303285d3c15dbabf983a919f5f630d349f3
+  languageName: node
+  linkType: hard
+
+"safe-stable-stringify@npm:^2.4.3":
+  version: 2.5.0
+  resolution: "safe-stable-stringify@npm:2.5.0"
+  checksum: 10c0/baea14971858cadd65df23894a40588ed791769db21bafb7fd7608397dbdce9c5aac60748abae9995e0fc37e15f2061980501e012cd48859740796bea2987f49
   languageName: node
   linkType: hard
 
