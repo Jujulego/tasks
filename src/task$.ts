@@ -1,5 +1,5 @@
+import { group$, multiplexer$, source$ } from 'kyrielle';
 import crypto from 'node:crypto';
-import { multiplexer$, source$ } from 'kyrielle';
 
 /**
  * Represents a task state
@@ -17,7 +17,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
 
   readonly events$ = multiplexer$({
     completed: source$<TaskEventCompleted>(),
-    status: multiplexer$({
+    status: group$({
       blocked: source$<TaskEventStatus>(),
       ready: source$<TaskEventStatus>(),
       starting: source$<TaskEventStatus>(),
