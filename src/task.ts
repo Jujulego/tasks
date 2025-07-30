@@ -22,12 +22,12 @@ export abstract class Task<C extends TaskContext = TaskContext> {
   readonly events$ = multiplexer$({
     completed: source$<TaskEventCompleted>(),
     status: group$({
-      blocked: source$<TaskEventStatus>(),
-      ready: source$<TaskEventStatus>(),
-      starting: source$<TaskEventStatus>(),
-      running: source$<TaskEventStatus>(),
-      done: source$<TaskEventStatus>(),
-      failed: source$<TaskEventStatus>(),
+      blocked: source$<TaskEventStatus<'blocked'>>(),
+      ready: source$<TaskEventStatus<'ready'>>(),
+      starting: source$<TaskEventStatus<'starting'>>(),
+      running: source$<TaskEventStatus<'running'>>(),
+      done: source$<TaskEventStatus<'done'>>(),
+      failed: source$<TaskEventStatus<'failed'>>(),
     })
   });
   readonly logger$: Logger;
