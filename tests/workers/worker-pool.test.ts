@@ -1,6 +1,5 @@
 import util from 'util';
-import { vi } from 'vitest';
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WorkerPoolTest } from './utils.js';
 
 // Setup
@@ -9,7 +8,7 @@ let pool: WorkerPoolTest;
 beforeEach(() => {
   pool = new WorkerPoolTest(1);
 
-  vi.spyOn(pool, '_start');
+  vi.spyOn(pool, 'onStart');
 });
 
 // Tests
@@ -23,8 +22,8 @@ describe('WorkerPool', () => {
 
     expect(pool.size).toBe(1);
 
-    expect(pool._start).toHaveBeenCalledTimes(1);
-    expect(pool._start).toHaveReturnedWith(worker);
+    expect(pool.onStart).toHaveBeenCalledTimes(1);
+    expect(pool.onStart).toHaveReturnedWith(worker);
 
     expect(worker.on).toHaveBeenCalledWith('exit', expect.any(Function));
   });
@@ -45,7 +44,7 @@ describe('WorkerPool', () => {
     await expect(prom).resolves.toBe(worker);
 
     expect(worker.ref).toHaveBeenCalled();
-    expect(pool._start).toHaveBeenCalledTimes(1);
+    expect(pool.onStart).toHaveBeenCalledTimes(1);
   });
 
   it('should resolve to an other worker (on next call, after it exited)', async () => {
@@ -61,6 +60,6 @@ describe('WorkerPool', () => {
 
     await expect(prom).resolves.not.toBe(worker);
 
-    expect(pool._start).toHaveBeenCalledTimes(2);
+    expect(pool.onStart).toHaveBeenCalledTimes(2);
   });
 });

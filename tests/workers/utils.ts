@@ -1,17 +1,16 @@
-import wt from 'node:worker_threads';
-import { EventEmitter } from 'node:events';
-import { vi } from 'vitest';
-
 import { WorkerHandler } from '@/src/workers/worker-handler.js';
 import { WorkerPool } from '@/src/workers/worker-pool.js';
 import { WorkerTask } from '@/src/workers/worker-task.js';
+import { EventEmitter } from 'node:events';
+import type wt from 'node:worker_threads';
+import { vi } from 'vitest';
 
 import { spyLogger } from '../utils.js';
 
 // Test pool
 export class WorkerPoolTest extends WorkerPool {
   // Methods
-  public _start(): wt.Worker {
+  onStart(): wt.Worker {
     const worker = new EventEmitter();
 
     Object.assign(worker, {
