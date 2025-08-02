@@ -8,7 +8,7 @@ on:
     branches: [ latest, next ]
 
 concurrency:
-  group: javascript-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
