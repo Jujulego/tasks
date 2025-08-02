@@ -469,38 +469,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^4.1.0, @jujulego/event-tree@npm:^4.1.1, @jujulego/event-tree@npm:^4.2.0":
-  version: 4.3.0
-  resolution: "@jujulego/event-tree@npm:4.3.0"
-  dependenciesMeta:
-    vitest@0.34.6:
-      unplugged: true
-  checksum: 10c0/8ceb88b3aa794496b88b1e2e7cd1e8b84d071d93e288fdb1ba36ab19934167d1c1f32f28b513f505bc03c5c723a33728640d88342fa9f85e3b37c618d6cc9226
-  languageName: node
-  linkType: hard
-
-"@jujulego/logger@npm:^0.2.2":
-  version: 0.2.4
-  resolution: "@jujulego/logger@npm:0.2.4"
-  dependencies:
-    "@jujulego/event-tree": "npm:^4.1.1"
-    "@jujulego/quick-tag": "npm:^0.3.3"
-    chalk: "npm:^5.3.0"
-    chalk-template: "npm:^1.1.0"
-  checksum: 10c0/01c1800c7bb1218a5b997658d91f6312aa56cd438fcb82128b0ff9926458d29a4b58f87512d9d3f2dd7dedcaeb363ea9200df98a7eb750338fe389b82786e75d
-  languageName: node
-  linkType: hard
-
-"@jujulego/quick-tag@npm:^0.3.3":
-  version: 0.3.3
-  resolution: "@jujulego/quick-tag@npm:0.3.3"
-  dependenciesMeta:
-    vitest@0.34.6:
-      unplugged: true
-  checksum: 10c0/ec8b9f7e46e524412babfc732f960f9ca651f6d256f9deebc5f5129cb70e36d479cbe81edd83baa95f785238592ab74cbd35c305042b8332b917f14286bb2acc
-  languageName: node
-  linkType: hard
-
 "@jujulego/quick-tag@npm:^1.0.1":
   version: 1.0.3
   resolution: "@jujulego/quick-tag@npm:1.0.3"
@@ -519,9 +487,6 @@ __metadata:
   resolution: "@jujulego/tasks@workspace:."
   dependencies:
     "@eslint/js": "npm:9.32.0"
-    "@jujulego/event-tree": "npm:^4.2.0"
-    "@jujulego/logger": "npm:^0.2.2"
-    "@jujulego/utils": "npm:^2.0.0"
     "@jujulego/vite-plugin-swc": "npm:1.2.0"
     "@kyrielle/logger": "npm:^2.0.0"
     "@microsoft/eslint-formatter-sarif": "npm:3.1.0"
@@ -547,15 +512,6 @@ __metadata:
       unplugged: true
   languageName: unknown
   linkType: soft
-
-"@jujulego/utils@npm:^2.0.0":
-  version: 2.1.1
-  resolution: "@jujulego/utils@npm:2.1.1"
-  dependencies:
-    "@jujulego/event-tree": "npm:^4.1.0"
-  checksum: 10c0/cf408db0d8825a632c34ae3e8c18044556372a29111d29db17165cc4c4f4b70a582edef31f82f3033729da62c86ca7307fef83663e3cf95b7fe3ceff0ef32a8b
-  languageName: node
-  linkType: hard
 
 "@jujulego/vite-plugin-swc@npm:1.2.0":
   version: 1.2.0
@@ -1873,15 +1829,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk-template@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "chalk-template@npm:1.1.0"
-  dependencies:
-    chalk: "npm:^5.2.0"
-  checksum: 10c0/bb6eda6115a33d06828caf8c44f786c26e0d392c74c2bd6bb0f7526588b15664e3e7c0305858531cdd9b266fc54a31fe71fe3844afcd47a3e67445313f149437
-  languageName: node
-  linkType: hard
-
 "chalk@npm:^4.0.0":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
@@ -1889,13 +1836,6 @@ __metadata:
     ansi-styles: "npm:^4.1.0"
     supports-color: "npm:^7.1.0"
   checksum: 10c0/4a3fef5cc34975c898ffe77141450f679721df9dde00f6c304353fa9c8b571929123b26a0e4617bde5018977eb655b31970c297b91b63ee83bb82aeb04666880
-  languageName: node
-  linkType: hard
-
-"chalk@npm:^5.2.0, chalk@npm:^5.3.0":
-  version: 5.4.1
-  resolution: "chalk@npm:5.4.1"
-  checksum: 10c0/b23e88132c702f4855ca6d25cb5538b1114343e41472d5263ee8a37cccfccd9c4216d111e1097c6a27830407a1dc81fecdf2a56f2c63033d4dbbd88c10b0dcef
   languageName: node
   linkType: hard
 
