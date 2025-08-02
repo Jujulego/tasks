@@ -1,7 +1,7 @@
 import { type Logger, logger$ } from '@kyrielle/logger';
 import { group$, multiplexer$, source$ } from 'kyrielle';
 import crypto from 'node:crypto';
-import type { GroupTask } from './groups/index.js';
+import type { GroupTask } from './groups/group-task.js';
 import type { TaskManager } from './task-manager.js';
 
 /**
@@ -19,7 +19,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
   readonly id: string;
   readonly weight: number;
 
-  readonly events$ = multiplexer$({
+  protected readonly taskEvents$ = multiplexer$({
     completed: source$<TaskEventCompleted>(),
     status: group$({
       blocked: source$<TaskEventStatus<'blocked'>>(),
@@ -177,12 +177,12 @@ export abstract class Task<C extends TaskContext = TaskContext> {
   // Properties
   abstract get name(): string;
 
-  get dependencies(): readonly Task[] {
-    return this._dependencies;
-  }
-
   get completed(): boolean {
     return ['done', 'failed'].includes(this.status);
+  }
+
+  get dependencies(): readonly Task[] {
+    return this._dependencies;
   }
 
   get duration(): number {
@@ -191,6 +191,10 @@ export abstract class Task<C extends TaskContext = TaskContext> {
     }
 
     return (this._endTime || Date.now()) - this._startTime;
+  }
+
+  get events$() {
+    return this.taskEvents$;
   }
 
   get group(): GroupTask | undefined {

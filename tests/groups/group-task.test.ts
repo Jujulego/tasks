@@ -1,17 +1,15 @@
-import { vi } from 'vitest';
-
-import { Task } from '@/src/task.legacy.js';
-import { TaskManager } from '@/src/task-manager.legacy.js';
-
+import { TaskManager } from '@/src/task-manager.js';
+import type { Task } from '@/src/task.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { spyLogger, TestGroupTask, TestTask } from '../utils.js';
 
 // Setup
 let group: TestGroupTask;
 let manager: TaskManager;
 
-const taskAddedEventSpy = vi.fn<[Task], void>();
-const taskStartedEventSpy = vi.fn<[Task], void>();
-const taskCompletedEventSpy = vi.fn<[Task], void>();
+const taskAddedEventSpy = vi.fn<(task: Task) => void>();
+const taskStartedEventSpy = vi.fn<(task: Task) => void>();
+const taskCompletedEventSpy = vi.fn<(task: Task) => void>();
 
 beforeEach(() => {
   group = new TestGroupTask('test');
@@ -19,9 +17,9 @@ beforeEach(() => {
 
   vi.clearAllMocks();
 
-  group.on('task.added', taskAddedEventSpy);
-  group.on('task.started', taskStartedEventSpy);
-  group.on('task.completed', taskCompletedEventSpy);
+  group.events$.on('task.added', taskAddedEventSpy);
+  group.events$.on('task.started', taskStartedEventSpy);
+  group.events$.on('task.completed', taskCompletedEventSpy);
 });
 
 // Tests
@@ -50,7 +48,7 @@ describe('GroupTask.add', () => {
     const task = new TestTask('test-1');
     group.add(task);
 
-    task.emit('completed', { status: 'done', duration: 1000 });
+    task.events$.emit('completed', { status: 'done', duration: 1000 });
 
     expect(taskCompletedEventSpy).toHaveBeenCalledWith(task);
   });
@@ -71,7 +69,7 @@ describe('GroupTask.start', () => {
     // Mock orchestrate
     const task = new TestTask('test-1');
 
-    group._orchestrate.mockImplementation(async function* () {
+    vi.mocked(group.onOrchestrate).mockImplementation(async function* () {
       yield task;
     });
 
@@ -82,7 +80,7 @@ describe('GroupTask.start', () => {
     vi.spyOn(group, 'add');
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(group._orchestrate).toHaveBeenCalled();
+    expect(group.onOrchestrate).toHaveBeenCalled();
     expect(group.add).toHaveBeenCalledWith(task);
     expect(manager.add).toHaveBeenCalledWith(task);
   });
@@ -90,13 +88,13 @@ describe('GroupTask.start', () => {
   it('should throw if called directly, without a manager', () => {
     expect(() => group.start()).toThrow('A GroupTask must be started using a TaskManager');
 
-    expect(group._orchestrate).not.toHaveBeenCalled();
+    expect(group.onOrchestrate).not.toHaveBeenCalled();
   });
 
   it('should stop itself if orchestrate fails', async () => {
     // Mock orchestrate
     // eslint-disable-next-line require-yield
-    group._orchestrate.mockImplementation(async function* () {
+    vi.mocked(group.onOrchestrate).mockImplementation(async function* () {
       throw new Error('Failed !');
     });
 
@@ -106,7 +104,7 @@ describe('GroupTask.start', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(group.status).toBe('failed');
-    expect(group._stop).toHaveBeenCalled();
+    expect(group.onStop).toHaveBeenCalled();
 
     expect(spyLogger.error).toHaveBeenCalledWith(
       'An error happened in group test. Stopping it',

@@ -1,4 +1,4 @@
-import { GroupTask } from '@/src/groups/group-task.legacy.js';
+import { GroupTask } from '@/src/groups/group-task.js';
 import { Task, TaskOptions, TaskStatus } from '@/src/task.js';
 import { logger$ } from '@kyrielle/logger';
 import { vi } from 'vitest';
@@ -26,8 +26,8 @@ export class TestGroupTask extends GroupTask {
   }
 
   // Methods
-  _orchestrate = vi.fn();
-  _stop = vi.fn();
+  readonly onOrchestrate = vi.fn();
+  readonly onStop = vi.fn();
 }
 
 // Logger
