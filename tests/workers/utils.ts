@@ -36,7 +36,7 @@ export class WorkerTaskTest extends WorkerTask {
   }
 
   // Methods
-  _handleEvent = vi.fn();
+  onEvent = vi.fn();
 }
 
 // Test handler

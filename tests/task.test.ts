@@ -101,34 +101,33 @@ describe('Task.complexity', () => {
 });
 
 describe('Task.start', () => {
-  it('should call inner onStart method', () => {
-    task.start();
+  it('should call inner onStart method', async () => {
+    await task.start();
 
     expect(task.onStart).toHaveBeenCalled();
     expect(task.status).toBe('starting');
     expect(spyLogger.verbose).toHaveBeenCalledWith('starting test');
   });
 
-  it.each(['blocked', 'starting', 'running', 'done', 'failed'] as const)('should throw if task is %s', (status) => {
+  it.each(['blocked', 'starting', 'running', 'done', 'failed'] as const)('should throw if task is %s', async (status) => {
     task.setStatus(status);
 
-    expect(() => task.start())
-      .toThrow(`Cannot start a ${status} task`);
+    await expect(task.start).rejects.toThrow(`Cannot start a ${status} task`);
   });
 });
 
 describe('Task.stop', () => {
-  it('should call inner onStop method', () => {
+  it('should call inner onStop method', async () => {
     task.setStatus('running');
-    task.stop();
+    await task.stop();
 
     expect(task.onStop).toHaveBeenCalled();
     expect(spyLogger.verbose).toHaveBeenCalledWith('stopping test');
   });
 
-  it.each(['blocked', 'ready', 'done', 'failed'] as const)('should do nothing if task is %s', (status) => {
+  it.each(['blocked', 'ready', 'done', 'failed'] as const)('should do nothing if task is %s', async (status) => {
     task.setStatus(status);
-    task.stop();
+    await task.stop();
 
     expect(task.onStop).not.toHaveBeenCalled();
     expect(spyLogger.verbose).not.toHaveBeenCalled();
@@ -178,8 +177,8 @@ describe('Task.duration', () => {
     expect(task.duration).toBe(0);
   });
 
-  it('should be at spent time since start', () => {
-    task.start();
+  it('should be at spent time since start', async () => {
+    await task.start();
 
     vi.advanceTimersByTime(500);
     expect(task.duration).toBe(500);
@@ -188,8 +187,8 @@ describe('Task.duration', () => {
     expect(task.duration).toBe(1000);
   });
 
-  it('should store duration at done time', () => {
-    task.start();
+  it('should store duration at done time', async () => {
+    await task.start();
 
     // "wait" and complete
     vi.advanceTimersByTime(500);
@@ -202,8 +201,8 @@ describe('Task.duration', () => {
     expect(task.duration).toBe(500);
   });
 
-  it('should store duration at failed time', () => {
-    task.start();
+  it('should store duration at failed time', async () => {
+    await task.start();
 
     // "wait" and complete
     vi.advanceTimersByTime(500);
@@ -232,11 +231,11 @@ describe('Task.status', () => {
     expect(completedEventSpy).not.toHaveBeenCalled();
   });
 
-  it.each(['done', 'failed'] as const)('should emit and log status change (starting => %s)', (status) => {
+  it.each(['done', 'failed'] as const)('should emit and log status change (starting => %s)', async (status) => {
     // Start task to store current date then "wait" for 1s
     vi.useFakeTimers();
 
-    task.start();
+    await task.start();
     vi.advanceTimersByTime(1000);
 
     // Set completed status

@@ -45,13 +45,13 @@ export abstract class Task<C extends TaskContext = TaskContext> {
    * Called to start the task.
    * @protected
    */
-  protected abstract onStart(manager?: TaskManager): void;
+  protected abstract onStart(manager?: TaskManager): Promise<void> | void;
 
   /**
    * Called to stop the task.
    * @protected
    */
-  protected abstract onStop(): void;
+  protected abstract onStop(): Promise<void> | void;
 
   // Methods
   private _recomputeStatus(): void {
@@ -150,7 +150,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
    * The task will be started only if its status is "ready".
    * In other cases, it will throw an error.
    */
-  start(manager?: TaskManager): void {
+  async start(manager?: TaskManager): Promise<void> {
     if (this._status !== 'ready') {
       throw Error(`Cannot start a ${this._status} task`);
     }
@@ -159,7 +159,7 @@ export abstract class Task<C extends TaskContext = TaskContext> {
     this.setStatus('starting');
     this._startTime = Date.now();
 
-    this.onStart(manager);
+    await this.onStart(manager);
   }
 
   /**
@@ -167,10 +167,10 @@ export abstract class Task<C extends TaskContext = TaskContext> {
    * The task will be stopped only if its status is "starting" or "running".
    * In other cases, it won't do anything.
    */
-  stop(): void {
+  async stop(): Promise<void> {
     if (['starting', 'running'].includes(this._status)) {
       this.logger$.verbose(`stopping ${this.name}`);
-      this.onStop();
+      await this.onStop();
     }
   }
 

@@ -1,8 +1,7 @@
-import wt from 'node:worker_threads';
-
-import { Task, TaskContext, TaskOptions } from '../task.legacy.js';
-import { HandlerMessage, TaskMessage } from './messages.js';
-import { WorkerPool } from './worker-pool.js';
+import type wt from 'node:worker_threads';
+import { Task, type TaskContext, type TaskOptions } from '../task.js';
+import type { HandlerMessage, TaskMessage } from './messages.js';
+import type { WorkerPool } from './worker-pool.js';
 
 // Class
 export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Task<C> {
@@ -21,11 +20,11 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
 
   // Methods
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected _handleEvent(_payload: unknown): void {
+  protected onEvent(payload: unknown): void {
     return;
   }
 
-  protected async _start(): Promise<void> {
+  protected async onStart(): Promise<void> {
     const worker = await this.pool.reserveWorker();
     this._worker = worker;
 
@@ -42,19 +41,19 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
 
         case 'failure':
           this.pool.freeWorker(worker);
-          this._logger.error(`Error while running ${this.name}`, message.error as Error);
+          this.logger$.error(`Error while running ${this.name}`, message.error as Error);
           this.setStatus('failed');
 
           break;
 
         case 'event':
-          this._handleEvent(message.payload);
+          this.onEvent(message.payload);
           break;
       }
     });
 
     worker.on('messageerror', (err) => {
-      this._logger.warning(`Error while receiving a message from ${this.name}`, err);
+      this.logger$.warning(`Error while receiving a message from ${this.name}`, err);
     });
 
     worker.on('exit', (code) => {
@@ -66,7 +65,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
     });
 
     worker.on('error', (err) => {
-      this._logger.error(`Error while running ${this.name}`, err);
+      this.logger$.error(`Error while running ${this.name}`, err);
 
       this.pool.freeWorker(worker);
       this.setStatus('failed');
@@ -83,7 +82,7 @@ export abstract class WorkerTask<C extends TaskContext = TaskContext> extends Ta
     this._worker.postMessage(msg);
   }
 
-  protected _stop(): void {
-    this._worker?.terminate();
+  protected async onStop(): Promise<void> {
+    await this._worker?.terminate();
   }
 }
