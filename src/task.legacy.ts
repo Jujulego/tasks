@@ -49,6 +49,7 @@ export interface TaskCompletedEvent {
   duration: number;
 }
 
+/** @deprecated */
 export type TaskEventMap = {
   completed: TaskCompletedEvent;
   status: TaskStatusEvent;

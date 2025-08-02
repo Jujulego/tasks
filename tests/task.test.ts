@@ -1,6 +1,6 @@
+import type { TaskEventCompleted, TaskEventStatus } from '@/src/task.js';
 import crypto from 'node:crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TaskEventCompleted, TaskEventStatus } from '@/src/task.js';
 import { spyLogger, TestTask } from './utils.js';
 
 // Setup

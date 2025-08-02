@@ -26,8 +26,8 @@ export class TestGroupTask extends GroupTask {
   }
 
   // Methods
-  _orchestrate = vi.fn();
-  _stop = vi.fn();
+  readonly onOrchestrate = vi.fn();
+  readonly onStop = vi.fn();
 }
 
 // Logger

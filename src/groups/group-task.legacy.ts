@@ -1,15 +1,32 @@
-import { inherit$, multiplexer$, source$ } from 'kyrielle';
-import { type TaskManager } from '../task-manager.js';
-import { Task, type TaskContext, type TaskOptions, type TaskStatus, type TaskSummary } from '../task.js';
+import { inherit$, type InheritEventMap, type Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
+import type { TaskManager } from '../task-manager.legacy.js';
+import {
+  Task,
+  type TaskContext,
+  type TaskEventMap,
+  type TaskOptions,
+  type TaskStatus,
+  type TaskSummary
+} from '../task.legacy.js';
 
-/**
- * Represents a group of tasks. This task itself does nothing except orchestrating member tasks
- */
-export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> {
+// Types
+/** @deprecated */
+export type GroupTaskStats = Record<TaskStatus, number>;
+
+/** @deprecated */
+export type GroupTaskEventMap = InheritEventMap<TaskEventMap, {
+  'task.added': Task;
+  'task.started': Task;
+  'task.completed': Task;
+}>;
+
+// Class
+/** @deprecated */
+export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> implements Listenable<GroupTaskEventMap> {
   // Attributes
   private readonly _tasks: Task[] = [];
 
-  protected readonly groupEvents$ = multiplexer$({
+  protected readonly _groupEvents = inherit$(this._taskEvents,  {
     task: multiplexer$({
       added: source$<Task>(),
       started: source$<Task>(),
@@ -27,11 +44,15 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
   }
 
   // Methods
-  protected abstract onOrchestrate(): AsyncGenerator<Task>;
+  readonly on = this._groupEvents.on;
+  readonly off = this._groupEvents.off;
+  readonly clear = this._groupEvents.clear;
+
+  protected abstract _orchestrate(): AsyncGenerator<Task>;
 
   private async _loop(manager: TaskManager): Promise<void> {
     try {
-      for await (const task of this.onOrchestrate()) {
+      for await (const task of this._orchestrate()) {
         if (!this._tasks.includes(task)) {
           this.add(task);
         }
@@ -39,19 +60,19 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
         manager.add(task);
       }
     } catch (err) {
-      this.logger$.error(`An error happened in group ${this.name}. Stopping it`, err as Error);
+      this._logger.error(`An error happened in group ${this.name}. Stopping it`, err as Error);
 
       this.stop();
       this.setStatus('failed');
     }
   }
 
-  protected onStart(manager?: TaskManager) {
+  protected _start(manager?: TaskManager): void {
     if (!manager) {
       throw new Error('A GroupTask must be started using a TaskManager');
     }
 
-    void this._loop(manager);
+    this._loop(manager);
   }
 
   add(task: Task) {
@@ -64,23 +85,19 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     task.setGroup(this);
 
     // Listen to task events
-    task.events$.on('status.running', () => {
+    task.on('status.running', () => {
       this.setStatus('running');
-      this.groupEvents$.emit('task.started', task);
+      this._groupEvents.emit('task.started', task);
     });
 
-    task.events$.on('completed', () => {
-      this.groupEvents$.emit('task.completed', task);
+    task.on('completed', () => {
+      this._groupEvents.emit('task.completed', task);
     });
 
-    this.groupEvents$.emit('task.added', task);
+    this._groupEvents.emit('task.added', task);
   }
 
   // Properties
-  get events$() {
-    return inherit$(this.taskEvents$, this.groupEvents$);
-  }
-
   get tasks(): readonly Task[] {
     return this._tasks;
   }
@@ -108,6 +125,3 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     });
   }
 }
-
-// Types
-export type GroupTaskStats = Record<TaskStatus, number>;
