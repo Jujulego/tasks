@@ -1,7 +1,7 @@
 import { Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
 
 import { Task } from './task.legacy.js';
-import { TaskManager } from './task-manager.js';
+import { TaskManager } from './task-manager.legacy.js';
 
 // Types
 export interface TaskSetResults {

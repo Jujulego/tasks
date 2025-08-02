@@ -1,18 +1,16 @@
-import os from 'node:os';
-import { vi } from 'vitest';
-
-import { Task } from '@/src/task.legacy.js';
 import { TaskManager } from '@/src/task-manager.js';
-
+import type { Task } from '@/src/task.js';
+import os from 'node:os';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { spyLogger, TestTask } from './utils.js';
 
 // Setup
-let tasks: TestTask[];
+let tasks: [TestTask, TestTask, TestTask];
 let manager: TaskManager;
 
-const addedEventSpy = vi.fn<[Task], void>();
-const startedEventSpy = vi.fn<[Task], void>();
-const completedEventSpy = vi.fn<[Task], void>();
+const addedEventSpy = vi.fn<(task: Task) => void>();
+const startedEventSpy = vi.fn<(task: Task) => void>();
+const completedEventSpy = vi.fn<(task: Task) => void>();
 
 beforeEach(() => {
   tasks = [
@@ -26,9 +24,9 @@ beforeEach(() => {
   vi.resetAllMocks();
   vi.restoreAllMocks();
 
-  manager.on('added', addedEventSpy);
-  manager.on('started', startedEventSpy);
-  manager.on('completed', completedEventSpy);
+  manager.events$.on('added', addedEventSpy);
+  manager.events$.on('started', startedEventSpy);
+  manager.events$.on('completed', completedEventSpy);
 });
 
 // Tests

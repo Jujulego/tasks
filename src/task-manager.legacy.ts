@@ -1,29 +1,39 @@
-import { type Logger, logger$ } from '@kyrielle/logger';
-import { multiplexer$, once$, source$ } from 'kyrielle';
+import { multiplexer$, once$, source$ } from '@jujulego/event-tree';
+import type { Logger } from '@jujulego/logger';
 import os from 'node:os';
-import type { Task } from './task.js';
+import { logger } from './logger.js';
+import type { Task } from './task.legacy.js';
 
+// Types
+/** @deprecated */
+export interface TaskManagerOpts {
+  jobs?: number;
+  logger?: Logger;
+}
+
+// Class
+/** @deprecated */
 export class TaskManager {
   // Attributes
   private _jobs: number;
   private _runningWeight = 0;
 
+  private readonly _tasks: Task[] = [];
   private readonly _index = new Set<Task>();
   private readonly _running = new Set<Task>();
-  private readonly _tasks: Task[] = [];
 
-  readonly events$ = multiplexer$({
+  protected readonly _logger: Logger;
+  protected readonly _events = multiplexer$({
     added: source$<Task>(),
     started: source$<Task>(),
     completed: source$<Task>(),
   });
-  readonly logger$: Logger;
 
   // Constructor
   constructor(opts: TaskManagerOpts = {}) {
-    this.logger$ = opts.logger ?? logger$();
+    this._logger = opts.logger ?? logger;
     this._jobs = (opts.jobs && opts.jobs > 0) ? opts.jobs : os.cpus().length;
-    this.logger$.verbose(`Run up to ${this._jobs} tasks at the same time`);
+    this._logger.verbose(`Run up to ${this._jobs} tasks at the same time`);
   }
 
   // Methods
@@ -41,7 +51,7 @@ export class TaskManager {
     this._tasks.push(task);
     this._index.add(task);
 
-    this.events$.emit('added', task);
+    this._events.emit('added', task);
 
     // Add task's dependencies
     for (const t of task.dependencies) {
@@ -53,7 +63,7 @@ export class TaskManager {
     // Emit completed for previous task
     if (previous) {
       this._running.delete(previous);
-      this.events$.emit('completed', previous);
+      this._events.emit('completed', previous);
       this._runningWeight -= previous.weight;
     }
 
@@ -64,13 +74,13 @@ export class TaskManager {
       }
 
       if (task.status === 'ready') {
-        once$(task.events$, 'completed', () => this._startNext(task));
+        once$(task, 'completed', () => this._startNext(task));
 
         task.start(this);
         this._running.add(task);
         this._runningWeight += task.weight;
 
-        this.events$.emit('started', task);
+        this._events.emit('started', task);
       }
     }
   }
@@ -82,33 +92,26 @@ export class TaskManager {
   }
 
   // Properties
+  get on() {
+    return this._events.on;
+  }
+
+  get off() {
+    return this._events.off;
+  }
+
+  get tasks(): readonly Task[] {
+    return this._tasks;
+  }
+
   get jobs(): number {
     return this._jobs;
   }
 
   set jobs(jobs: number) {
     this._jobs = jobs;
-    this.logger$.verbose(`Run up to ${this._jobs} tasks at the same time`);
+    this._logger.verbose(`Run up to ${this._jobs} tasks at the same time`);
 
     this._startNext();
   }
-
-  get tasks(): readonly Task[] {
-    return this._tasks;
-  }
-}
-
-// Types
-export interface TaskManagerOpts {
-  /**
-   * Maximum of parallel jobs allowed. Defaults to the number of cpus.
-   *
-   * Depends on task weight: a task with weight 2 will count as 2 jobs.
-   */
-  readonly jobs?: number;
-
-  /**
-   * Logger to use.
-   */
-  readonly logger?: Logger;
 }
