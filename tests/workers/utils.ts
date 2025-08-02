@@ -41,5 +41,5 @@ export class WorkerTaskTest extends WorkerTask {
 // Test handler
 export class WorkerHandlerTest extends WorkerHandler {
   // Methods
-  _run = vi.fn();
+  onRun = vi.fn();
 }

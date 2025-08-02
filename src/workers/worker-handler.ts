@@ -1,5 +1,5 @@
 import wt from 'node:worker_threads';
-import type { TaskMessage, HandlerMessage } from './messages.js';
+import type { HandlerMessage, TaskMessage } from './messages.js';
 
 // Class
 export abstract class WorkerHandler {
@@ -7,7 +7,7 @@ export abstract class WorkerHandler {
   private _port?: wt.MessagePort;
 
   // Methods
-  protected abstract _run(payload: unknown): void | Promise<void>;
+  protected abstract onRun(payload: unknown): void | Promise<void>;
 
   init(port = wt.parentPort) {
     if (!port) {
@@ -17,19 +17,23 @@ export abstract class WorkerHandler {
     this._port = port;
 
     // Handle incoming messages
-    this._port.on('message', async (msg: TaskMessage) => {
+    this._port.on('message', (msg: TaskMessage) => {
       if (msg.type === 'run') {
-        try {
-          this._sendMessage({ type: 'started' });
-          await this._run(msg.payload);
-          this._sendMessage({ type: 'success' });
-        } catch (error) {
-          this._sendMessage({ type: 'failure', error });
-        }
+        void this._run(msg.payload);
       }
     });
 
     this._sendMessage({ type: 'ready' });
+  }
+
+  private async _run(payload: unknown): Promise<void> {
+    try {
+      this._sendMessage({ type: 'started' });
+      await this.onRun(payload);
+      this._sendMessage({ type: 'success' });
+    } catch (error) {
+      this._sendMessage({ type: 'failure', error });
+    }
   }
 
   private _sendMessage(msg: HandlerMessage) {
