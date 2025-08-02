@@ -1,61 +1,39 @@
-import { Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
-
-import { Task } from './task.legacy.js';
-import { TaskManager } from './task-manager.legacy.js';
-
-// Types
-export interface TaskSetResults {
-  success: number;
-  failed: number;
-}
-
-export type TaskSetStatus = 'created' | 'started' | 'finished';
-
-export type TaskSetEventMap = {
-  started: Task;
-  completed: Task;
-  finished: Readonly<TaskSetResults>;
-}
+import { multiplexer$, source$ } from 'kyrielle';
+import type { TaskManager } from './task-manager.js';
+import type { Task } from './task.js';
 
 // Class
-export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
+export class TaskSet<T extends Task = Task> implements Iterable<T> {
   // Attributes
-  private readonly _tasks = new Set<Task>();
-  private readonly _events = multiplexer$({
-    started: source$<Task>(),
-    completed: source$<Task>(),
-    finished: source$<Readonly<TaskSetResults>>(),
+  private _status: TaskSetStatus = 'created';
+  private _successCount = 0;
+  private _failureCount = 0;
+  private readonly _tasks = new Set<T>();
+
+  readonly events$ = multiplexer$({
+    started: source$<T>(),
+    completed: source$<T>(),
+    finished: source$<TaskSetResults>(),
   });
 
-  private _status: TaskSetStatus = 'created';
-  private readonly _results: TaskSetResults = {
-    success: 0,
-    failed: 0,
-  };
-
   // Methods
-  readonly on = this._events.on;
-  readonly off = this._events.off;
-  readonly keys = this._events.keys;
-  readonly clear = this._events.clear;
-
-  private _handleComplete(task: Task, success: boolean): void {
-    this._events.emit('completed', task);
+  private _handleComplete(task: T, success: boolean): void {
+    this.events$.emit('completed', task);
 
     // Trigger finished
     if (success) {
-      ++this._results.success;
+      ++this._successCount;
     } else {
-      ++this._results.failed;
+      ++this._failureCount;
     }
 
-    if (this._results.success + this._results.failed === this._tasks.size) {
+    if (this._successCount + this._failureCount === this._tasks.size) {
       this._status = 'finished';
-      this._events.emit('finished', this._results);
+      this.events$.emit('finished', this.results);
     }
   }
 
-  add(task: Task): void {
+  add(task: T): void {
     if (this._status !== 'created') {
       throw Error(`Cannot add a task to a ${this._status} task set`);
     }
@@ -65,9 +43,9 @@ export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
     }
 
     // Listen to task's status
-    task.on('status', ({ status }) => {
+    task.events$.on('status', ({ status }) => {
       if (status === 'running') {
-        this._events.emit('started', task);
+        this.events$.emit('started', task);
       } else if (status === 'done' || status === 'failed') {
         this._handleComplete(task, status === 'done');
       }
@@ -84,7 +62,10 @@ export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
 
     if (this._tasks.size === 0) {
       this._status = 'finished';
-      this._events.emit('finished', this._results);
+      this.events$.emit('finished', {
+        success: 0,
+        failed: 0,
+      });
     } else {
       // Update status
       this._status = 'started';
@@ -96,7 +77,7 @@ export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
     }
   }
 
-  [Symbol.iterator](): Iterator<Task> {
+  [Symbol.iterator](): Iterator<T> {
     return this._tasks.values();
   }
 
@@ -105,11 +86,22 @@ export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
     return this._status;
   }
 
-  get tasks(): ReadonlyArray<Task> {
+  get tasks(): ReadonlyArray<T> {
     return Array.from(this._tasks.values());
   }
 
-  get results(): Readonly<TaskSetResults> {
-    return this._results;
+  get results(): TaskSetResults {
+    return {
+      success: this._successCount,
+      failed: this._failureCount,
+    };
   }
+}
+
+// Types
+export type TaskSetStatus = 'created' | 'started' | 'finished';
+
+export interface TaskSetResults {
+  readonly success: number;
+  readonly failed: number;
 }
