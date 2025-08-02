@@ -112,7 +112,7 @@ describe('Task.start', () => {
   it.each(['blocked', 'starting', 'running', 'done', 'failed'] as const)('should throw if task is %s', async (status) => {
     task.setStatus(status);
 
-    await expect(task.start).rejects.toThrow(`Cannot start a ${status} task`);
+    await expect(task.start()).rejects.toThrow(`Cannot start a ${status} task`);
   });
 });
 

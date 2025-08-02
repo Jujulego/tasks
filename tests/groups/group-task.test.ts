@@ -86,7 +86,7 @@ describe('GroupTask.start', () => {
   });
 
   it('should throw if called directly, without a manager', async () => {
-    await expect(group.start).rejects.toThrow('A GroupTask must be started using a TaskManager');
+    await expect(group.start()).rejects.toThrow('A GroupTask must be started using a TaskManager');
 
     expect(group.onOrchestrate).not.toHaveBeenCalled();
   });
