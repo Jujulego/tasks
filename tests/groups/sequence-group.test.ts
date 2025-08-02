@@ -1,14 +1,12 @@
-import { vi } from 'vitest';
-
 import { SequenceGroup } from '@/src/groups/sequence-group.js';
-import { TaskManager } from '@/src/task-manager.legacy.js';
-
+import { TaskManager } from '@/src/task-manager.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, spyLogger, TestTask } from '../utils.js';
 
 // Setup
 let manager: TaskManager;
 let group: SequenceGroup;
-let tasks: TestTask[];
+let tasks: [TestTask, TestTask, TestTask];
 
 beforeEach(() => {
   manager = new TaskManager({ jobs: 8, logger: spyLogger });
@@ -96,7 +94,7 @@ describe('SequenceGroup.stop', () => {
     group.stop();
     await flushPromises();
 
-    expect(tasks[0]._stop).toHaveBeenCalled();
+    expect(tasks[0].onStop).toHaveBeenCalled();
     tasks[0].setStatus('done');
     await flushPromises();
 
@@ -114,7 +112,7 @@ describe('SequenceGroup.stop', () => {
     group.stop();
     await flushPromises();
 
-    expect(tasks[0]._stop).toHaveBeenCalled();
+    expect(tasks[0].onStop).toHaveBeenCalled();
     tasks[0].setStatus('failed');
     await flushPromises();
 
