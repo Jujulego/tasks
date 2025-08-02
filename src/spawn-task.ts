@@ -1,33 +1,14 @@
-import { group$, Listenable, inherit$, InheritEventMap, source$ } from '@jujulego/event-tree';
+import { group$, inherit$, multiplexer$, source$ } from 'kyrielle';
 import cp from 'node:child_process';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import kill from 'tree-kill';
+import { Task, type TaskContext, type TaskOptions } from './task.js';
 
-import { Task, TaskContext, TaskEventMap, TaskOptions } from './task.legacy.js';
-
-// Types
-export type SpawnTaskStream = 'stdout' | 'stderr';
-export type SpawnTaskEnv = Partial<Record<string, string>>;
-
-export interface SpawnTaskOptions extends TaskOptions {
-  cwd?: string;
-  env?: SpawnTaskEnv;
-}
-
-export interface SpawnTaskStreamEvent<S extends SpawnTaskStream = SpawnTaskStream> {
-  stream: S;
-  data: Buffer;
-}
-
-export type SpawnTaskEventMap = InheritEventMap<TaskEventMap, {
-  stream: SpawnTaskStreamEvent;
-  'stream.stdout': SpawnTaskStreamEvent<'stdout'>;
-  'stream.stderr': SpawnTaskStreamEvent<'stderr'>;
-}>;
-
-// Class
-export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> implements Listenable<SpawnTaskEventMap> {
+/**
+ * Spawns a process.
+ */
+export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> {
   // Attributes
   private _process?: cp.ChildProcess;
   private _exitCode: number | null = null;
@@ -35,10 +16,10 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
   readonly cwd: string;
   readonly env: SpawnTaskEnv;
 
-  protected readonly _spawnEvents = inherit$(this._taskEvents,  {
+  protected readonly spawnEvents$ = multiplexer$({
     stream: group$({
-      stdout: source$<SpawnTaskStreamEvent<'stdout'>>(),
-      stderr: source$<SpawnTaskStreamEvent<'stderr'>>(),
+      stdout: source$<SpawnTaskEventStream<'stdout'>>(),
+      stderr: source$<SpawnTaskEventStream<'stderr'>>(),
     })
   });
 
@@ -74,11 +55,7 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
   }
 
   // Methods
-  readonly on = this._spawnEvents.on;
-  readonly off = this._spawnEvents.off;
-  readonly clear = this._spawnEvents.clear;
-
-  protected _start(): void {
+  protected onStart(): void {
     this._process = cp.execFile(this.cmd, this.args, {
       cwd: this.cwd,
       shell: true,
@@ -94,11 +71,11 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
     });
 
     this._process.stdout?.on('data', (data: Buffer) => {
-      this._spawnEvents.emit('stream.stdout', { stream: 'stdout', data });
+      this.spawnEvents$.emit('stream.stdout', { stream: 'stdout', data });
     });
 
     this._process.stderr?.on('data', (data: Buffer) => {
-      this._spawnEvents.emit('stream.stderr', { stream: 'stderr', data });
+      this.spawnEvents$.emit('stream.stderr', { stream: 'stderr', data });
     });
 
     this._process.on('close', (code, signal) => {
@@ -111,29 +88,33 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
       }
 
       if (signal) {
-        this._logger.verbose(`${this.name} was ended by signal ${signal}`);
+        this.logger$.verbose(`${this.name} was ended by signal ${signal}`);
       }
     });
 
     this._process.on('error', (err) => {
-      this._logger.warning(`Error while spawning ${this.name}`, err);
+      this.logger$.warning(`Error while spawning ${this.name}`, err);
       this.setStatus('failed');
     });
   }
 
-  protected _stop(): void {
+  protected onStop(): void {
     if (this._process?.pid) {
       kill(this._process.pid, 'SIGTERM', (err) => {
         if (err) {
-          this._logger.warning(`Failed to kill ${this.name}`, err);
+          this.logger$.warning(`Failed to kill ${this.name}`, err);
         } else {
-          this._logger.debug(`Killed ${this.name}`);
+          this.logger$.debug(`Killed ${this.name}`);
         }
       });
     }
   }
 
   // Properties
+  get events$() {
+    return inherit$(this.taskEvents$, this.spawnEvents$);
+  }
+
   get name(): string {
     return [this.cmd, ...this.args].join(' ');
   }
@@ -141,4 +122,18 @@ export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> impl
   get exitCode(): number | null {
     return this._exitCode;
   }
+}
+
+// Types
+export type SpawnTaskStream = 'stdout' | 'stderr';
+export type SpawnTaskEnv = Partial<Record<string, string>>;
+
+export interface SpawnTaskEventStream<S extends SpawnTaskStream = SpawnTaskStream> {
+  readonly stream: S;
+  readonly data: Buffer;
+}
+
+export interface SpawnTaskOptions extends TaskOptions {
+  readonly cwd?: string;
+  readonly env?: SpawnTaskEnv;
 }

@@ -1,11 +1,9 @@
+import { SpawnTask, type SpawnTaskEventStream } from '@/src/spawn-task.js';
 import cp from 'node:child_process';
 import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import kill from 'tree-kill';
-import { vi } from 'vitest';
-
-import { SpawnTask, SpawnTaskStreamEvent } from '@/src/spawn-task.js';
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { spyLogger } from './utils.js';
 
 // Mocks
@@ -15,14 +13,14 @@ vi.mock('tree-kill');
 let task: SpawnTask;
 let proc: cp.ChildProcess;
 
-const streamEventSpy = vi.fn<[SpawnTaskStreamEvent], void>();
+const streamEventSpy = vi.fn<(event: SpawnTaskEventStream) => void>();
 
 beforeEach(() => {
   task = new SpawnTask('test', ['-a', '--arg'], {}, { logger: spyLogger });
 
   vi.clearAllMocks();
 
-  task.on('stream', streamEventSpy);
+  task.events$.on('stream', streamEventSpy);
 
   // Mock execFile
   proc = new EventEmitter() as cp.ChildProcess;
@@ -118,8 +116,7 @@ describe('SpawnTask.stop', () => {
 
     expect(kill).toHaveBeenCalledWith(proc.pid, 'SIGTERM', expect.any(Function));
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cb = vi.mocked(kill).mock.calls[0][2]!;
+    const cb = vi.mocked(kill).mock.calls[0]![2]!;
     cb();
 
     expect(spyLogger.debug).toHaveBeenCalledWith(`Killed ${task.name}`);
@@ -128,8 +125,7 @@ describe('SpawnTask.stop', () => {
   it('should log error if failed to kill process', () => {
     task.stop();
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cb = vi.mocked(kill).mock.calls[0][2]!;
+    const cb = vi.mocked(kill).mock.calls[0]![2]!;
     cb(new Error('Failed !'));
 
     expect(spyLogger.warning).toHaveBeenCalledWith(`Failed to kill ${task.name}`, new Error('Failed !'));
