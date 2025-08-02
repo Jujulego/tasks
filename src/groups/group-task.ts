@@ -27,7 +27,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
   }
 
   // Methods
-  protected abstract onOrchestrate(): AsyncGenerator<Task>;
+  protected abstract onOrchestrate(): AsyncGenerator<Task> | Generator<Task>;
 
   private async _loop(manager: TaskManager): Promise<void> {
     try {
