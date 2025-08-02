@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
 
-      - name: Use Node.js 22.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
         with:
           node-version: 22.x
@@ -52,7 +52,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
 
-      - name: Use Node.js 22.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
         with:
           node-version: 22.x
@@ -81,7 +81,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['18.x', '20.x', '22.x']
+        node: ['18.x', '20.x', '22.x', '24.x']
 
     steps:
       - name: Checkout repository
@@ -96,16 +96,16 @@ jobs:
       - name: Install
         run: yarn install --immutable
 
-      - name: Run tests
-        run: yarn test --coverage
-
       - name: Check tests typings
         run: yarn test:types
+
+      - name: Run tests
+        run: yarn test --coverage
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:
-          flags: unit,node-${{ matrix.node }}
+          flags: node-${{ matrix.node }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload test results to Codecov
@@ -113,7 +113,7 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           files: junit-report.xml
-          flags: unit,node-${{ matrix.node }}
+          flags: node-${{ matrix.node }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
@@ -131,7 +131,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
 
-      - name: Use Node.js 22.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
         with:
           node-version: 22.x
