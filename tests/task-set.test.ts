@@ -1,19 +1,18 @@
-import { vi } from 'vitest';
-
-import { Task } from '@/src/task.legacy.js';
-import { TaskManager } from '@/src/task-manager.legacy.js';
-import { TaskSet, TaskSetResults } from '@/src/task-set.legacy.js';
-
+import { TaskManager } from '@/src/task-manager.js';
+import type { TaskSetResults } from '@/src/task-set.js';
+import { TaskSet } from '@/src/task-set.js';
+import type { Task } from '@/src/task.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { spyLogger, TestTask } from './utils.js';
 
 // Setup
-let tasks: TestTask[];
+let tasks: [TestTask, TestTask, TestTask];
 let manager: TaskManager;
 let set: TaskSet;
 
-const startedEventSpy = vi.fn<[Task], void>();
-const completedEventSpy = vi.fn<[Task], void>();
-const finishedEventSpy = vi.fn<[TaskSetResults], void>();
+const startedEventSpy = vi.fn<(task: Task) => void>();
+const completedEventSpy = vi.fn<(task: Task) => void>();
+const finishedEventSpy = vi.fn<(results: TaskSetResults) => void>();
 
 beforeEach(() => {
   tasks = [
@@ -28,9 +27,9 @@ beforeEach(() => {
   vi.resetAllMocks();
   vi.restoreAllMocks();
 
-  set.on('started', startedEventSpy);
-  set.on('completed', completedEventSpy);
-  set.on('finished', finishedEventSpy);
+  set.events$.on('started', startedEventSpy);
+  set.events$.on('completed', completedEventSpy);
+  set.events$.on('finished', finishedEventSpy);
 });
 
 // Tests
