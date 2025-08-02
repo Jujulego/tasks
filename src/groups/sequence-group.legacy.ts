@@ -4,6 +4,7 @@ import { GroupTask } from './group-task.legacy.js';
 import { Task, TaskContext } from '../task.legacy.js';
 
 // Class
+/** @deprecated */
 export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
   // Attributes
   private _stopped = false;

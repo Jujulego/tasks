@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { SequenceGroup } from '@/src/groups/sequence-group.js';
+import { SequenceGroup } from '@/src/groups/sequence-group.legacy.js';
 import { TaskManager } from '@/src/task-manager.legacy.js';
 
 import { flushPromises, spyLogger, TestTask } from '../utils.js';

@@ -1,7 +1,7 @@
 import { waitFor$ } from '@jujulego/event-tree';
 
 import { Task, TaskContext } from '../task.legacy.js';
-import { SequenceGroup } from './sequence-group.js';
+import { SequenceGroup } from './sequence-group.legacy.js';
 
 // Class
 export class FallbackGroup<C extends TaskContext = TaskContext> extends SequenceGroup<C> {
