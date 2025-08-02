@@ -22,7 +22,7 @@ export class TestTask extends Task {
 export class TestGroupTask extends GroupTask {
   // Constructor
   constructor(name: string, opts: TaskOptions = {}) {
-    super(name, {}, { logger: spyLogger as any, ...opts });
+    super(name, {}, { logger: spyLogger, ...opts });
   }
 
   // Methods
