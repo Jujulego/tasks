@@ -31,53 +31,56 @@ beforeEach(() => {
 
 // Tests
 describe('TaskManager.add', () => {
-  it('should store task and start it', () => {
+  it('should store task and start it', async () => {
     manager.add(tasks[0]);
 
     expect(manager.tasks).toContain(tasks[0]);
-    expect(tasks[0].status).toBe('starting');
+    await vi.waitFor(() => expect(tasks[0].status).toBe('starting'));
 
     expect(startedEventSpy).toHaveBeenCalledWith(tasks[0]);
     expect(addedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
-  it('should only start 1 task a the same time (sum of task weight < jobs options)', () => {
+  it('should only start 1 task a the same time (sum of task weight >= jobs options)', async () => {
     manager.add(tasks[0]);
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
-    expect(tasks[0].status).toBe('starting');
+    await vi.waitFor(() => expect(tasks[0].status).toBe('starting'));
     expect(tasks[1].status).toBe('ready');
     expect(tasks[2].status).toBe('ready');
   });
 
-  it('should only start 2 task a the same time (sum of task weight < jobs options)', () => {
+  it('should only start 2 task a the same time (sum of task weight < jobs options)', async () => {
     const lightWeight = new TestTask('light weight', { weight: 0 });
 
     manager.add(lightWeight);
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
-    expect(lightWeight.status).toBe('starting');
+    await vi.waitFor(() => expect(lightWeight.status).toBe('starting'));
     expect(tasks[1].status).toBe('starting');
     expect(tasks[2].status).toBe('ready');
   });
 
-  it('should store task and all it\'s dependencies and start the dependency', () => {
+  it('should store task and all it\'s dependencies and start the dependency', async () => {
     tasks[1].dependsOn(tasks[2]);
     manager.add(tasks[1]);
 
     expect(manager.tasks).toContain(tasks[1]);
     expect(manager.tasks).toContain(tasks[2]);
 
+    await vi.waitFor(() => expect(tasks[2].status).toBe('starting'));
+
     expect(tasks[1].status).toBe('blocked');
-    expect(tasks[2].status).toBe('starting');
   });
 
-  it('should start next task when current is done', () => {
+  it('should start next task when current is done', async () => {
     manager.add(tasks[0]);
     manager.add(tasks[1]);
     manager.add(tasks[2]);
+
+    await vi.waitFor(() => expect(tasks[0].status).toBe('starting'));
 
     tasks[0].setStatus('done');
 
@@ -88,10 +91,12 @@ describe('TaskManager.add', () => {
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
   });
 
-  it('should start next task when current is failed', () => {
+  it('should start next task when current is failed', async () => {
     manager.add(tasks[0]);
     manager.add(tasks[1]);
     manager.add(tasks[2]);
+
+    await vi.waitFor(() => expect(tasks[0].status).toBe('starting'));
 
     tasks[0].setStatus('failed');
 
@@ -116,14 +121,14 @@ describe('TaskManager.jobs', () => {
     expect(os.cpus).toHaveBeenCalled();
   });
 
-  it('should start tasks if more jobs are available', () => {
+  it('should start tasks if more jobs are available', async () => {
     manager.add(tasks[0]);
     manager.add(tasks[1]);
     manager.add(tasks[2]);
 
     manager.jobs = 2;
 
-    expect(tasks[0].status).toBe('starting');
+    await vi.waitFor(() => expect(tasks[0].status).toBe('starting'));
     expect(tasks[1].status).toBe('starting');
     expect(tasks[2].status).toBe('ready');
   });

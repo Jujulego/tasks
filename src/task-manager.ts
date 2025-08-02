@@ -5,6 +5,7 @@ import type { Task } from './task.js';
 
 export class TaskManager {
   // Attributes
+  private _dirty = false;
   private _jobs: number;
   private _runningWeight = 0;
 
@@ -75,10 +76,21 @@ export class TaskManager {
     }
   }
 
+  private async _startTasks() {
+    if (this._dirty) {
+      await this._startNext();
+      this._dirty = false;
+    }
+  }
+
   add(task: Task): void {
     this._add(task);
     this._sortByComplexity();
-    void this._startNext();
+
+    if (!this._dirty) {
+      this._dirty = true;
+      queueMicrotask(() => void this._startTasks());
+    }
   }
 
   // Properties
@@ -87,10 +99,14 @@ export class TaskManager {
   }
 
   set jobs(jobs: number) {
+    this._dirty = true;
     this._jobs = jobs;
     this.logger$.verbose(`Run up to ${this._jobs} tasks at the same time`);
 
-    void this._startNext();
+    if (!this._dirty) {
+      this._dirty = true;
+      queueMicrotask(() => void this._startTasks());
+    }
   }
 
   get tasks(): readonly Task[] {
