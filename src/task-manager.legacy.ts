@@ -1,17 +1,18 @@
 import { multiplexer$, once$, source$ } from '@jujulego/event-tree';
-import { Logger } from '@jujulego/logger';
+import type { Logger } from '@jujulego/logger';
 import os from 'node:os';
-
 import { logger } from './logger.js';
-import { Task } from './task.legacy.js';
+import type { Task } from './task.legacy.js';
 
 // Types
+/** @deprecated */
 export interface TaskManagerOpts {
   jobs?: number;
   logger?: Logger;
 }
 
 // Class
+/** @deprecated */
 export class TaskManager {
   // Attributes
   private _jobs: number;

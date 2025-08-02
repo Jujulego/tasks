@@ -3,7 +3,7 @@ import type { Logger } from '@jujulego/logger';
 import crypto from 'node:crypto';
 import type { GroupTask } from './groups/index.js';
 import { logger } from './logger.js';
-import type { TaskManager } from './task-manager.js';
+import type { TaskManager } from './task-manager.legacy.js';
 
 // Types
 /** @deprecated */
