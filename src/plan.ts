@@ -1,5 +1,5 @@
-import { Task, TaskSummary } from './task.legacy.js';
-import { GroupTask } from './groups/index.js';
+import { Task, type TaskSummary } from './task.js';
+import { GroupTask } from './groups/group-task.js';
 
 // Utils
 export function* _plan(task: Task, marks: Set<Task>): Generator<TaskSummary, void, undefined> {
@@ -12,7 +12,7 @@ export function* _plan(task: Task, marks: Set<Task>): Generator<TaskSummary, voi
     yield* _plan(dep, marks);
   }
 
-  // Handle task it self
+  // Handle task itself
   yield task.summary;
 
   // Handle group's children
