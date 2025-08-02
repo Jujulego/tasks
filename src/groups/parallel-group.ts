@@ -1,16 +1,15 @@
-import { once$ } from '@jujulego/event-tree';
-
-import { GroupTask } from './group-task.legacy.js';
-import { Task, TaskContext } from '../task.legacy.js';
+import { once$ } from 'kyrielle';
+import type { Task, TaskContext } from '../task.js';
+import { GroupTask } from './group-task.js';
 
 // Class
 export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
   // Methods
-  protected async* _orchestrate(): AsyncGenerator<Task> {
+  protected* onOrchestrate(): Generator<Task> {
     for (const task of this.tasks) {
       yield task;
 
-      once$(task, 'completed', () => {
+      once$(task.events$, 'completed', () => {
         const stats = this.stats;
 
         if (stats.done + stats.failed === this.tasks.length) {
@@ -20,7 +19,7 @@ export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTas
     }
   }
 
-  protected _stop() {
+  protected onStop() {
     // Stop all tasks
     for (const task of this.tasks) {
       task.stop();

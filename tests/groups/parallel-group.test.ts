@@ -1,14 +1,12 @@
-import { vi } from 'vitest';
-
 import { ParallelGroup } from '@/src/groups/parallel-group.js';
-import { TaskManager } from '@/src/task-manager.legacy.js';
-
+import { TaskManager } from '@/src/task-manager.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, spyLogger, TestTask } from '../utils.js';
 
 // Setup
 let manager: TaskManager;
 let group: ParallelGroup;
-let tasks: TestTask[];
+let tasks: [TestTask, TestTask, TestTask];
 
 beforeEach(() => {
   manager = new TaskManager({ jobs: 8, logger: spyLogger });
@@ -80,9 +78,9 @@ describe('ParallelGroup.stop', () => {
 
     group.stop();
 
-    expect(tasks[0]._stop).toHaveBeenCalled();
-    expect(tasks[1]._stop).toHaveBeenCalled();
-    expect(tasks[2]._stop).toHaveBeenCalled();
+    expect(tasks[0].onStop).toHaveBeenCalled();
+    expect(tasks[1].onStop).toHaveBeenCalled();
+    expect(tasks[2].onStop).toHaveBeenCalled();
   });
 });
 
