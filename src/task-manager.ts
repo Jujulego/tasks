@@ -49,7 +49,7 @@ export class TaskManager {
     }
   }
 
-  private _startNext(previous?: Task) {
+  private async _startNext(previous?: Task) {
     // Emit completed for previous task
     if (previous) {
       this._running.delete(previous);
@@ -64,9 +64,9 @@ export class TaskManager {
       }
 
       if (task.status === 'ready') {
-        once$(task.events$, 'completed', () => this._startNext(task));
+        once$(task.events$, 'completed', () => void this._startNext(task));
 
-        task.start(this);
+        await task.start(this);
         this._running.add(task);
         this._runningWeight += task.weight;
 
@@ -78,7 +78,7 @@ export class TaskManager {
   add(task: Task): void {
     this._add(task);
     this._sortByComplexity();
-    this._startNext();
+    void this._startNext();
   }
 
   // Properties
@@ -90,7 +90,7 @@ export class TaskManager {
     this._jobs = jobs;
     this.logger$.verbose(`Run up to ${this._jobs} tasks at the same time`);
 
-    this._startNext();
+    void this._startNext();
   }
 
   get tasks(): readonly Task[] {

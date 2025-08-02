@@ -76,7 +76,7 @@ describe('ParallelGroup.stop', () => {
     manager.add(group);
     await flushPromises();
 
-    group.stop();
+    await group.stop();
 
     expect(tasks[0].onStop).toHaveBeenCalled();
     expect(tasks[1].onStop).toHaveBeenCalled();

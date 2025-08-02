@@ -91,7 +91,7 @@ describe('SequenceGroup.stop', () => {
     manager.add(group);
     await flushPromises();
 
-    group.stop();
+    await group.stop();
     await flushPromises();
 
     expect(tasks[0].onStop).toHaveBeenCalled();
@@ -109,7 +109,7 @@ describe('SequenceGroup.stop', () => {
     manager.add(group);
     await flushPromises();
 
-    group.stop();
+    await group.stop();
     await flushPromises();
 
     expect(tasks[0].onStop).toHaveBeenCalled();

@@ -41,7 +41,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
     } catch (err) {
       this.logger$.error(`An error happened in group ${this.name}. Stopping it`, err as Error);
 
-      this.stop();
+      await this.stop();
       this.setStatus('failed');
     }
   }

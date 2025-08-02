@@ -1,6 +1,6 @@
 import { waitFor$ } from 'kyrielle';
-import { GroupTask } from './group-task.js';
 import type { Task, TaskContext } from '../task.js';
+import { GroupTask } from './group-task.js';
 
 // Class
 export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
@@ -40,11 +40,11 @@ export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTas
     }
   }
 
-  protected onStop(): void {
+  protected async onStop() {
     this._stopped = true;
 
     // Stop current task
-    this._currentTask?.stop();
+    await this._currentTask?.stop();
   }
 
   complexity(cache: Map<string, number> = new Map()): number {

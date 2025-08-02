@@ -93,7 +93,7 @@ describe('FallbackGroup.stop', () => {
     manager.add(group);
     await flushPromises();
 
-    group.stop();
+    await group.stop();
     await flushPromises();
 
     expect(tasks[0].onStop).toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe('FallbackGroup.stop', () => {
     manager.add(group);
     await flushPromises();
 
-    group.stop();
+    await group.stop();
     await flushPromises();
 
     expect(tasks[0].onStop).toHaveBeenCalled();
