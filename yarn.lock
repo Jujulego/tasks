@@ -469,7 +469,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/event-tree@npm:^4.1.0, @jujulego/event-tree@npm:^4.1.1, @jujulego/event-tree@npm:^4.2.0":
+"@jujulego/event-tree@npm:^4.1.0, @jujulego/event-tree@npm:^4.2.0":
   version: 4.3.0
   resolution: "@jujulego/event-tree@npm:4.3.0"
   dependenciesMeta:
@@ -479,25 +479,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/logger@npm:^0.2.2":
-  version: 0.2.4
-  resolution: "@jujulego/logger@npm:0.2.4"
+"@jujulego/logger@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@jujulego/logger@npm:1.0.1"
   dependencies:
-    "@jujulego/event-tree": "npm:^4.1.1"
-    "@jujulego/quick-tag": "npm:^0.3.3"
+    "@jujulego/quick-tag": "npm:^1.0.1"
+    "@swc/helpers": "npm:^0.5.3"
     chalk: "npm:^5.3.0"
     chalk-template: "npm:^1.1.0"
-  checksum: 10c0/01c1800c7bb1218a5b997658d91f6312aa56cd438fcb82128b0ff9926458d29a4b58f87512d9d3f2dd7dedcaeb363ea9200df98a7eb750338fe389b82786e75d
-  languageName: node
-  linkType: hard
-
-"@jujulego/quick-tag@npm:^0.3.3":
-  version: 0.3.3
-  resolution: "@jujulego/quick-tag@npm:0.3.3"
-  dependenciesMeta:
-    vitest@0.34.6:
-      unplugged: true
-  checksum: 10c0/ec8b9f7e46e524412babfc732f960f9ca651f6d256f9deebc5f5129cb70e36d479cbe81edd83baa95f785238592ab74cbd35c305042b8332b917f14286bb2acc
+    kyrielle: "npm:^0.10.0"
+  checksum: 10c0/5aad13f9dfb9f29d1e132464aa1dfa682b4d89ff5f1bb69be4c64ed1beb7f8f8fb622b92fe2dfca4c8d2a7ca01fb42925829dd1b5bb1d60e8c86dd8b3e3b815a
   languageName: node
   linkType: hard
 
@@ -520,7 +511,7 @@ __metadata:
   dependencies:
     "@eslint/js": "npm:9.32.0"
     "@jujulego/event-tree": "npm:^4.2.0"
-    "@jujulego/logger": "npm:^0.2.2"
+    "@jujulego/logger": "npm:^1.0.0"
     "@jujulego/utils": "npm:^2.0.0"
     "@jujulego/vite-plugin-swc": "npm:1.2.0"
     "@kyrielle/logger": "npm:^2.0.0"
@@ -2904,6 +2895,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^10.0.3":
+  version: 10.1.1
+  resolution: "immer@npm:10.1.1"
+  checksum: 10c0/b749e10d137ccae91788f41bd57e9387f32ea6d6ea8fd7eb47b23fd7766681575efc7f86ceef7fe24c3bc9d61e38ff5d2f49c2663b2b0c056e280a4510923653
+  languageName: node
+  linkType: hard
+
 "import-fresh@npm:^3.2.1":
   version: 3.3.1
   resolution: "import-fresh@npm:3.3.1"
@@ -3172,6 +3170,19 @@ __metadata:
   version: 6.0.3
   resolution: "kind-of@npm:6.0.3"
   checksum: 10c0/61cdff9623dabf3568b6445e93e31376bee1cdb93f8ba7033d86022c2a9b1791a1d9510e026e6465ebd701a6dd2f7b0808483ad8838341ac52f003f512e0b4c4
+  languageName: node
+  linkType: hard
+
+"kyrielle@npm:^0.10.0":
+  version: 0.10.1
+  resolution: "kyrielle@npm:0.10.1"
+  dependencies:
+    "@swc/helpers": "npm:^0.5.3"
+    immer: "npm:^10.0.3"
+  dependenciesMeta:
+    vitest@1.2.1:
+      unplugged: true
+  checksum: 10c0/e8cc4aaa4d84504c1ddea61b5cd4d58e66a20958e46b9a08613ccc78e4667dc96577e709d73db00d5aff55e66314eb057cd3032c1017267eeb511173ee4d9d28
   languageName: node
   linkType: hard
 
