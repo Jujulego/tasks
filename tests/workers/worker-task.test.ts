@@ -1,8 +1,7 @@
+import type { WorkerPool } from '@/src/workers/worker-pool.js';
 import { EventEmitter } from 'node:events';
-import wt from 'node:worker_threads';
-import { vi } from 'vitest';
-
-import { WorkerPool } from '@/src/workers/worker-pool.js';
+import type wt from 'node:worker_threads';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WorkerPoolTest, WorkerTaskTest } from './utils.js';
 
 // Setup
@@ -29,7 +28,7 @@ beforeEach(() => {
 // Tests
 describe('WorkerTask.start', () => {
   it('should send run message to worker thread', async () => {
-    task.start();
+    await task.start();
 
     expect(pool.reserveWorker).toHaveBeenCalled();
 
@@ -45,7 +44,7 @@ describe('WorkerTask.start', () => {
   });
 
   it('should be runnning when receiving started message', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -56,7 +55,7 @@ describe('WorkerTask.start', () => {
   });
 
   it('should be done and free worker when receiving success message', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -68,7 +67,7 @@ describe('WorkerTask.start', () => {
   });
 
   it('should be failed and free worker when receiving failure message', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -79,19 +78,19 @@ describe('WorkerTask.start', () => {
     expect(pool.freeWorker).toHaveBeenCalledWith(worker);
   });
 
-  it('should call _handleEvent when receiving event message', async () => {
-    task.start();
+  it('should call onEvent when receiving event message', async () => {
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     worker.emit('message', { type: 'event', payload: { event: 'test' } });
 
-    expect(task._handleEvent).toHaveBeenCalledWith({ event: 'test' });
+    expect(task.onEvent).toHaveBeenCalledWith({ event: 'test' });
   });
 
   it('should be done if worker exit successfully', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -103,7 +102,7 @@ describe('WorkerTask.start', () => {
   });
 
   it('should be failed if worker exit with error', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -115,7 +114,7 @@ describe('WorkerTask.start', () => {
   });
 
   it('should be failed if worker emit an error', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -127,12 +126,12 @@ describe('WorkerTask.start', () => {
   });
 
   it('should terminate worker on stop', async () => {
-    task.start();
+    await task.start();
 
     // wait for pool to return worker
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    task.stop();
+    await task.stop();
 
     expect(worker.terminate).toHaveBeenCalled();
   });

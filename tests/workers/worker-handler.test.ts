@@ -1,7 +1,6 @@
 import { EventEmitter } from 'node:events';
-import wt from 'node:worker_threads';
-import { vi } from 'vitest';
-
+import type wt from 'node:worker_threads';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WorkerHandlerTest } from './utils.js';
 
 // Setup
@@ -20,13 +19,13 @@ beforeEach(() => {
 
 // Tests
 describe('WorkerHandler', () => {
-  it('should call _run when receiving a message and send back result', async () => {
+  it('should call onRun when receiving a message and send back result', async () => {
     handler.init(port);
 
     // Emit message to initiate work
     port.emit('message', { type: 'run', payload: { test: true } });
 
-    expect(handler._run).toHaveBeenCalledWith({ test: true });
+    expect(handler.onRun).toHaveBeenCalledWith({ test: true });
 
     expect(port.postMessage).toHaveBeenCalledWith({
       type: 'started',
@@ -40,14 +39,14 @@ describe('WorkerHandler', () => {
     });
   });
 
-  it('should call _run when receiving a message and send back error', async () => {
+  it('should call onRun when receiving a message and send back error', async () => {
     handler.init(port);
 
     // Emit message to initiate work
-    vi.mocked(handler._run).mockRejectedValue(new Error('failed !'));
+    vi.mocked(handler.onRun).mockRejectedValue(new Error('failed !'));
     port.emit('message', { type: 'run', payload: { test: true } });
 
-    expect(handler._run).toHaveBeenCalledWith({ test: true });
+    expect(handler.onRun).toHaveBeenCalledWith({ test: true });
 
     // Should have posted failure
     await new Promise((resolve) => setTimeout(resolve, 0));

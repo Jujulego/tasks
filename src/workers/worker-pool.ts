@@ -1,7 +1,6 @@
-import { Condition } from '@jujulego/utils';
-import wt from 'node:worker_threads';
-
-import { HandlerMessage } from './messages.js';
+import type wt from 'node:worker_threads';
+import { type Condition, condition$, waitValue$ } from '../utils/condition$.js';
+import type { HandlerMessage } from './messages.js';
 
 // Class
 export abstract class WorkerPool {
@@ -13,11 +12,11 @@ export abstract class WorkerPool {
 
   // Constructor
   constructor(readonly max: number) {
-    this._hasFreeWorkers = new Condition(() => this._running.size < this.max);
+    this._hasFreeWorkers = condition$(() => this._running.size < this.max);
   }
 
   // Methods
-  protected abstract _start(): wt.Worker;
+  protected abstract onStart(): wt.Worker;
 
   private _watchWorker(worker: wt.Worker): void {
     worker.on('exit', () => {
@@ -42,14 +41,14 @@ export abstract class WorkerPool {
   }
 
   private _startWorker(): wt.Worker {
-    const worker = this._start();
+    const worker = this.onStart();
     this._watchWorker(worker);
 
     return worker;
   }
 
   async reserveWorker(): Promise<wt.Worker> {
-    await this._hasFreeWorkers.waitFor(true);
+    await waitValue$(this._hasFreeWorkers, true);
 
     const isNew = this._available.length === 0;
     const worker = this._available.pop() ?? this._startWorker();

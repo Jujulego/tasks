@@ -35,8 +35,8 @@ beforeEach(() => {
 
 // Tests
 describe('SpawnTask.start', () => {
-  it('should spawn a new process using execFile', () => {
-    task.start();
+  it('should spawn a new process using execFile', async () => {
+    await task.start();
 
     expect(cp.execFile).toHaveBeenCalledWith('test', ['-a', '--arg'], {
       cwd: process.cwd(),
@@ -46,15 +46,15 @@ describe('SpawnTask.start', () => {
     });
   });
 
-  it('should put task into running status when process is spawned', () => {
-    task.start();
+  it('should put task into running status when process is spawned', async () => {
+    await task.start();
     proc.emit('spawn', undefined);
 
     expect(task.status).toBe('running');
   });
 
-  it('should emit data from process\'s stdout', () => {
-    task.start();
+  it('should emit data from process\'s stdout', async () => {
+    await task.start();
 
     const buf = Buffer.from('test stdout');
     proc.stdout?.emit('data', buf);
@@ -62,8 +62,8 @@ describe('SpawnTask.start', () => {
     expect(streamEventSpy).toHaveBeenCalledWith({ stream: 'stdout', data: buf });
   });
 
-  it('should emit data from process\'s stderr', () => {
-    task.start();
+  it('should emit data from process\'s stderr', async () => {
+    await task.start();
 
     const buf = Buffer.from('test stderr');
     proc.stderr?.emit('data', buf);
@@ -71,24 +71,24 @@ describe('SpawnTask.start', () => {
     expect(streamEventSpy).toHaveBeenCalledWith({ stream: 'stderr', data: buf });
   });
 
-  it('should put task into done status when process completes with 0 exit code', () => {
-    task.start();
+  it('should put task into done status when process completes with 0 exit code', async () => {
+    await task.start();
     proc.emit('close', 0);
 
     expect(task.status).toBe('done');
     expect(task.exitCode).toBe(0);
   });
 
-  it('should put task into failed status when process completes with 1 exit code', () => {
-    task.start();
+  it('should put task into failed status when process completes with 1 exit code', async () => {
+    await task.start();
     proc.emit('close', 1);
 
     expect(task.status).toBe('failed');
     expect(task.exitCode).toBe(1);
   });
 
-  it('should log if process was ended by a signal', () => {
-    task.start();
+  it('should log if process was ended by a signal', async () => {
+    await task.start();
     proc.emit('close', 1, 'SIGTERM');
 
     expect(task.status).toBe('failed');
@@ -96,8 +96,8 @@ describe('SpawnTask.start', () => {
     expect(spyLogger.verbose).toHaveBeenCalledWith(`${task.name} was ended by signal SIGTERM`);
   });
 
-  it('should put task into failed status if process failed to spawn', () => {
-    task.start();
+  it('should put task into failed status if process failed to spawn', async () => {
+    await task.start();
     proc.emit('error', 'Failed !');
 
     expect(task.status).toBe('failed');
@@ -107,12 +107,12 @@ describe('SpawnTask.start', () => {
 });
 
 describe('SpawnTask.stop', () => {
-  beforeEach(() => {
-    task.start();
+  beforeEach(async () => {
+    await task.start();
   });
 
-  it('should use tree-kill to kill process', () => {
-    task.stop();
+  it('should use tree-kill to kill process', async () => {
+    await task.stop();
 
     expect(kill).toHaveBeenCalledWith(proc.pid, 'SIGTERM', expect.any(Function));
 
@@ -122,8 +122,8 @@ describe('SpawnTask.stop', () => {
     expect(spyLogger.debug).toHaveBeenCalledWith(`Killed ${task.name}`);
   });
 
-  it('should log error if failed to kill process', () => {
-    task.stop();
+  it('should log error if failed to kill process', async () => {
+    await task.stop();
 
     const cb = vi.mocked(kill).mock.calls[0]![2]!;
     cb(new Error('Failed !'));
