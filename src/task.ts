@@ -2,7 +2,7 @@ import { type Logger, logger$ } from '@kyrielle/logger';
 import { group$, multiplexer$, source$ } from 'kyrielle';
 import crypto from 'node:crypto';
 import type { GroupTask } from './groups/index.js';
-import type { TaskManager } from './task-manager.legacy.js';
+import type { TaskManager } from './task-manager.js';
 
 /**
  * Represents a task state
