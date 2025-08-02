@@ -5,6 +5,7 @@ import type { Task } from './task.js';
 
 export class TaskManager {
   // Attributes
+  private _dirty = false;
   private _jobs: number;
   private _runningWeight = 0;
 
@@ -49,7 +50,7 @@ export class TaskManager {
     }
   }
 
-  private _startNext(previous?: Task) {
+  private async _startNext(previous?: Task) {
     // Emit completed for previous task
     if (previous) {
       this._running.delete(previous);
@@ -64,9 +65,9 @@ export class TaskManager {
       }
 
       if (task.status === 'ready') {
-        once$(task.events$, 'completed', () => this._startNext(task));
+        once$(task.events$, 'completed', () => void this._startNext(task));
 
-        task.start(this);
+        await task.start(this);
         this._running.add(task);
         this._runningWeight += task.weight;
 
@@ -75,10 +76,21 @@ export class TaskManager {
     }
   }
 
+  private async _startTasks() {
+    if (this._dirty) {
+      await this._startNext();
+      this._dirty = false;
+    }
+  }
+
   add(task: Task): void {
     this._add(task);
     this._sortByComplexity();
-    this._startNext();
+
+    if (!this._dirty) {
+      this._dirty = true;
+      queueMicrotask(() => void this._startTasks());
+    }
   }
 
   // Properties
@@ -87,10 +99,14 @@ export class TaskManager {
   }
 
   set jobs(jobs: number) {
+    this._dirty = true;
     this._jobs = jobs;
     this.logger$.verbose(`Run up to ${this._jobs} tasks at the same time`);
 
-    this._startNext();
+    if (!this._dirty) {
+      this._dirty = true;
+      queueMicrotask(() => void this._startTasks());
+    }
   }
 
   get tasks(): readonly Task[] {

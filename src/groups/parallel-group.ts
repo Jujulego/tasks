@@ -19,10 +19,10 @@ export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTas
     }
   }
 
-  protected onStop() {
+  protected async onStop() {
     // Stop all tasks
     for (const task of this.tasks) {
-      task.stop();
+      await task.stop();
     }
   }
 
