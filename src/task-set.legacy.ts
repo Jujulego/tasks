@@ -1,16 +1,18 @@
-import { Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
-
-import { Task } from './task.legacy.js';
-import { TaskManager } from './task-manager.legacy.js';
+import { type Listenable, multiplexer$, source$ } from '@jujulego/event-tree';
+import type { TaskManager } from './task-manager.legacy.js';
+import type { Task } from './task.legacy.js';
 
 // Types
+/** @deprecated */
 export interface TaskSetResults {
   success: number;
   failed: number;
 }
 
+/** @deprecated */
 export type TaskSetStatus = 'created' | 'started' | 'finished';
 
+/** @deprecated */
 export type TaskSetEventMap = {
   started: Task;
   completed: Task;
@@ -18,6 +20,7 @@ export type TaskSetEventMap = {
 }
 
 // Class
+/** @deprecated */
 export class TaskSet implements Iterable<Task>, Listenable<TaskSetEventMap> {
   // Attributes
   private readonly _tasks = new Set<Task>();

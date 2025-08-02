@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 
 import { Task } from '@/src/task.legacy.js';
 import { TaskManager } from '@/src/task-manager.legacy.js';
-import { TaskSet, TaskSetResults } from '@/src/task-set.js';
+import { TaskSet, TaskSetResults } from '@/src/task-set.legacy.js';
 
 import { spyLogger, TestTask } from './utils.js';
 
