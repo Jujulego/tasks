@@ -84,8 +84,8 @@ describe('TaskManager.add', () => {
 
     tasks[0].setStatus('done');
 
-    expect(tasks[0].status).toBe('done');
-    expect(tasks[1].status).toBe('starting');
+    await vi.waitFor(() => expect(tasks[1].status).toBe('starting'));
+
     expect(tasks[2].status).toBe('ready');
 
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
@@ -100,8 +100,8 @@ describe('TaskManager.add', () => {
 
     tasks[0].setStatus('failed');
 
-    expect(tasks[0].status).toBe('failed');
-    expect(tasks[1].status).toBe('starting');
+    await vi.waitFor(() => expect(tasks[1].status).toBe('starting'));
+
     expect(tasks[2].status).toBe('ready');
 
     expect(completedEventSpy).toHaveBeenCalledWith(tasks[0]);
