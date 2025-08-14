@@ -50,12 +50,9 @@ export class TaskManager {
     }
   }
 
-  private async _startNext(previous?: Task) {
-    // Emit completed for previous task
-    if (previous) {
-      this._running.delete(previous);
-      this.events$.emit('completed', previous);
-      this._runningWeight -= previous.weight;
+  private async _startTasks() {
+    if (!this._dirty) {
+      return;
     }
 
     // Start other tasks
@@ -65,7 +62,13 @@ export class TaskManager {
       }
 
       if (task.status === 'ready') {
-        once$(task.events$, 'completed', () => void this._startNext(task));
+        once$(task.events$, 'completed', () => {
+          this._running.delete(task);
+          this._runningWeight -= task.weight;
+          this.events$.emit('completed', task);
+
+          this._markDirty();
+        });
 
         await task.start(this);
         this._running.add(task);
@@ -74,23 +77,21 @@ export class TaskManager {
         this.events$.emit('started', task);
       }
     }
+
+    this._dirty = false;
   }
 
-  private async _startTasks() {
-    if (this._dirty) {
-      await this._startNext();
-      this._dirty = false;
+  private _markDirty() {
+    if (!this._dirty) {
+      this._dirty = true;
+      queueMicrotask(() => void this._startTasks());
     }
   }
 
   add(task: Task): void {
     this._add(task);
     this._sortByComplexity();
-
-    if (!this._dirty) {
-      this._dirty = true;
-      queueMicrotask(() => void this._startTasks());
-    }
+    this._markDirty();
   }
 
   // Properties
@@ -99,14 +100,9 @@ export class TaskManager {
   }
 
   set jobs(jobs: number) {
-    this._dirty = true;
-    this._jobs = jobs;
     this.logger$.verbose(`Run up to ${this._jobs} tasks at the same time`);
-
-    if (!this._dirty) {
-      this._dirty = true;
-      queueMicrotask(() => void this._startTasks());
-    }
+    this._jobs = jobs;
+    this._markDirty();
   }
 
   get tasks(): readonly Task[] {
