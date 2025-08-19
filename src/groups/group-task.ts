@@ -51,7 +51,7 @@ export abstract class GroupTask<C extends TaskContext = TaskContext> extends Tas
       throw new Error('A GroupTask must be started using a TaskManager');
     }
 
-    void this._loop(manager);
+    queueMicrotask(() => void this._loop(manager));
   }
 
   add(task: Task) {
