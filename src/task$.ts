@@ -1,0 +1,95 @@
+import { type Observable, type Ref, var$ } from 'kyrielle';
+import { isTaskActive, TaskState } from './task-state.js';
+
+/**
+ * Wraps task managing logic.
+ * @since 3.0.0
+ */
+export function task$({ onStart, onCancel }: TaskProps): Task$ {
+  const controller = new AbortController();
+  const state$ = var$(TaskState.Ready);
+
+  return {
+    state$,
+    async start(): Promise<void> {
+      if (state$.defer() !== TaskState.Ready) {
+        throw new Error(`Task in "${state$.defer()}" state cannot be started.`);
+      }
+
+      const signal = controller.signal;
+
+      try {
+        await onStart({
+          signal,
+          setState(state: TaskState.Running | TaskState.Succeeded | TaskState.Failed) {
+            if (!signal.aborted && isTaskActive(state$.defer())) {
+              state$.mutate(state);
+            }
+          }
+        });
+      } catch (err) {
+        if (!signal.aborted) {
+          state$.mutate(TaskState.Failed);
+          throw err;
+        }
+      }
+    },
+    async cancel(): Promise<void> {
+      try {
+        state$.mutate(TaskState.Canceling);
+        controller.abort(new TaskCancel());
+
+        if (onCancel) {
+          await onCancel();
+        }
+      } finally {
+        state$.mutate(TaskState.Canceled);
+      }
+    }
+  };
+}
+
+// Utils
+export class TaskCancel extends Error {}
+
+// Types
+export interface TaskProps {
+  /**
+   * Callback used to start the task. it should yield next states as the task proceed
+   */
+  onStart(this: void, props: TaskOnStartProps): Promise<void> | void;
+
+  /**
+   * Callback use to cancel or interrupt the task.
+   */
+  readonly onCancel?: (this: void) => Promise<void> | void;
+}
+
+export interface TaskOnStartProps {
+  /**
+   * Triggered when task is canceled
+   */
+  readonly signal: AbortSignal;
+
+  /**
+   * Updates current task state
+   */
+  setState(this: void, state: TaskState.Running | TaskState.Succeeded | TaskState.Failed): void;
+}
+
+export interface Task$ {
+  /**
+   * Current state of the task
+   */
+  readonly state$: Ref<TaskState> | Observable<TaskState>;
+
+  /**
+   * Starts the task, throws if the task is not yet ready.
+   */
+  start(this: void, signal: AbortSignal): Promise<void>;
+
+  /**
+   * Cancels the task.
+   */
+  cancel(this: void): Promise<void>;
+}

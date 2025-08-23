@@ -1,19 +1,14 @@
 // Enum
 export enum TaskState {
   /**
-   * Task is created, not yet given to a task manager
-   */
-  Created = 'created',
-
-  /**
-   * Task is blocked by one of its dependencies
+   * Task is blocked, not yet ready to be started
    */
   Blocked = 'blocked',
 
   /**
    * Task is waiting to be started
    */
-  Queued = 'queued',
+  Ready = 'ready',
 
   /**
    * Task is starting
@@ -36,6 +31,11 @@ export enum TaskState {
   Failed = 'failed',
 
   /**
+   * Task is canceling
+   */
+  Canceling = 'canceling',
+
+  /**
    * Task was canceled
    */
   Canceled = 'canceled',
@@ -43,11 +43,11 @@ export enum TaskState {
 
 // Utils
 export function isTaskWaiting(state: TaskState) {
-  return [TaskState.Created, TaskState.Blocked, TaskState.Queued].includes(state);
+  return [TaskState.Blocked, TaskState.Ready].includes(state);
 }
 
 export function isTaskActive(state: TaskState) {
-  return [TaskState.Starting, TaskState.Running].includes(state);
+  return [TaskState.Starting, TaskState.Running, TaskState.Canceling].includes(state);
 }
 
 export function isTaskCompleted(state: TaskState) {
