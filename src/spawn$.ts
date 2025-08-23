@@ -3,8 +3,7 @@ import { task$ } from './task$.js';
 import { TaskState } from './task-state.js';
 
 /**
- * Creates a task spawning a process in a shell
- *
+ * Creates a task spawning a process in a shell.
  * @since 3.0.0
  */
 export function spawn$(cmd: string, args: readonly string[]) {

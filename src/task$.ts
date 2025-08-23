@@ -1,15 +1,18 @@
 import { type Observable, type Ref, var$ } from 'kyrielle';
+import { randomUUID } from 'node:crypto';
 import { isTaskActive, TaskState } from './task-state.js';
 
 /**
  * Wraps task managing logic.
  * @since 3.0.0
  */
-export function task$({ onStart, onCancel }: TaskProps): Task$ {
+export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
   const controller = new AbortController();
   const state$ = var$(TaskState.Ready);
 
   return {
+    id: id ?? randomUUID(),
+    weight: weight ?? 1,
     state$,
     async start(): Promise<void> {
       if (state$.defer() !== TaskState.Ready) {
@@ -49,11 +52,34 @@ export function task$({ onStart, onCancel }: TaskProps): Task$ {
   };
 }
 
-// Utils
-export class TaskCancel extends Error {}
+// Errors
+/**
+ * Thrown when task is canceled.
+ */
+export class TaskCancel extends Error {
+  name = 'TaskCancel';
+
+  constructor() {
+    super('Task canceled.');
+  }
+}
 
 // Types
 export interface TaskProps {
+  /**
+   * Uniquely identifies the task.
+   *
+   * One will be generated when if missing.
+   */
+  readonly id?: string;
+
+  /**
+   * "Cost" to run the task, used to limit the number of parallel tasks by the task manager.
+   *
+   * Defaults to 1.
+   */
+  readonly weight?: number;
+
   /**
    * Callback used to start the task. it should yield next states as the task proceed
    */
@@ -78,6 +104,16 @@ export interface TaskOnStartProps {
 }
 
 export interface Task$ {
+  /**
+   * Uniquely identifies the task.
+   */
+  readonly id: string;
+
+  /**
+   * "Cost" to run the task, used to limit the number of parallel tasks by the task manager.
+   */
+  readonly weight: number;
+
   /**
    * Current state of the task
    */
