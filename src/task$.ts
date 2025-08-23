@@ -1,6 +1,6 @@
-import { type Observable, type Ref, var$ } from 'kyrielle';
+import { filter$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
-import { isTaskActive, TaskState } from './task-state.js';
+import { isTaskActive, isTaskCompleted, isTaskWaiting, TaskState } from './task-state.js';
 
 /**
  * Wraps task managing logic.
@@ -8,12 +8,42 @@ import { isTaskActive, TaskState } from './task-state.js';
  */
 export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
   const controller = new AbortController();
+  const dependencies: Task$[] = [];
+
   const state$ = var$(TaskState.Ready);
+
+  function recomputeState() {
+    if (isTaskWaiting(state$.defer())) return;
+
+    if (dependencies.every((dep) => dep.state === TaskState.Succeeded)) {
+      state$.mutate(TaskState.Ready);
+    } else {
+      state$.mutate(TaskState.Blocked);
+    }
+  }
 
   return {
     id: id ?? randomUUID(),
-    weight: weight ?? 1,
+    dependencies,
     state$,
+    weight: weight ?? 1,
+
+    dependsOn(task: Task$) {
+      if (!isTaskWaiting(state$.defer())) {
+        throw new Error(`Cannot add dependency to task in "${state$.defer()}" state.`);
+      }
+
+      // Register dependency. If given task is not succeeded current one must be blocked.
+      dependencies.push(task);
+
+      if (task.state !== TaskState.Succeeded) {
+        state$.mutate(TaskState.Blocked);
+      }
+
+      // Track dependency state
+      once$(pipe$(task.state$, filter$(isTaskCompleted)), recomputeState);
+    },
+
     async start(): Promise<void> {
       if (state$.defer() !== TaskState.Ready) {
         throw new Error(`Task in "${state$.defer()}" state cannot be started.`);
@@ -37,6 +67,7 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
         }
       }
     },
+
     async cancel(): Promise<void> {
       try {
         state$.mutate(TaskState.Canceling);
@@ -48,7 +79,11 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
       } finally {
         state$.mutate(TaskState.Canceled);
       }
-    }
+    },
+
+    get state() {
+      return state$.defer();
+    },
   };
 }
 
@@ -110,14 +145,29 @@ export interface Task$ {
   readonly id: string;
 
   /**
+   * Dependencies of the current task.
+   */
+  readonly dependencies: readonly Task$[];
+
+  /**
+   * Current state of the task.
+   */
+  readonly state: TaskState;
+
+  /**
    * "Cost" to run the task, used to limit the number of parallel tasks by the task manager.
    */
   readonly weight: number;
 
   /**
-   * Current state of the task
+   * Reference on current state of the task.
    */
-  readonly state$: Ref<TaskState> | Observable<TaskState>;
+  readonly state$: Ref<TaskState> & Observable<TaskState>;
+
+  /**
+   * Adds a dependency to this task.
+   */
+  dependsOn(this: void, task: Task$): void;
 
   /**
    * Starts the task, throws if the task is not yet ready.
