@@ -1,5 +1,4 @@
-import { task$ } from '@/src/task$.js';
-import { TaskState } from '@/src/task-state.js';
+import { task$, type TaskOnStartProps, TaskState } from '@/src/index.js';
 import { var$ } from 'kyrielle';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -82,6 +81,42 @@ describe('task$', () => {
       expect(() => task.dependsOn(dep)).toThrow(new Error('Cannot add dependency to task in "starting" state.'));
 
       expect(task.dependencies).toHaveLength(0);
+    });
+  });
+
+  describe('start', () => {
+    it('should update task state to starting and call onStart callback', async () => {
+      const onStart = vi.fn();
+      const task = task$({ onStart });
+
+      await task.start();
+
+      expect(task.state).toBe(TaskState.Starting);
+      expect(onStart).toHaveBeenCalled();
+    });
+
+    it.each([
+      TaskState.Running,
+      TaskState.Succeeded,
+      TaskState.Failed,
+    ] as const)('should apply running state as triggerred by onStart callback', async (state) => {
+      const onStart = vi.fn(({ setState }: TaskOnStartProps) => setState(state));
+      const task = task$({ onStart });
+
+      await task.start();
+
+      expect(task.state).toBe(state);
+    });
+
+    it('should update task state to failed if onStart callback throws', async () => {
+      const onStart = vi.fn(() => {
+        throw new Error('Test');
+      });
+      const task = task$({ onStart });
+
+      await expect(task.start()).rejects.toThrow(new Error('Test'));
+
+      expect(task.state).toBe(TaskState.Failed);
     });
   });
 });

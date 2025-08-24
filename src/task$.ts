@@ -1,4 +1,5 @@
 import { filter$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
+import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { isTaskActive, isTaskCompleted, isTaskWaiting, TaskState } from './task-state.js';
 
@@ -13,9 +14,7 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
   const state$ = var$(TaskState.Ready);
 
   function recomputeState() {
-    if (!isTaskWaiting(state$.defer())) {
-      return;
-    }
+    assert(isTaskWaiting(state$.defer()), 'recomputeState called on non waiting task');
 
     if (dependencies.every((dep) => dep.state === TaskState.Succeeded)) {
       state$.mutate(TaskState.Ready);
