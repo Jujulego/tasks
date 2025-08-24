@@ -118,5 +118,46 @@ describe('task$', () => {
 
       expect(task.state).toBe(TaskState.Failed);
     });
+
+    it('should throw if task is not waiting', async () => {
+      const task = task$({ onStart: vi.fn() });
+
+      await task.start();
+      await expect(task.start()).rejects.toThrow(new Error('Task in "starting" state cannot be started.'));
+    });
+  });
+
+  describe('cancel', () => {
+    it('should update task state to cancelled and trigger onStart signal', async () => {
+      const onStart = vi.fn<(props: TaskOnStartProps) => void>();
+      const task = task$({ onStart });
+
+      // First start the task
+      await task.start();
+
+      const { signal } = onStart.mock.calls[0]![0];
+      expect(signal.aborted).toBe(false);
+
+      // Then cancel it !
+      await task.cancel();
+
+      expect(task.state).toBe(TaskState.Canceled);
+      expect(signal.aborted).toBe(true);
+    });
+
+    it('should call onCancel callback', async () => {
+      expect.assertions(3);
+
+      const onCancel = vi.fn(() => {
+        expect(task.state).toBe(TaskState.Canceling);
+      });
+      const task = task$({ onStart: vi.fn(), onCancel });
+
+      await task.start();
+      await task.cancel();
+
+      expect(task.state).toBe(TaskState.Canceled);
+      expect(onCancel).toHaveBeenCalled();
+    });
   });
 });

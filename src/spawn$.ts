@@ -1,3 +1,4 @@
+import { filter$, pipe$, var$, waitFor$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { task$ } from './task$.js';
 import { TaskState } from './task-state.js';
@@ -7,6 +8,8 @@ import { TaskState } from './task-state.js';
  * @since 3.0.0
  */
 export function spawn$(cmd: string, args: readonly string[]) {
+  const closed$ = var$(false);
+
   return task$({
     onStart({ signal, setState }) {
       // TODO: escape args & pass them as string, to resolve DEP0190
@@ -25,7 +28,12 @@ export function spawn$(cmd: string, args: readonly string[]) {
         } else {
           setState(TaskState.Failed);
         }
+
+        closed$.mutate(true);
       });
+    },
+    async onCancel() {
+      await waitFor$(pipe$(closed$, filter$((v) => v)));
     }
   });
 }
