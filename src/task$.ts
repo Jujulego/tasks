@@ -13,7 +13,9 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
   const state$ = var$(TaskState.Ready);
 
   function recomputeState() {
-    if (isTaskWaiting(state$.defer())) return;
+    if (!isTaskWaiting(state$.defer())) {
+      return;
+    }
 
     if (dependencies.every((dep) => dep.state === TaskState.Succeeded)) {
       state$.mutate(TaskState.Ready);
@@ -52,6 +54,7 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
       const signal = controller.signal;
 
       try {
+        state$.mutate(TaskState.Starting);
         await onStart({
           signal,
           setState(state: TaskState.Running | TaskState.Succeeded | TaskState.Failed) {
@@ -82,7 +85,7 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
     },
 
     get state() {
-      return state$.defer();
+      return this.state$.defer();
     },
   };
 }
@@ -172,7 +175,7 @@ export interface Task$ {
   /**
    * Starts the task, throws if the task is not yet ready.
    */
-  start(this: void, signal: AbortSignal): Promise<void>;
+  start(this: void): Promise<void>;
 
   /**
    * Cancels the task.
