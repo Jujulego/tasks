@@ -1,7 +1,7 @@
 import { ParallelGroup } from '@/src/groups/parallel-group.js';
 import { plan } from '@/src/plan.js';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { spyLogger, TestTask } from './utils.js';
+import { spyLogger, TestTask } from '../utils.js';
 
 // Setup
 let tasks: [TestTask, TestTask, TestTask];

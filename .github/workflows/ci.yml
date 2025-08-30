@@ -71,9 +71,50 @@ jobs:
           sarif_file: eslint-results.sarif
           wait-for-processing: true
 
-  tests:
-    name: 'Tests on node ${{ matrix.node }}'
+  unit-tests:
+    name: 'Unit tests'
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 22.x
+          cache: yarn
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Check tests typings
+        run: yarn test:types
+
+      - name: Run tests
+        run: yarn vitest tests/unit --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          files: junit-report.xml
+          flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  tests:
+    name: 'Integration tests on node ${{ matrix.node }}'
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
 
     permissions:
       contents: read
@@ -96,19 +137,16 @@ jobs:
       - name: Install
         run: yarn install --immutable
 
-      - name: Check tests typings
-        run: yarn test:types
-
       - name: Run tests
-        run: yarn test --coverage
+        run: yarn vitest tests/integration --coverage
 
-      - name: Upload results to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           flags: node-${{ matrix.node }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Upload test results to Codecov
+      - name: Upload results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
@@ -116,14 +154,25 @@ jobs:
           flags: node-${{ matrix.node }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  ready:
+    name: 'Ready'
+    runs-on: ubuntu-latest
+    needs: [ lint, build, tests ]
+
+    permissions:
+      contents: read
+
+    steps:
+      - run: echo 'You are sooo curious!'
+
   publish:
     if: ${{ github.event_name == 'push' }}
     name: 'Publish to npm'
 
     runs-on: ubuntu-latest
     environment: npm
-    needs: [ lint, build, tests ]
-    
+    needs: [ ready ]
+
     permissions:
       contents: read
 

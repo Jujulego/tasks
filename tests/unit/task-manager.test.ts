@@ -2,7 +2,7 @@ import { TaskManager } from '@/src/task-manager.js';
 import type { Task } from '@/src/task.js';
 import os from 'node:os';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { spyLogger, TestTask } from './utils.js';
+import { spyLogger, TestTask } from '../utils.js';
 
 // Setup
 let tasks: [TestTask, TestTask, TestTask];
