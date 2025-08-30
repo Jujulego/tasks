@@ -1,7 +1,7 @@
 import { TaskManager } from '@/src/task-manager.js';
 import type { Task } from '@/src/task.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { spyLogger, TestGroupTask, TestTask } from '../utils.js';
+import { spyLogger, TestGroupTask, TestTask } from '../../utils.js';
 
 // Setup
 let group: TestGroupTask;

@@ -3,7 +3,7 @@ import type { TaskSetResults } from '@/src/task-set.js';
 import { TaskSet } from '@/src/task-set.js';
 import type { Task } from '@/src/task.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { spyLogger, TestTask } from './utils.js';
+import { spyLogger, TestTask } from '../utils.js';
 
 // Setup
 let tasks: [TestTask, TestTask, TestTask];

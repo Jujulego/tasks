@@ -5,7 +5,7 @@ import { EventEmitter } from 'node:events';
 import type wt from 'node:worker_threads';
 import { vi } from 'vitest';
 
-import { spyLogger } from '../utils.js';
+import { spyLogger } from '../../utils.js';
 
 // Test pool
 export class WorkerPoolTest extends WorkerPool {

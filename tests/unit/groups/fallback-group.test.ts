@@ -1,7 +1,7 @@
 import { FallbackGroup } from '@/src/groups/fallback-group.js';
 import { TaskManager } from '@/src/task-manager.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushPromises, spyLogger, TestTask } from '../utils.js';
+import { flushPromises, spyLogger, TestTask } from '../../utils.js';
 
 // Setup
 let manager: TaskManager;

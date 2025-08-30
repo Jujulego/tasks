@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import kill from 'tree-kill';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { spyLogger } from './utils.js';
+import { spyLogger } from '../utils.js';
 
 // Mocks
 vi.mock('tree-kill');
