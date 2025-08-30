@@ -1,4 +1,4 @@
-import { spawn$, type SpawnTask$, task$, type TaskOnStartProps, TaskState } from '@/src/index.js';
+import { spawn$, type SpawnTask$, type Task$, task$, type TaskOnStartProps, TaskState } from '@/src/index.js';
 import { type ChildProcess, execFile } from 'node:child_process';
 import { type Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -10,6 +10,8 @@ vi.mock('@/src/task$.js');
 // Setup
 beforeEach(() => {
   vi.resetAllMocks();
+
+  vi.mocked(task$).mockReturnValue({} as Task$);
 });
 
 // Tests
