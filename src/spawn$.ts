@@ -1,7 +1,7 @@
 import { type Observable, type Ref, var$, waitFor$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { Duplex, type Readable } from 'node:stream';
+import { PassThrough, type Readable } from 'node:stream';
 import { type Task$, task$, type TaskProps } from './task$.js';
 import { TaskState } from './task-state.js';
 
@@ -13,8 +13,8 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnTaskPro
   const { id, cwd = process.cwd(), env, ...rest } = props;
   const closed$ = var$();
   const exitCode$ = var$<number>();
-  const stdout = new Duplex({ allowHalfOpen: false });
-  const stderr = new Duplex({ allowHalfOpen: false });
+  const stdout = new PassThrough({ allowHalfOpen: false });
+  const stderr = new PassThrough({ allowHalfOpen: false });
 
   const task = task$({
     ...rest,
@@ -54,20 +54,19 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnTaskPro
     }
   });
 
-  return {
-    ...task,
+  const spawned = Object.assign(task, {
     exitCode$,
+    stderr,
+    stdout,
+  });
 
-    get exitCode() {
-      return this.exitCode$.defer() ?? null;
-    },
-    get stderr() {
-      return stderr;
-    },
-    get stdout() {
-      return stdout;
-    }
-  };
+  Object.defineProperty(spawned, 'exitCode', {
+    enumerable: true,
+    configurable: true,
+    get: () => exitCode$.defer() ?? null,
+  });
+
+  return spawned as unknown as SpawnTask$;
 }
 
 function createSpawnTaskId(cmd: string, args: readonly string[], cwd: string) {

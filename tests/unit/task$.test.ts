@@ -39,6 +39,7 @@ describe('task$', () => {
       const dep = task$({ onStart: vi.fn() });
       const task = task$({ onStart: vi.fn() });
 
+      vi.spyOn(dep, 'state', 'get').mockReturnValue(TaskState.Succeeded);
       vi.spyOn(dep, 'state$', 'get').mockReturnValue(var$(TaskState.Succeeded));
 
       task.dependsOn(dep);
@@ -53,8 +54,9 @@ describe('task$', () => {
 
       const depState$ = var$(TaskState.Ready);
       vi.spyOn(dep, 'state$', 'get').mockReturnValue(depState$);
-
       task.dependsOn(dep);
+
+      vi.spyOn(dep, 'state', 'get').mockReturnValue(TaskState.Succeeded);
       depState$.mutate(TaskState.Succeeded);
 
       expect(task.state).toBe(TaskState.Ready);
@@ -68,6 +70,8 @@ describe('task$', () => {
       vi.spyOn(dep, 'state$', 'get').mockReturnValue(depState$);
 
       task.dependsOn(dep);
+
+      vi.spyOn(dep, 'state', 'get').mockReturnValue(TaskState.Failed);
       depState$.mutate(TaskState.Failed);
 
       expect(task.state).toBe(TaskState.Blocked);

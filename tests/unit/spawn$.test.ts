@@ -36,7 +36,7 @@ describe('spawn$', () => {
     beforeEach(() => {
       task = spawn$('echo', ['Hello World!'], { cwd: '/test' });
 
-      onStart = vi.mocked(task$).mock.calls[0]![0].onStart;
+      onStart = vi.mocked(task$).mock.calls[0]![0].onStart as (this: void, props: TaskOnStartProps) => void;
       onCancel = vi.mocked(task$).mock.calls[0]![0].onCancel! as (this: void) => Promise<void>;
 
       child = {

@@ -84,7 +84,7 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
     },
 
     get state() {
-      return this.state$.defer();
+      return state$.defer();
     },
   };
 }
