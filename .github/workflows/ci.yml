@@ -154,14 +154,25 @@ jobs:
           flags: node-${{ matrix.node }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  ready:
+    name: 'Ready'
+    runs-on: ubuntu-latest
+    needs: [ lint, build, tests ]
+
+    permissions:
+      contents: read
+
+    steps:
+      - run: echo 'You are sooo curious!'
+
   publish:
     if: ${{ github.event_name == 'push' }}
     name: 'Publish to npm'
 
     runs-on: ubuntu-latest
     environment: npm
-    needs: [ lint, build, tests ]
-    
+    needs: [ ready ]
+
     permissions:
       contents: read
 
