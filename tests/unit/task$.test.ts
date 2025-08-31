@@ -1,3 +1,4 @@
+import { depnode$ } from '@/src/bases/depnode$.js';
 import { task$, type TaskOnStartProps, TaskState } from '@/src/index.js';
 import { var$ } from 'kyrielle';
 import { describe, expect, it, vi } from 'vitest';
@@ -36,11 +37,8 @@ describe('task$', () => {
     });
 
     it('should add the successful dependency and keep task state', () => {
-      const dep = task$({ onStart: vi.fn() });
+      const dep = depnode$({ completed$: var$(true) });
       const task = task$({ onStart: vi.fn() });
-
-      vi.spyOn(dep, 'state', 'get').mockReturnValue(TaskState.Succeeded);
-      vi.spyOn(dep, 'state$', 'get').mockReturnValue(var$(TaskState.Succeeded));
 
       task.dependsOn(dep);
 
@@ -49,30 +47,23 @@ describe('task$', () => {
     });
 
     it('should update task state to ready when dependency succeeds', () => {
-      const dep = task$({ onStart: vi.fn() });
+      const completed$ = var$<boolean>();
+      const dep = depnode$({ completed$ });
       const task = task$({ onStart: vi.fn() });
 
-      const depState$ = var$(TaskState.Ready);
-      vi.spyOn(dep, 'state$', 'get').mockReturnValue(depState$);
       task.dependsOn(dep);
-
-      vi.spyOn(dep, 'state', 'get').mockReturnValue(TaskState.Succeeded);
-      depState$.mutate(TaskState.Succeeded);
+      completed$.mutate(true);
 
       expect(task.state).toBe(TaskState.Ready);
     });
 
     it('should keep task state on blocked when dependency fails', () => {
-      const dep = task$({ onStart: vi.fn() });
+      const completed$ = var$<boolean>();
+      const dep = depnode$({ completed$ });
       const task = task$({ onStart: vi.fn() });
 
-      const depState$ = var$(TaskState.Ready);
-      vi.spyOn(dep, 'state$', 'get').mockReturnValue(depState$);
-
       task.dependsOn(dep);
-
-      vi.spyOn(dep, 'state', 'get').mockReturnValue(TaskState.Failed);
-      depState$.mutate(TaskState.Failed);
+      completed$.mutate(false);
 
       expect(task.state).toBe(TaskState.Blocked);
     });

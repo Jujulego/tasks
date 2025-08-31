@@ -27,7 +27,7 @@
     "build": "yarn run build:esm && yarn run build:types",
     "build:esm": "swc src -d dist --strip-leading-paths",
     "build:types": "tsc --project tsconfig.build.json",
-    "test": "vitest run --typecheck",
+    "test": "vitest run",
     "test:types": "tsc --project tests"
   },
   "dependencies": {
