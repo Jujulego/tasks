@@ -1,4 +1,4 @@
-import { depnode$ } from '@/src/bases/depnode$.js';
+import { node$ } from '@/src/bases/node$.js';
 import { task$, type TaskOnStartProps, TaskState } from '@/src/index.js';
 import { var$ } from 'kyrielle';
 import { describe, expect, it, vi } from 'vitest';
@@ -37,7 +37,7 @@ describe('task$', () => {
     });
 
     it('should add the successful dependency and keep task state', () => {
-      const dep = depnode$({ completed$: var$(true) });
+      const dep = node$({ completed$: var$(true) });
       const task = task$({ onStart: vi.fn() });
 
       task.dependsOn(dep);
@@ -48,7 +48,7 @@ describe('task$', () => {
 
     it('should update task state to ready when dependency succeeds', () => {
       const completed$ = var$<boolean>();
-      const dep = depnode$({ completed$ });
+      const dep = node$({ completed$ });
       const task = task$({ onStart: vi.fn() });
 
       task.dependsOn(dep);
@@ -59,7 +59,7 @@ describe('task$', () => {
 
     it('should keep task state on blocked when dependency fails', () => {
       const completed$ = var$<boolean>();
-      const dep = depnode$({ completed$ });
+      const dep = node$({ completed$ });
       const task = task$({ onStart: vi.fn() });
 
       task.dependsOn(dep);

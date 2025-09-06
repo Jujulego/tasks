@@ -1,11 +1,12 @@
 import { filter$, map$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
-import { type DepNode, depnode$ } from './bases/depnode$.js';
+import { type Node, node$ } from './bases/node$.js';
 import { isTaskActive, isTaskCompleted, isTaskWaiting, TaskState } from './task-state.js';
 
 /**
  * Wraps task managing logic.
+ *
  * @since 3.0.0
  */
 export function task$(props: TaskProps): Task$ {
@@ -14,7 +15,7 @@ export function task$(props: TaskProps): Task$ {
   const controller = new AbortController();
   const state$ = var$(TaskState.Ready);
 
-  const node = depnode$({
+  const node = node$({
     id,
     completed$: pipe$(state$,
       filter$(isTaskCompleted),
@@ -37,7 +38,7 @@ export function task$(props: TaskProps): Task$ {
     state$,
     weight: weight ?? 1,
 
-    dependsOn(dep: DepNode) {
+    dependsOn(dep: Node) {
       if (!isTaskWaiting(state$.defer())) {
         throw new Error(`Cannot add dependency to task in "${state$.defer()}" state.`);
       }
@@ -147,7 +148,7 @@ export interface TaskOnStartProps {
   setState(this: void, state: TaskState.Running | TaskState.Succeeded | TaskState.Failed): void;
 }
 
-export interface Task$ extends DepNode {
+export interface Task$ extends Node {
   /**
    * Uniquely identifies the task.
    */

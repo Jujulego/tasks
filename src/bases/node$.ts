@@ -1,21 +1,24 @@
-import { type Observable, pipe$, type Ref, store$, var$ } from 'kyrielle';
+import { type Observable, pipe$, type Ref, store$, type Subscribable, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 
-export function depnode$({ id, completed$ }: DepNodeProps): DepNode {
-  const dependencies: DepNode[] = [];
+/**
+ * Base of tasks dependency tree nodes
+ */
+export function node$({ id, completed$ }: NodeProps): Node {
+  const dependencies: Node[] = [];
 
   return {
     id: id ?? randomUUID(),
     completed$: pipe$(completed$, store$(var$<boolean>())),
     dependencies,
 
-    dependsOn(node: DepNode) {
+    dependsOn(node: Node) {
       dependencies.push(node);
     },
   };
 }
 
-export interface DepNodeProps {
+export interface NodeProps {
   /**
    * Uniquely identifies the node.
    *
@@ -27,10 +30,10 @@ export interface DepNodeProps {
    * Reference indicating when node is completed.
    * Must contain true when successful, and false on failure.
    */
-  readonly completed$: Observable<boolean>;
+  readonly completed$: Subscribable<boolean>;
 }
 
-export interface DepNode {
+export interface Node {
   /**
    * Uniquely identifies the node.
    */
@@ -45,10 +48,10 @@ export interface DepNode {
   /**
    * Dependencies of the current node.
    */
-  readonly dependencies: readonly DepNode[];
+  readonly dependencies: readonly Node[];
 
   /**
    * Adds a dependency to this node.
    */
-  dependsOn(this: void, node: DepNode): void;
+  dependsOn(this: void, node: Node): void;
 }
