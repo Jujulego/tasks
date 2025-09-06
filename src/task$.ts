@@ -1,22 +1,32 @@
-import { filter$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
+import { filter$, map$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
+import { type Node, node$ } from './bases/node$.js';
 import { isTaskActive, isTaskCompleted, isTaskWaiting, TaskState } from './task-state.js';
 
 /**
  * Wraps task managing logic.
+ *
  * @since 3.0.0
  */
-export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
-  const controller = new AbortController();
-  const dependencies: Task$[] = [];
+export function task$(props: TaskProps): Task$ {
+  const { id = randomUUID(), weight, onStart, onCancel } = props;
 
+  const controller = new AbortController();
   const state$ = var$(TaskState.Ready);
+
+  const node = node$({
+    id,
+    completed$: pipe$(state$,
+      filter$(isTaskCompleted),
+      map$((state) => state === TaskState.Succeeded)
+    ),
+  });
 
   function recomputeState() {
     assert(isTaskWaiting(state$.defer()), 'recomputeState called on non waiting task');
 
-    if (dependencies.every((dep) => dep.state === TaskState.Succeeded)) {
+    if (node.dependencies.every((dep) => dep.completed$.defer())) {
       state$.mutate(TaskState.Ready);
     } else {
       state$.mutate(TaskState.Blocked);
@@ -24,25 +34,23 @@ export function task$({ id, weight, onStart, onCancel }: TaskProps): Task$ {
   }
 
   return {
-    id: id ?? randomUUID(),
-    dependencies,
+    ...node,
     state$,
     weight: weight ?? 1,
 
-    dependsOn(task: Task$) {
+    dependsOn(dep: Node) {
       if (!isTaskWaiting(state$.defer())) {
         throw new Error(`Cannot add dependency to task in "${state$.defer()}" state.`);
       }
 
-      // Register dependency. If given task is not succeeded current one must be blocked.
-      dependencies.push(task);
+      node.dependsOn(dep);
 
-      if (task.state !== TaskState.Succeeded) {
+      if (!dep.completed$.defer()) {
         state$.mutate(TaskState.Blocked);
       }
 
       // Track dependency state
-      once$(pipe$(task.state$, filter$(isTaskCompleted)), recomputeState);
+      once$(dep.completed$, recomputeState);
     },
 
     async start(): Promise<void> {
@@ -140,16 +148,11 @@ export interface TaskOnStartProps {
   setState(this: void, state: TaskState.Running | TaskState.Succeeded | TaskState.Failed): void;
 }
 
-export interface Task$ {
+export interface Task$ extends Node {
   /**
    * Uniquely identifies the task.
    */
   readonly id: string;
-
-  /**
-   * Dependencies of the current task.
-   */
-  readonly dependencies: readonly Task$[];
 
   /**
    * Current state of the task.
@@ -165,11 +168,6 @@ export interface Task$ {
    * Reference on current state of the task.
    */
   readonly state$: Ref<TaskState> & Observable<TaskState>;
-
-  /**
-   * Adds a dependency to this task.
-   */
-  dependsOn(this: void, task: Task$): void;
 
   /**
    * Starts the task, throws if the task is not yet ready.
