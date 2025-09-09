@@ -13,6 +13,7 @@ export * from './task.js';
 export * from './task-manager.js';
 export * from './task-set.js';
 
+export * from './group$.js';
 export * from './group-state.js';
 export * from './spawn$.js';
 export * from './task$.js';
