@@ -2,6 +2,7 @@ import { filter$, map$, type Observable, once$, pipe$, type Ref, var$ } from 'ky
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type Node, node$ } from './bases/node$.js';
+import type { Orchestrable } from './bases/orchestrable.js';
 import { isTaskActive, isTaskCompleted, isTaskWaiting, TaskState } from './task-state.js';
 
 /**
@@ -148,7 +149,7 @@ export interface TaskOnStartProps {
   setState(this: void, state: TaskState.Running | TaskState.Succeeded | TaskState.Failed): void;
 }
 
-export interface Task$ extends Node {
+export interface Task$ extends Node, Orchestrable {
   /**
    * Uniquely identifies the task.
    */
