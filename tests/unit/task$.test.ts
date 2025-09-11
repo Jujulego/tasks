@@ -27,7 +27,7 @@ describe('task$', () => {
 
   describe('dependsOn', () => {
     it('should add dependency and change task state to blocked', () => {
-      const dep = task$({ onStart: vi.fn() });
+      const dep = node$({ completed$: var$() });
       const task = task$({ onStart: vi.fn() });
 
       task.dependsOn(dep);
@@ -69,7 +69,7 @@ describe('task$', () => {
     });
 
     it('should throw if task is not waiting', async () => {
-      const dep = task$({ onStart: vi.fn() });
+      const dep = node$({ completed$: var$() });
       const task = task$({ onStart: vi.fn() });
 
       await task.start();
