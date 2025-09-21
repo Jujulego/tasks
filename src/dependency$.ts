@@ -2,7 +2,9 @@ import { type Observable, pipe$, type Ref, store$, type Subscribable, var$ } fro
 import { randomUUID } from 'node:crypto';
 
 /**
- * Dependency graph nodes
+ * Dependency graph node
+ *
+ * @since 3.0.0
  */
 export function dependency$({ id, completed$ }: DependencyProps): Dependency$ {
   const dependencies: Dependency$[] = [];
