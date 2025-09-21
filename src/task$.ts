@@ -1,7 +1,7 @@
 import { filter$, map$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
-import { type Node, node$ } from './bases/node$.js';
+import { type Dependency$, dependency$ } from './dependency$.js';
 import { isTaskActive, isTaskCompleted, isTaskWaiting, TaskState } from './task-state.js';
 
 /**
@@ -15,7 +15,7 @@ export function task$(props: TaskProps): Task$ {
   const controller = new AbortController();
   const state$ = var$(TaskState.Ready);
 
-  const node = node$({
+  const node = dependency$({
     id,
     completed$: pipe$(state$,
       filter$(isTaskCompleted),
@@ -38,7 +38,7 @@ export function task$(props: TaskProps): Task$ {
     state$,
     weight: weight ?? 1,
 
-    dependsOn(dep: Node) {
+    dependsOn(dep: Dependency$) {
       if (!isTaskWaiting(state$.defer())) {
         throw new Error(`Cannot add dependency to task in "${state$.defer()}" state.`);
       }
@@ -148,7 +148,7 @@ export interface TaskOnStartProps {
   setState(this: void, state: TaskState.Running | TaskState.Succeeded | TaskState.Failed): void;
 }
 
-export interface Task$ extends Node {
+export interface Task$ extends Dependency$ {
   /**
    * Uniquely identifies the task.
    */
