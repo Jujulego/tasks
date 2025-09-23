@@ -15,6 +15,7 @@ export function job$(props: JobProps): Job$ {
   return {
     id,
     state$,
+    state: state$.defer,
     weight: weight ?? 1,
 
     block(): void {
@@ -86,10 +87,6 @@ export function job$(props: JobProps): Job$ {
         state$.mutate(JobState.Canceled);
       }
     },
-
-    get state() {
-      return state$.defer();
-    },
   };
 }
 
@@ -149,11 +146,6 @@ export interface Job$ {
   readonly id: string;
 
   /**
-   * Current state of the job.
-   */
-  readonly state: JobState;
-
-  /**
    * Job's weight. A job with a high weight need many resources.
    */
   readonly weight: number;
@@ -182,6 +174,11 @@ export interface Job$ {
    * Cancels the job.
    */
   cancel(this: void): Promise<void>;
+
+  /**
+   * Returns current state of the job.
+   */
+  state(this: void): JobState;
 }
 
 // Enum

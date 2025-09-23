@@ -1,45 +1,45 @@
-import { spawn$, type SpawnTask$, type Task$, task$, type TaskOnStartProps, TaskState } from '@/src/index.js';
+import { type JobOnStartProps, spawn$, type SpawnStep$, type Step$, step$, TaskState } from '@/src/index.js';
 import { type ChildProcess, execFile } from 'node:child_process';
 import { type Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mocks
 vi.mock('node:child_process');
-vi.mock('@/src/task$.js');
+vi.mock('@/src/step$.js');
 
 // Setup
 beforeEach(() => {
   vi.resetAllMocks();
 
-  vi.mocked(task$).mockReturnValue({} as Task$);
+  vi.mocked(step$).mockReturnValue({} as Step$);
 });
 
 // Tests
 describe('spawn$', () => {
-  it('should call task$ to create task', () => {
-    const task = spawn$('echo', ['Hello World!'], { cwd: '/test', weight: 2 });
+  it('should call step$', () => {
+    const step = spawn$('echo', ['Hello World!'], { cwd: '/test', weight: 2 });
 
-    expect(task$).toHaveBeenCalledWith({
+    expect(step$).toHaveBeenCalledWith({
       id: 'cbe401e31f0981953038940216faffe6',
       weight: 2,
       onStart: expect.any(Function),
       onCancel: expect.any(Function),
     });
 
-    expect(task.exitCode).toBeNull();
+    expect(step.exitCode).toBeNull();
   });
 
   describe('callbacks', () => {
-    let task: SpawnTask$;
+    let step: SpawnStep$;
     let child: ChildProcess;
-    let onStart: (this: void, props: TaskOnStartProps) => void;
+    let onStart: (this: void, props: JobOnStartProps) => void;
     let onCancel: (this: void) => Promise<void>;
 
     beforeEach(() => {
-      task = spawn$('echo', ['Hello World!'], { cwd: '/test' });
+      step = spawn$('echo', ['Hello World!'], { cwd: '/test' });
 
-      onStart = vi.mocked(task$).mock.calls[0]![0].onStart as (this: void, props: TaskOnStartProps) => void;
-      onCancel = vi.mocked(task$).mock.calls[0]![0].onCancel! as (this: void) => Promise<void>;
+      onStart = vi.mocked(step$).mock.calls[0]![0].onStart as (this: void, props: JobOnStartProps) => void;
+      onCancel = vi.mocked(step$).mock.calls[0]![0].onCancel! as (this: void) => Promise<void>;
 
       child = {
         once: vi.fn(),
@@ -113,7 +113,7 @@ describe('spawn$', () => {
         .mock.calls.find((call) => call[0] === 'close')![1](0, null);
 
       expect(setState).toHaveBeenCalledWith(TaskState.Succeeded);
-      expect(task.exitCode).toBe(0);
+      expect(step.exitCode).toBe(0);
 
       await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
     });
@@ -135,7 +135,7 @@ describe('spawn$', () => {
         .mock.calls.find((call) => call[0] === 'close')![1](1, null);
 
       expect(setState).toHaveBeenCalledWith(TaskState.Failed);
-      expect(task.exitCode).toBe(1);
+      expect(step.exitCode).toBe(1);
 
       await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
     });

@@ -8,7 +8,7 @@ import { isJobWaiting, job$, type Job$, type JobProps, JobState } from './job$.j
  *
  * @since 3.0.0
  */
-export function step$(props: JobProps): Step$ {
+export function step$(props: StepProps): Step$ {
   // Bases
   const job = job$(props);
   const node = dependency$({
@@ -22,8 +22,8 @@ export function step$(props: JobProps): Step$ {
   const selfBlock$ = var$(false);
 
   function updateBlock() {
-    if (!isJobWaiting(job.state)) {
-      throw new Error(`updateBlock called on a "${job.state}" step.`);
+    if (!isJobWaiting(job.state())) {
+      throw new Error(`updateBlock called on a "${job.state()}" step.`);
     }
 
     const selfBlock = selfBlock$.defer();
@@ -42,8 +42,8 @@ export function step$(props: JobProps): Step$ {
     ...node,
 
     dependsOn(dependency: Dependency$) {
-      if (!isJobWaiting(job.state)) {
-        throw new Error(`Cannot add dependency to step in "${job.state}" state.`);
+      if (!isJobWaiting(job.state())) {
+        throw new Error(`Cannot add dependency to step in "${job.state()}" state.`);
       }
 
       node.dependsOn(dependency);
@@ -74,8 +74,5 @@ export function step$(props: JobProps): Step$ {
 }
 
 // Types
-export interface StepProps extends JobProps {
-}
-
-export interface Step$ extends Dependency$, Job$ {
-}
+export type StepProps = JobProps;
+export type Step$ = Dependency$ & Job$;
