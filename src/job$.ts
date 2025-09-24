@@ -21,32 +21,20 @@ export function job$(props: JobProps): Job$ {
     block(): void {
       const state = state$.defer();
 
-      switch (state) {
-        case JobState.Blocked:
-          return;
-
-        case JobState.Ready:
-          state$.mutate(JobState.Blocked);
-          return;
-
-        default:
-          throw new Error(`Job in "${state}" state cannot be blocked.`);
+      if (state === JobState.Ready) {
+        state$.mutate(JobState.Blocked);
+      } else if (state !== JobState.Blocked) {
+        throw new Error(`Job in "${state}" state cannot be blocked.`);
       }
     },
 
     unblock(): void {
       const state = state$.defer();
 
-      switch (state) {
-        case JobState.Ready:
-          return;
-
-        case JobState.Blocked:
-          state$.mutate(JobState.Ready);
-          return;
-
-        default:
-          throw new Error(`Job in "${state}" state cannot be unblocked.`);
+      if (state === JobState.Blocked) {
+        state$.mutate(JobState.Ready);
+      } else if (state !== JobState.Ready) {
+        throw new Error(`Job in "${state}" state cannot be unblocked.`);
       }
     },
 
