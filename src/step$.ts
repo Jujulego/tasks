@@ -1,20 +1,20 @@
 import { filter$, map$, once$, pipe$, var$ } from 'kyrielle';
 import { dependency$, type Dependency$ } from './dependency$.js';
-import { isJobWaiting, job$, type Job$, type JobProps, JobState } from './job$.js';
+import { isWorkloadWaiting, workload$, type Workload$, type WorkloadProps, WorkloadState } from './workload$.js';
 
 /**
- * A step is a job that can be part of a greater process. It can be and have dependencies
+ * A step is a workload that can be part of a greater process. It can be and have dependencies
  * and will blocked by its unsuccessful dependency.
  *
  * @since 3.0.0
  */
 export function step$(props: StepProps): Step$ {
   // Bases
-  const job = job$(props);
+  const workload = workload$(props);
   const node = dependency$({
-    id: job.id,
-    completed$: pipe$(job.state$,
-      map$((state) => state === JobState.Succeeded)
+    id: workload.id,
+    completed$: pipe$(workload.state$,
+      map$((state) => state === WorkloadState.Succeeded)
     ),
   });
 
@@ -22,34 +22,34 @@ export function step$(props: StepProps): Step$ {
   const selfBlock$ = var$(false);
 
   function updateBlock() {
-    if (!isJobWaiting(job.state())) {
-      throw new Error(`updateBlock called on a "${job.state()}" step.`);
+    if (!isWorkloadWaiting(workload.state())) {
+      throw new Error(`updateBlock called on a "${workload.state()}" step.`);
     }
 
     const selfBlock = selfBlock$.defer();
     const depsBlock = node.dependencies.some((dep) => !dep.completed$.defer());
 
     if (!selfBlock && !depsBlock) {
-      job.unblock();
+      workload.unblock();
     } else {
-      job.block();
+      workload.block();
     }
   }
 
   // Build object
   return {
-    ...job,
+    ...workload,
     ...node,
 
     dependsOn(dependency: Dependency$) {
-      if (!isJobWaiting(job.state())) {
-        throw new Error(`Cannot add dependency to step in "${job.state()}" state.`);
+      if (!isWorkloadWaiting(workload.state())) {
+        throw new Error(`Cannot add dependency to step in "${workload.state()}" state.`);
       }
 
       node.dependsOn(dependency);
 
       if (!dependency.completed$.defer()) {
-        job.block();
+        workload.block();
       }
 
       // Track dependency state
@@ -74,5 +74,5 @@ export function step$(props: StepProps): Step$ {
 }
 
 // Types
-export type StepProps = JobProps;
-export type Step$ = Dependency$ & Job$;
+export type StepProps = WorkloadProps;
+export type Step$ = Dependency$ & Workload$;

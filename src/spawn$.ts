@@ -2,7 +2,7 @@ import { type Observable, type Ref, var$, waitFor$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
-import { JobState } from './job$.js';
+import { WorkloadState } from './workload$.js';
 import { type Step$, step$ } from './step$.js';
 import { type TaskProps } from './task$.js';
 
@@ -32,13 +32,13 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
         env: { ...process.env, ...env },
       });
 
-      spawned.once('spawn', () => setState(JobState.Running));
-      spawned.once('error', () => setState(JobState.Failed));
+      spawned.once('spawn', () => setState(WorkloadState.Running));
+      spawned.once('error', () => setState(WorkloadState.Failed));
       spawned.once('close', (code) => {
         if (code === 0) {
-          setState(JobState.Succeeded);
+          setState(WorkloadState.Succeeded);
         } else {
-          setState(JobState.Failed);
+          setState(WorkloadState.Failed);
         }
 
         if (code !== null) {

@@ -1,4 +1,4 @@
-import { type JobOnStartProps, spawn$, type SpawnStep$, type Step$, step$, TaskState } from '@/src/index.js';
+import { type WorkloadOnStartProps, spawn$, type SpawnStep$, type Step$, step$, TaskState } from '@/src/index.js';
 import { type ChildProcess, execFile } from 'node:child_process';
 import { type Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -32,13 +32,13 @@ describe('spawn$', () => {
   describe('callbacks', () => {
     let step: SpawnStep$;
     let child: ChildProcess;
-    let onStart: (this: void, props: JobOnStartProps) => void;
+    let onStart: (this: void, props: WorkloadOnStartProps) => void;
     let onCancel: (this: void) => Promise<void>;
 
     beforeEach(() => {
       step = spawn$('echo', ['Hello World!'], { cwd: '/test' });
 
-      onStart = vi.mocked(step$).mock.calls[0]![0].onStart as (this: void, props: JobOnStartProps) => void;
+      onStart = vi.mocked(step$).mock.calls[0]![0].onStart as (this: void, props: WorkloadOnStartProps) => void;
       onCancel = vi.mocked(step$).mock.calls[0]![0].onCancel! as (this: void) => Promise<void>;
 
       child = {
