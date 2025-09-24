@@ -29,6 +29,49 @@ describe('workload$', () => {
     expect(workload.weight).toBe(42);
   });
 
+  describe('block', () => {
+    it('should change workload state to blocked', () => {
+      const workload = workload$({ onStart: vi.fn() });
+
+      // Blocks a "ready" workload
+      workload.block();
+      expect(workload.state()).toBe(WorkloadState.Blocked);
+
+      // Blocks a "blocked" workload
+      workload.block();
+      expect(workload.state()).toBe(WorkloadState.Blocked);
+    });
+
+    it('should throw if workload state is neither blocked or ready', async () => {
+      const workload = workload$({ onStart: vi.fn() });
+      await workload.cancel();
+
+      expect(() => workload.block()).toThrow(new Error('Workload in "canceled" state cannot be blocked.'));
+    });
+  });
+
+  describe('unblock', () => {
+    it('should change workload state to ready', () => {
+      const workload = workload$({ onStart: vi.fn() });
+
+      // Unblocks a "ready" workload
+      workload.unblock();
+      expect(workload.state()).toBe(WorkloadState.Ready);
+
+      // Unblocks a "blocked" workload
+      workload.block();
+      workload.unblock();
+      expect(workload.state()).toBe(WorkloadState.Ready);
+    });
+
+    it('should throw if workload state is neither blocked or ready', async () => {
+      const workload = workload$({ onStart: vi.fn() });
+      await workload.cancel();
+
+      expect(() => workload.unblock()).toThrow(new Error('Workload in "canceled" state cannot be unblocked.'));
+    });
+  });
+
   describe('start', () => {
     it('should update workload state to starting and call onStart callback', async () => {
       const onStart = vi.fn();
