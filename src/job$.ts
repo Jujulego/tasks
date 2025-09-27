@@ -1,6 +1,7 @@
 import { filter$, once$, pipe$, var$ } from 'kyrielle';
 import { dependency$, type Dependency$ } from './dependency$.js';
 import { isWorkloadWaiting } from './enums/workload-state.js';
+import { assert } from './utils/assert.js';
 import { workload$, type Workload$, type WorkloadProps } from './workload$.js';
 
 /**
@@ -21,9 +22,7 @@ export function job$(props: JobProps): Job$ {
   const selfBlock$ = var$(false);
 
   function updateBlock() {
-    if (!isWorkloadWaiting(workload.state())) {
-      throw new Error(`updateBlock called on a "${workload.state()}" job.`);
-    }
+    assert(isWorkloadWaiting(workload.state()), `updateBlock called on a "${workload.state()}" job.`);
 
     const selfBlock = selfBlock$.defer();
     const depsBlock = node.dependencies.some((dep) => !dep.completed$.defer());

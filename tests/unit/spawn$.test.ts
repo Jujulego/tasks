@@ -1,4 +1,4 @@
-import { type WorkloadOnStartProps, spawn$, type SpawnJob$, type Job$, job$, TaskState } from '@/src/index.js';
+import { type WorkloadOnStartProps, spawn$, type SpawnJob$, type Job$, job$, WorkloadState } from '@/src/index.js';
 import { type ChildProcess, execFile } from 'node:child_process';
 import { type Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -77,7 +77,7 @@ describe('spawn$', () => {
       // Call "spawn" event callback
       vi.mocked(child.once).mock.calls.find((call) => call[0] === 'spawn')![1]();
 
-      expect(setState).toHaveBeenCalledWith(TaskState.Running);
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Running);
     });
 
     it('should set task state to failed when process is errored', () => {
@@ -93,7 +93,7 @@ describe('spawn$', () => {
       vi.mocked(child.once as ((event: string, cb: (...args: unknown[]) => void) => void))
         .mock.calls.find((call) => call[0] === 'error')![1]();
 
-      expect(setState).toHaveBeenCalledWith(TaskState.Failed);
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
     });
 
     it('should set task state to succeeded when process closes with exit code 0', async () => {
@@ -112,7 +112,7 @@ describe('spawn$', () => {
       vi.mocked(child.once as ((event: string, cb: (...args: unknown[]) => void) => void))
         .mock.calls.find((call) => call[0] === 'close')![1](0, null);
 
-      expect(setState).toHaveBeenCalledWith(TaskState.Succeeded);
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Succeeded);
       expect(job.exitCode).toBe(0);
 
       await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
@@ -134,7 +134,7 @@ describe('spawn$', () => {
       vi.mocked(child.once as ((event: string, cb: (...args: unknown[]) => void) => void))
         .mock.calls.find((call) => call[0] === 'close')![1](1, null);
 
-      expect(setState).toHaveBeenCalledWith(TaskState.Failed);
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
       expect(job.exitCode).toBe(1);
 
       await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
