@@ -3,12 +3,12 @@ import { dependency$, type Dependency$ } from './dependency$.js';
 import { isWorkloadWaiting, workload$, type Workload$, type WorkloadProps, WorkloadState } from './workload$.js';
 
 /**
- * A step is a workload that can be part of a greater process. It can be and have dependencies
+ * A job is a workload that can be part of a greater process. It can be and have dependencies
  * and will blocked by its unsuccessful dependency.
  *
  * @since 3.0.0
  */
-export function step$(props: StepProps): Step$ {
+export function job$(props: JobProps): Job$ {
   // Bases
   const workload = workload$(props);
   const node = dependency$({
@@ -23,7 +23,7 @@ export function step$(props: StepProps): Step$ {
 
   function updateBlock() {
     if (!isWorkloadWaiting(workload.state())) {
-      throw new Error(`updateBlock called on a "${workload.state()}" step.`);
+      throw new Error(`updateBlock called on a "${workload.state()}" job.`);
     }
 
     const selfBlock = selfBlock$.defer();
@@ -43,7 +43,7 @@ export function step$(props: StepProps): Step$ {
 
     dependsOn(dependency: Dependency$) {
       if (!isWorkloadWaiting(workload.state())) {
-        throw new Error(`Cannot add dependency to step in "${workload.state()}" state.`);
+        throw new Error(`Cannot add dependency to job in "${workload.state()}" state.`);
       }
 
       node.dependsOn(dependency);
@@ -74,5 +74,5 @@ export function step$(props: StepProps): Step$ {
 }
 
 // Types
-export type StepProps = WorkloadProps;
-export type Step$ = Dependency$ & Workload$;
+export type JobProps = WorkloadProps;
+export type Job$ = Dependency$ & Workload$;

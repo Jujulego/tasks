@@ -17,5 +17,5 @@ export * from './task$.js';
 export * from './task-state.js';
 
 export * from './spawn$.js';
-export * from './step$.js';
+export * from './job$.js';
 export * from './workload$.js';

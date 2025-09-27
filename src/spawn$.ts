@@ -3,22 +3,21 @@ import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
 import { WorkloadState } from './workload$.js';
-import { type Step$, step$ } from './step$.js';
-import { type TaskProps } from './task$.js';
+import { type Job$, job$, type JobProps } from './job$.js';
 
 /**
- * Creates a step spawning a process in a shell.
+ * Creates a job spawning a process in a shell.
  *
  * @since 3.0.0
  */
-export function spawn$(cmd: string, args: readonly string[], props: SpawnProps = {}): SpawnStep$ {
+export function spawn$(cmd: string, args: readonly string[], props: SpawnProps = {}): SpawnJob$ {
   const { id, cwd = process.cwd(), env, ...rest } = props;
   const closed$ = var$();
   const exitCode$ = var$<number>();
   const stdout = new PassThrough({ allowHalfOpen: false });
   const stderr = new PassThrough({ allowHalfOpen: false });
 
-  const step = step$({
+  const job = job$({
     ...rest,
     id: id || createSpawnId(cmd, args, cwd),
     onStart({ signal, setState }) {
@@ -56,7 +55,7 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
     }
   });
 
-  const spawned = Object.assign(step, {
+  const spawned = Object.assign(job, {
     exitCode$,
     stderr,
     stdout,
@@ -68,7 +67,7 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
     get: () => exitCode$.defer() ?? null,
   });
 
-  return spawned as unknown as SpawnStep$;
+  return spawned as unknown as SpawnJob$;
 }
 
 function createSpawnId(cmd: string, args: readonly string[], cwd: string) {
@@ -84,7 +83,7 @@ function createSpawnId(cmd: string, args: readonly string[], cwd: string) {
   return hash.digest('hex');
 }
 
-export interface SpawnStep$ extends Step$ {
+export interface SpawnJob$ extends Job$ {
   /**
    * Spawned process stdout stream.
    */
@@ -106,7 +105,7 @@ export interface SpawnStep$ extends Step$ {
   readonly exitCode$: Ref<number | undefined> & Observable<number>;
 }
 
-export interface SpawnProps extends Omit<TaskProps, 'onStart' | 'onCancel'> {
+export interface SpawnProps extends Omit<JobProps, 'onStart' | 'onCancel'> {
   /**
    * Directory where to run the command
    */
