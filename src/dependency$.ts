@@ -7,14 +7,14 @@ import { randomUUID } from 'node:crypto';
  * @since 3.0.0
  */
 export function dependency$({ id, completed$ }: DependencyProps): Dependency$ {
-  const dependencies: Dependency$[] = [];
+  const dependencies: Dependency[] = [];
 
   return {
     id: id ?? randomUUID(),
     completed$: pipe$(completed$, store$(var$<boolean>())),
     dependencies,
 
-    dependsOn(node: Dependency$) {
+    dependsOn(node: Dependency) {
       dependencies.push(node);
     },
   };
@@ -35,7 +35,15 @@ export interface DependencyProps {
   readonly completed$: Subscribable<boolean>;
 }
 
-export interface Dependency$ {
+export interface Dependency {
+  /**
+   * Reference indicating when node is completed.
+   * Contains true when successful, and false on failure.
+   */
+  readonly completed$: Ref<boolean | undefined> & Observable<boolean>;
+}
+
+export interface Dependency$ extends Dependency{
   /**
    * Uniquely identifies the node.
    */
@@ -50,10 +58,10 @@ export interface Dependency$ {
   /**
    * Dependencies of the current node.
    */
-  readonly dependencies: readonly Dependency$[];
+  readonly dependencies: readonly Dependency[];
 
   /**
    * Adds a dependency to this node.
    */
-  dependsOn(this: void, node: Dependency$): void;
+  dependsOn(this: void, node: Dependency): void;
 }

@@ -16,6 +16,7 @@ export * from './task-set.js';
 export * from './task$.js';
 export * from './task-state.js';
 
+export * from './enums/workload-state.js';
 export * from './spawn$.js';
 export * from './job$.js';
 export * from './workload$.js';

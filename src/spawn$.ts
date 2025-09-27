@@ -2,8 +2,8 @@ import { type Observable, type Ref, var$, waitFor$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
-import { WorkloadState } from './workload$.js';
 import { type Job$, job$, type JobProps } from './job$.js';
+import { WorkloadState } from './enums/workload-state.js';
 
 /**
  * Creates a job spawning a process in a shell.

@@ -1,6 +1,7 @@
-import { filter$, map$, once$, pipe$, var$ } from 'kyrielle';
+import { filter$, once$, pipe$, var$ } from 'kyrielle';
 import { dependency$, type Dependency$ } from './dependency$.js';
-import { isWorkloadWaiting, workload$, type Workload$, type WorkloadProps, WorkloadState } from './workload$.js';
+import { isWorkloadWaiting } from './enums/workload-state.js';
+import { workload$, type Workload$, type WorkloadProps } from './workload$.js';
 
 /**
  * A job is a workload that can be part of a greater process. It can be and have dependencies
@@ -13,9 +14,7 @@ export function job$(props: JobProps): Job$ {
   const workload = workload$(props);
   const node = dependency$({
     id: workload.id,
-    completed$: pipe$(workload.state$,
-      map$((state) => state === WorkloadState.Succeeded)
-    ),
+    completed$: workload.completed$,
   });
 
   // Block management
@@ -38,8 +37,8 @@ export function job$(props: JobProps): Job$ {
 
   // Build object
   return {
-    ...workload,
     ...node,
+    ...workload,
 
     dependsOn(dependency: Dependency$) {
       if (!isWorkloadWaiting(workload.state())) {

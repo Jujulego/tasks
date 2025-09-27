@@ -1,13 +1,7 @@
-import {
-  isWorkloadActive,
-  isWorkloadCompleted,
-  isWorkloadWaiting,
-  workload$,
-  type WorkloadOnStartProps,
-  WorkloadState,
-} from '@/src/index.js';
+import { workload$, type WorkloadOnStartProps, WorkloadState, } from '@/src/index.js';
 import { describe, expect, it, vi } from 'vitest';
 
+// Tests
 describe('workload$', () => {
   it('should create a workload in ready state, with defaults applied', () => {
     const workload = workload$({ onStart: vi.fn() });
@@ -147,65 +141,5 @@ describe('workload$', () => {
       expect(workload.state()).toBe(WorkloadState.Canceled);
       expect(onCancel).toHaveBeenCalled();
     });
-  });
-});
-
-describe('isWorkloadWaiting', () => {
-  it.each([
-    WorkloadState.Blocked,
-    WorkloadState.Ready,
-  ])('should return true for "%s"', (state) => {
-    expect(isWorkloadWaiting(state)).toBe(true);
-  });
-
-  it.each([
-    WorkloadState.Starting,
-    WorkloadState.Running,
-    WorkloadState.Succeeded,
-    WorkloadState.Failed,
-    WorkloadState.Canceling,
-    WorkloadState.Canceled,
-  ])('should return false for "%s"', (state) => {
-    expect(isWorkloadWaiting(state)).toBe(false);
-  });
-});
-
-describe('isWorkloadActive', () => {
-  it.each([
-    WorkloadState.Starting,
-    WorkloadState.Running,
-    WorkloadState.Canceling,
-  ])('should return true for "%s"', (state) => {
-    expect(isWorkloadActive(state)).toBe(true);
-  });
-
-  it.each([
-    WorkloadState.Blocked,
-    WorkloadState.Ready,
-    WorkloadState.Succeeded,
-    WorkloadState.Failed,
-    WorkloadState.Canceled,
-  ])('should return false for "%s"', (state) => {
-    expect(isWorkloadActive(state)).toBe(false);
-  });
-});
-
-describe('isWorkloadCompleted', () => {
-  it.each([
-    WorkloadState.Succeeded,
-    WorkloadState.Failed,
-  ])('should return true for "%s"', (state) => {
-    expect(isWorkloadCompleted(state)).toBe(true);
-  });
-
-  it.each([
-    WorkloadState.Blocked,
-    WorkloadState.Ready,
-    WorkloadState.Starting,
-    WorkloadState.Running,
-    WorkloadState.Canceling,
-    WorkloadState.Canceled,
-  ])('should return false for "%s"', (state) => {
-    expect(isWorkloadCompleted(state)).toBe(false);
   });
 });

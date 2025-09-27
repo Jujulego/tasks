@@ -1,5 +1,7 @@
-import { type Observable, type Ref, var$ } from 'kyrielle';
+import { map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
+import type { Dependency } from './dependency$.js';
+import { isWorkloadActive, WorkloadState } from './enums/workload-state.js';
 
 /**
  * Wraps workload status logic.
@@ -11,10 +13,15 @@ export function workload$(props: WorkloadProps): Workload$ {
 
   const controller = new AbortController();
   const state$ = var$(WorkloadState.Ready);
+  const completed$ = pipe$(state$,
+    map$((state) => state === WorkloadState.Succeeded)
+  );
 
   return {
     id,
+    completed$,
     state$,
+    completed: completed$.defer,
     state: state$.defer,
     weight: weight ?? 1,
 
@@ -127,7 +134,7 @@ export interface WorkloadOnStartProps {
   setState(this: void, state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed): void;
 }
 
-export interface Workload$ {
+export interface Workload$ extends Dependency {
   /**
    * Uniquely identifies the workload.
    */
@@ -167,60 +174,10 @@ export interface Workload$ {
    * Returns current state of the workload.
    */
   state(this: void): WorkloadState;
+
+  /**
+   * Returns true if the workload is successfully completed
+   */
+  completed(this: void): boolean;
 }
 
-// Enum
-export enum WorkloadState {
-  /**
-   * Workload is blocked, not yet ready to be started
-   */
-  Blocked = 'blocked',
-
-  /**
-   * Workload is waiting to be started
-   */
-  Ready = 'ready',
-
-  /**
-   * Workload is starting
-   */
-  Starting = 'starting',
-
-  /**
-   * Workload is running
-   */
-  Running = 'running',
-
-  /**
-   * Workload successfully ended
-   */
-  Succeeded = 'succeeded',
-
-  /**
-   * Workload failed
-   */
-  Failed = 'failed',
-
-  /**
-   * Workload is canceling
-   */
-  Canceling = 'canceling',
-
-  /**
-   * Workload was canceled
-   */
-  Canceled = 'canceled',
-}
-
-// Utils
-export function isWorkloadWaiting(state: WorkloadState) {
-  return [WorkloadState.Blocked, WorkloadState.Ready].includes(state);
-}
-
-export function isWorkloadActive(state: WorkloadState) {
-  return [WorkloadState.Starting, WorkloadState.Running, WorkloadState.Canceling].includes(state);
-}
-
-export function isWorkloadCompleted(state: WorkloadState) {
-  return [WorkloadState.Succeeded, WorkloadState.Failed].includes(state);
-}
