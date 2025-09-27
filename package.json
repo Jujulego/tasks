@@ -33,7 +33,7 @@
   "dependencies": {
     "@kyrielle/logger": "^2.0.0",
     "@swc/helpers": "^0.5.3",
-    "kyrielle": "^2.4.0",
+    "kyrielle": "^2.6.1",
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {
@@ -54,11 +54,6 @@
     "vite": "7.1.7",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
-  },
-  "dependenciesMeta": {
-    "vitest@3.2.4": {
-      "unplugged": true
-    }
   },
   "packageManager": "yarn@4.10.3"
 }

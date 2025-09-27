@@ -2,23 +2,25 @@ import { type Observable, pipe$, type Ref, store$, type Subscribable, var$ } fro
 import { randomUUID } from 'node:crypto';
 
 /**
- * Base of tasks dependency tree nodes
+ * Dependency graph node
+ *
+ * @since 3.0.0
  */
-export function node$({ id, completed$ }: NodeProps): Node {
-  const dependencies: Node[] = [];
+export function dependency$({ id, completed$ }: DependencyProps): Dependency$ {
+  const dependencies: Dependency[] = [];
 
   return {
     id: id ?? randomUUID(),
     completed$: pipe$(completed$, store$(var$<boolean>())),
     dependencies,
 
-    dependsOn(node: Node) {
+    dependsOn(node: Dependency) {
       dependencies.push(node);
     },
   };
 }
 
-export interface NodeProps {
+export interface DependencyProps {
   /**
    * Uniquely identifies the node.
    *
@@ -33,7 +35,15 @@ export interface NodeProps {
   readonly completed$: Subscribable<boolean>;
 }
 
-export interface Node {
+export interface Dependency {
+  /**
+   * Reference indicating when node is completed.
+   * Contains true when successful, and false on failure.
+   */
+  readonly completed$: Ref<boolean | undefined> & Observable<boolean>;
+}
+
+export interface Dependency$ extends Dependency{
   /**
    * Uniquely identifies the node.
    */
@@ -48,10 +58,10 @@ export interface Node {
   /**
    * Dependencies of the current node.
    */
-  readonly dependencies: readonly Node[];
+  readonly dependencies: readonly Dependency[];
 
   /**
    * Adds a dependency to this node.
    */
-  dependsOn(this: void, node: Node): void;
+  dependsOn(this: void, node: Dependency): void;
 }

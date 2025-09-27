@@ -1,5 +1,4 @@
-import { spawn$ } from '@/src/spawn$.js';
-import { TaskState } from '@/src/task-state.js';
+import { WorkloadState, spawn$ } from '@/src/index.js';
 import { EOL } from 'node:os';
 import { text } from 'node:stream/consumers';
 import { describe, expect, it, vi } from 'vitest';
@@ -8,38 +7,38 @@ import { describe, expect, it, vi } from 'vitest';
 describe('spawn$', () => {
   it('should spawn process, and track it\'s state', async () => {
     // Initiate
-    const task = spawn$('echo', ['Hello World!']);
+    const job = spawn$('echo', ['Hello World!']);
 
-    expect(task.state).toBe(TaskState.Ready);
-    expect(task.exitCode).toBeNull();
+    expect(job.state()).toBe(WorkloadState.Ready);
+    expect(job.exitCode).toBeNull();
 
     // Start process
-    await task.start();
+    await job.start();
 
-    expect(task.state).toBe(TaskState.Starting);
-    expect(task.exitCode).toBeNull();
+    expect(job.state()).toBe(WorkloadState.Starting);
+    expect(job.exitCode).toBeNull();
 
-    await vi.waitFor(() => expect(task.state).toBe(TaskState.Succeeded));
-    expect(task.exitCode).toBe(0);
+    await vi.waitFor(() => expect(job.state()).toBe(WorkloadState.Succeeded));
+    expect(job.exitCode).toBe(0);
 
     // Read stdout stream
-    await expect(text(task.stdout)).resolves.toBe(`Hello World!${EOL}`);
+    await expect(text(job.stdout)).resolves.toBe(`Hello World!${EOL}`);
   });
 
   it('should spawn failing process', async () => {
     // Initiate
     const task = spawn$('exit', ['1']);
 
-    expect(task.state).toBe(TaskState.Ready);
+    expect(task.state()).toBe(WorkloadState.Ready);
     expect(task.exitCode).toBeNull();
 
     // Start process
     await task.start();
 
-    expect(task.state).toBe(TaskState.Starting);
+    expect(task.state()).toBe(WorkloadState.Starting);
     expect(task.exitCode).toBeNull();
 
-    await vi.waitFor(() => expect(task.state).toBe(TaskState.Failed));
+    await vi.waitFor(() => expect(task.state()).toBe(WorkloadState.Failed));
     expect(task.exitCode).toBe(1);
   });
 });

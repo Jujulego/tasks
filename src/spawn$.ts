@@ -2,23 +2,24 @@ import { type Observable, type Ref, var$, waitFor$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
-import { type Task$, task$, type TaskProps } from './task$.js';
-import { TaskState } from './task-state.js';
+import { type Job$, job$, type JobProps } from './job$.js';
+import { WorkloadState } from './enums/workload-state.js';
 
 /**
- * Creates a task spawning a process in a shell.
+ * Creates a job spawning a process in a shell.
+ *
  * @since 3.0.0
  */
-export function spawn$(cmd: string, args: readonly string[], props: SpawnTaskProps = {}): SpawnTask$ {
+export function spawn$(cmd: string, args: readonly string[], props: SpawnProps = {}): SpawnJob$ {
   const { id, cwd = process.cwd(), env, ...rest } = props;
   const closed$ = var$();
   const exitCode$ = var$<number>();
   const stdout = new PassThrough({ allowHalfOpen: false });
   const stderr = new PassThrough({ allowHalfOpen: false });
 
-  const task = task$({
+  const job = job$({
     ...rest,
-    id: id || createSpawnTaskId(cmd, args, cwd),
+    id: id || createSpawnId(cmd, args, cwd),
     onStart({ signal, setState }) {
       // TODO: escape args & pass them as string, to resolve DEP0190
       const spawned = execFile(cmd, args, {
@@ -30,13 +31,13 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnTaskPro
         env: { ...process.env, ...env },
       });
 
-      spawned.once('spawn', () => setState(TaskState.Running));
-      spawned.once('error', () => setState(TaskState.Failed));
+      spawned.once('spawn', () => setState(WorkloadState.Running));
+      spawned.once('error', () => setState(WorkloadState.Failed));
       spawned.once('close', (code) => {
         if (code === 0) {
-          setState(TaskState.Succeeded);
+          setState(WorkloadState.Succeeded);
         } else {
-          setState(TaskState.Failed);
+          setState(WorkloadState.Failed);
         }
 
         if (code !== null) {
@@ -54,7 +55,7 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnTaskPro
     }
   });
 
-  const spawned = Object.assign(task, {
+  const spawned = Object.assign(job, {
     exitCode$,
     stderr,
     stdout,
@@ -66,10 +67,10 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnTaskPro
     get: () => exitCode$.defer() ?? null,
   });
 
-  return spawned as unknown as SpawnTask$;
+  return spawned as unknown as SpawnJob$;
 }
 
-function createSpawnTaskId(cmd: string, args: readonly string[], cwd: string) {
+function createSpawnId(cmd: string, args: readonly string[], cwd: string) {
   const hash = createHash('md5');
 
   hash.update(cwd);
@@ -82,7 +83,7 @@ function createSpawnTaskId(cmd: string, args: readonly string[], cwd: string) {
   return hash.digest('hex');
 }
 
-export interface SpawnTask$ extends Task$ {
+export interface SpawnJob$ extends Job$ {
   /**
    * Spawned process stdout stream.
    */
@@ -104,7 +105,7 @@ export interface SpawnTask$ extends Task$ {
   readonly exitCode$: Ref<number | undefined> & Observable<number>;
 }
 
-export interface SpawnTaskProps extends Omit<TaskProps, 'onStart' | 'onCancel'> {
+export interface SpawnProps extends Omit<JobProps, 'onStart' | 'onCancel'> {
   /**
    * Directory where to run the command
    */
