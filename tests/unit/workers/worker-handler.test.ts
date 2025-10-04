@@ -8,7 +8,7 @@ let port: wt.MessagePort;
 let handler: WorkerHandlerTest;
 
 beforeEach(() => {
-  port = new EventEmitter() as wt.MessagePort;
+  port = new EventEmitter() as unknown as wt.MessagePort;
 
   Object.assign(port, {
     postMessage: vi.fn(),
