@@ -1,4 +1,4 @@
-import { isWorkloadActive, isWorkloadCompleted, isWorkloadWaiting, WorkloadState } from '@/src/index.js';
+import { isWorkloadActive, isWorkloadEnded, isWorkloadWaiting, WorkloadState } from '@/src/index.js';
 import { describe, expect, it } from 'vitest';
 
 // Tests
@@ -42,12 +42,13 @@ describe('isWorkloadActive', () => {
   });
 });
 
-describe('isWorkloadCompleted', () => {
+describe('isWorkloadEnded', () => {
   it.each([
     WorkloadState.Succeeded,
     WorkloadState.Failed,
+    WorkloadState.Canceled,
   ])('should return true for "%s"', (state) => {
-    expect(isWorkloadCompleted(state)).toBe(true);
+    expect(isWorkloadEnded(state)).toBe(true);
   });
 
   it.each([
@@ -56,8 +57,7 @@ describe('isWorkloadCompleted', () => {
     WorkloadState.Starting,
     WorkloadState.Running,
     WorkloadState.Canceling,
-    WorkloadState.Canceled,
   ])('should return false for "%s"', (state) => {
-    expect(isWorkloadCompleted(state)).toBe(false);
+    expect(isWorkloadEnded(state)).toBe(false);
   });
 });

@@ -106,7 +106,7 @@ export interface WorkloadProps {
   readonly id?: string;
 
   /**
-   * Job's weight. A workload with a high weight need many resources.
+   * Workload's weight. A workload with a high weight need many resources.
    * Defaults to 1.
    */
   readonly weight?: number;

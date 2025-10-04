@@ -49,6 +49,6 @@ export function isWorkloadActive(state: WorkloadState) {
   return [WorkloadState.Starting, WorkloadState.Running, WorkloadState.Canceling].includes(state);
 }
 
-export function isWorkloadCompleted(state: WorkloadState) {
-  return [WorkloadState.Succeeded, WorkloadState.Failed].includes(state);
+export function isWorkloadEnded(state: WorkloadState) {
+  return [WorkloadState.Succeeded, WorkloadState.Failed, WorkloadState.Canceled].includes(state);
 }
