@@ -11,7 +11,7 @@ export const DEFAULT_STRENGTH = Math.max(cpus().length - 1, 1);
  *
  * @since 3.0.0
  */
-export function scheduler$(props: SchedulerProps): Scheduler$ {
+export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const { strength = DEFAULT_STRENGTH } = props;
 
   const events$ = multiplexer$({
