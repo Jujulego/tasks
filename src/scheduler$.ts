@@ -11,7 +11,7 @@ export const DEFAULT_STRENGTH = Math.max(cpus().length - 1, 1);
  *
  * @since 3.0.0
  */
-export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
+export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const { strength = DEFAULT_STRENGTH } = props;
 
   const events$ = multiplexer$({
@@ -22,31 +22,22 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
 
   const running = new Set<Workload$>();
   const queue: Workload$[] = [];
+  let dirty = false;
 
   async function schedule() {
+    if (dirty) return;
+    dirty = true;
+
     let runningWeight = pipe$(running, reduce$((w: number, t) => w + t.weight, 0));
 
-    while (runningWeight < strength) {
-      const workload = queue.pop();
-
-      if (!workload) {
-        break;
+    for (const workload of queue) {
+      if (workload.state() !== WorkloadState.Ready) {
+        continue;
       }
 
-      if (workload.state() !== WorkloadState.Ready || workload.weight + runningWeight > strength) {
-        queue.push(workload);
+      if (runningWeight + workload.weight > strength) {
         break;
       }
-
-      // Schedule new workloads once this one ends
-      const isEnded$ = pipe$(workload.state$, filter$(isWorkloadEnded));
-
-      once$(isEnded$, () => {
-        running.delete(workload);
-        events$.emit('ended', workload);
-
-        void schedule();
-      });
 
       // Start workload
       await workload.start();
@@ -54,7 +45,21 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
 
       running.add(workload);
       runningWeight += workload.weight;
+
+      // Schedule new workloads once this one ends
+      const isEnded$ = pipe$(workload.state$, filter$(isWorkloadEnded));
+
+      once$(isEnded$, () => {
+        events$.emit('ended', workload);
+
+        running.delete(workload);
+        runningWeight -= workload.weight;
+
+        void schedule();
+      });
     }
+
+    dirty = false;
   }
 
   return {
@@ -66,7 +71,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
         throw new Error(`Cannot schedule a workload in ${workload.state()} state`);
       }
 
-      queue.unshift(workload);
+      queue.push(workload);
       events$.emit('added', workload);
 
       // Schedule new workloads once this one is ready
