@@ -53,6 +53,7 @@ export default tsEslint.config(
     },
     rules: {
       ...vitest.configs.recommended.rules,
+      'vitest/prefer-called-exactly-once-with': 'off',
     }
   },
   {
