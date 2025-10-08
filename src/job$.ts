@@ -1,4 +1,4 @@
-import { filter$, once$, pipe$, var$ } from 'kyrielle';
+import { is$, once$, pipe$, var$ } from 'kyrielle';
 import { dependency$, type Dependency$ } from './dependency$.js';
 import { isWorkloadWaiting } from './enums/workload-state.js';
 import { assert } from './utils/assert.js';
@@ -48,11 +48,7 @@ export function job$(props: JobProps): Job$ {
       }
 
       // Track dependency state
-      const isCompleted$ = pipe$(
-        dependency.completed$,
-        filter$((isCompleted) => isCompleted),
-      );
-
+      const isCompleted$ = pipe$(dependency.completed$, is$(true));
       once$(isCompleted$, updateBlock);
     },
 

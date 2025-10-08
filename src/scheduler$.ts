@@ -1,4 +1,4 @@
-import { filter$, type Multiplexer, multiplexer$, once$, pipe$, reduce$, type Source, source$ } from 'kyrielle';
+import { filter$, is$, type Multiplexer, multiplexer$, once$, pipe$, reduce$, type Source, source$ } from 'kyrielle';
 import { cpus } from 'node:os';
 import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import type { Workload$ } from './workload$.js';
@@ -75,11 +75,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       events$.emit('added', workload);
 
       // Schedule new workloads once this one is ready
-      const isReady$ = pipe$(
-        workload.state$,
-        filter$((state) => state === WorkloadState.Ready)
-      );
-
+      const isReady$ = pipe$(workload.state$, is$(WorkloadState.Ready));
       once$(isReady$, () => void schedule());
     },
   };
