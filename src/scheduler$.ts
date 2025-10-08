@@ -40,7 +40,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       }
 
       // Start workload
-      await workload.start();
+      await workload.start(scheduler);
       events$.emit('started', workload);
 
       running.add(workload);
@@ -62,7 +62,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
     dirty = false;
   }
 
-  return {
+  const scheduler = {
     events$,
     strength,
 
@@ -83,6 +83,8 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       once$(isReady$, () => void schedule());
     },
   };
+
+  return scheduler;
 }
 
 // Types
