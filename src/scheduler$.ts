@@ -11,7 +11,7 @@ export const DEFAULT_STRENGTH = Math.max(cpus().length - 1, 1);
  *
  * @since 3.0.0
  */
-export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
+export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const { strength = DEFAULT_STRENGTH } = props;
 
   const events$ = multiplexer$({
@@ -91,7 +91,7 @@ export interface SchedulerProps {
    * Scheduler's total strength, limits the total weight of running workloads.
    * Defaults to cpu count
    */
-  strength?: number;
+  readonly strength?: number;
 }
 
 export interface Scheduler$ {
@@ -110,7 +110,7 @@ export interface Scheduler$ {
   }>;
 
   /**
-   * Register workload
+   * Registers a workload to be started as soon as possible.
    */
   register(this: void, workload: Workload$): void;
 }

@@ -13,10 +13,7 @@ import { workload$, type Workload$, type WorkloadProps } from './workload$.js';
 export function job$(props: JobProps): Job$ {
   // Bases
   const workload = workload$(props);
-  const node = dependency$({
-    id: workload.id,
-    completed$: workload.completed$,
-  });
+  const node = dependency$(workload);
 
   // Block management
   const selfBlock$ = var$(false);
