@@ -1,5 +1,5 @@
 import { type WorkloadOnStartProps, spawn$, type SpawnJob$, type Job$, job$, WorkloadState } from '@/src/index.js';
-import { unscheduler$ } from '@/src/utils/unscheduler$.js';
+import { unscheduler$ } from '@/src/unscheduler$.js';
 import { type ChildProcess, execFile } from 'node:child_process';
 import { type Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

@@ -2,7 +2,7 @@ import { map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 import type { Dependency } from './dependency$.js';
 import { isWorkloadActive, WorkloadState } from './enums/workload-state.js';
-import { unscheduler$ } from './utils/unscheduler$.js';
+import { unscheduler$ } from './unscheduler$.js';
 
 /**
  * Wraps workload status logic.
