@@ -22,13 +22,34 @@ export function group$(props: GroupProps): Group$ {
     ...job,
     items: () => items,
     push: (workload) => {
-      assert(isWorkloadWaiting(job.state()), `Cannot push workload to a workload in ${job.state()} state`);
+      assert(isWorkloadWaiting(job.state()), `Cannot add to a group a workload in ${job.state()} state`);
+
+      // Mark workload
+      const marked = workload as Marked;
+
+      if (marked[GROUP_MARK] && marked[GROUP_MARK] !== job.id) {
+        throw new Error(`Cannot add workflow to group, it is already member of ${marked[GROUP_MARK]}`);
+      }
+
+      Object.defineProperty(marked, GROUP_MARK, {
+        enumerable: true,
+        writable: false,
+        value: job.id,
+      });
+
       items.push(workload);
     },
   };
 }
 
+// Utils
+const GROUP_MARK = Symbol.for('@jujulego/tasks:group-mark');
+
 // Types
+interface Marked {
+  [GROUP_MARK]?: string;
+}
+
 export interface GroupProps extends Omit<JobProps, 'onStart'> {
   /**
    * Uniquely identifies the group.
