@@ -1,4 +1,6 @@
+import { isWorkloadWaiting } from './enums/workload-state.js';
 import { job$, type Job$, type JobProps } from './job$.js';
+import { assert } from './utils/assert.js';
 import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
 
 /**
@@ -6,38 +8,28 @@ import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
  *
  * @since 3.0.0
  */
-export function group$<S extends WorkloadScheduler>(props: GroupProps<S>): Group$<S> {
-  const { scheduler, onOrchestrate, ...rest } = props;
+export function group$(props: GroupProps): Group$ {
+  const { onOrchestrate, ...rest } = props;
+  const items: Workload$[] = [];
 
   // Bases
   const job = job$({
     ...rest,
-    onStart({ setState, signal }): void {
-      void onOrchestrate({
-        signal,
-        setState,
-        register(workload: Workload$) {
-          scheduler.register(workload);
-        },
-      });
-    }
+    onStart: (props) => onOrchestrate(items, props),
   });
 
   return {
     ...job,
-    scheduler,
+    items: () => items,
+    push: (workload) => {
+      assert(isWorkloadWaiting(job.state()), `Cannot push workload to a workload in ${job.state()} state`);
+      items.push(workload);
+    },
   };
 }
 
 // Types
-export interface WorkloadScheduler {
-  /**
-   * Registers a workload to be started as soon as possible.
-   */
-  register(workload: Workload$): void;
-}
-
-export interface GroupProps<S extends WorkloadScheduler> extends Omit<JobProps, 'onStart'> {
+export interface GroupProps extends Omit<JobProps, 'onStart'> {
   /**
    * Uniquely identifies the group.
    * One will be generated when if missing.
@@ -45,20 +37,15 @@ export interface GroupProps<S extends WorkloadScheduler> extends Omit<JobProps, 
   readonly id?: string;
 
   /**
-   * Scheduler used to start workloads.
-   */
-  readonly scheduler: S;
-
-  /**
    * Group's orchestration weight. A group with a high weight need many resources, independently of its members.
-   * Defaults to 0.
+   * Defaults to 1.
    */
   readonly weight?: number;
 
   /**
    * Callback used to register each task in the order they should start.
    */
-  readonly onOrchestrate: (this: void, props: GroupOnOrchestrateProps) => Promise<void>;
+  readonly onOrchestrate: (this: void, items: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void>;
 
   /**
    * Callback used to cancel or interrupt the group's orchestration.
@@ -66,21 +53,14 @@ export interface GroupProps<S extends WorkloadScheduler> extends Omit<JobProps, 
   readonly onCancel?: (this: void) => Promise<void> | void;
 }
 
-export interface GroupOnOrchestrateProps extends WorkloadOnStartProps {
+export interface Group$ extends Job$ {
   /**
-   * Triggered when group is canceled
+   * Items contained in group.
    */
-  readonly signal: AbortSignal;
+  items(): readonly Workload$[];
 
   /**
-   * Registers a workload to be started as soon as possible.
+   * Push an item to the group. Throws if group is not waiting.
    */
-  register(this: void, workload: Workload$): void;
-}
-
-export interface Group$<S extends WorkloadScheduler> extends Job$ {
-  /**
-   * Scheduler used to start workloads.
-   */
-  readonly scheduler: S;
+  push(workload: Workload$): void;
 }
