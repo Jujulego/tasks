@@ -24,7 +24,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const queue: Workload$[] = [];
   let dirty = false;
 
-  async function schedule() {
+  function schedule() {
     if (dirty) return;
     dirty = true;
 
@@ -40,7 +40,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       }
 
       // Start workload
-      await workload.start(scheduler);
+      workload.start(scheduler);
       events$.emit('started', workload);
 
       running.add(workload);
@@ -55,7 +55,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
         running.delete(workload);
         runningWeight -= workload.weight;
 
-        void schedule();
+        schedule();
       });
     }
 
@@ -76,7 +76,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
 
       // Schedule new workloads once this one is ready
       const isReady$ = pipe$(workload.state$, is$(WorkloadState.Ready));
-      once$(isReady$, () => void schedule());
+      once$(isReady$, () => schedule());
     },
   };
 

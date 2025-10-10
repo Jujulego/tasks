@@ -45,7 +45,7 @@ export interface GroupProps extends Omit<JobProps, 'onStart'> {
   /**
    * Callback used to register each task in the order they should start.
    */
-  readonly onOrchestrate: (this: void, items: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void>;
+  readonly onOrchestrate: (this: void, items: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void> | void;
 
   /**
    * Callback used to cancel or interrupt the group's orchestration.

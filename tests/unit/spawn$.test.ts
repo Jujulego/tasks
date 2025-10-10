@@ -1,4 +1,5 @@
 import { type WorkloadOnStartProps, spawn$, type SpawnJob$, type Job$, job$, WorkloadState } from '@/src/index.js';
+import { unscheduler$ } from '@/src/utils/unscheduler$.js';
 import { type ChildProcess, execFile } from 'node:child_process';
 import { type Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -53,7 +54,7 @@ describe('spawn$', () => {
     it('should call execFile to spawn process', () => {
       const controller = new AbortController();
 
-      onStart({ signal: controller.signal, setState: vi.fn() });
+      onStart({ scheduler: unscheduler$(), signal: controller.signal, setState: vi.fn() });
 
       expect(execFile).toHaveBeenCalledWith('echo', ['Hello World!'], {
         shell: true,
@@ -69,7 +70,7 @@ describe('spawn$', () => {
       const controller = new AbortController();
       const setState = vi.fn();
 
-      onStart({ signal: controller.signal, setState });
+      onStart({ scheduler: unscheduler$(), signal: controller.signal, setState });
 
       expect(child.once).toHaveBeenCalledWith('spawn', expect.any(Function));
       expect(setState).not.toHaveBeenCalled();
@@ -84,7 +85,7 @@ describe('spawn$', () => {
       const controller = new AbortController();
       const setState = vi.fn();
 
-      onStart({ signal: controller.signal, setState });
+      onStart({ scheduler: unscheduler$(), signal: controller.signal, setState });
 
       expect(child.once).toHaveBeenCalledWith('error', expect.any(Function));
       expect(setState).not.toHaveBeenCalled();
@@ -101,7 +102,7 @@ describe('spawn$', () => {
       const setState = vi.fn();
       const cancelResolved = vi.fn();
 
-      onStart({ signal: controller.signal, setState });
+      onStart({ scheduler: unscheduler$(), signal: controller.signal, setState });
       void onCancel().then(cancelResolved);
 
       expect(child.once).toHaveBeenCalledWith('close', expect.any(Function));
@@ -123,7 +124,7 @@ describe('spawn$', () => {
       const setState = vi.fn();
       const cancelResolved = vi.fn();
 
-      onStart({ signal: controller.signal, setState });
+      onStart({ scheduler: unscheduler$(), signal: controller.signal, setState });
       void onCancel().then(cancelResolved);
 
       expect(child.once).toHaveBeenCalledWith('close', expect.any(Function));

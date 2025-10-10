@@ -46,7 +46,7 @@ export function workload$(props: WorkloadProps): Workload$ {
       }
     },
 
-    async start(scheduler: WorkloadScheduler = unscheduler$()): Promise<void> {
+    start(scheduler: WorkloadScheduler = unscheduler$()): void {
       if (state$.defer() !== WorkloadState.Ready) {
         throw new Error(`Workload in "${state$.defer()}" state cannot be started.`);
       }
@@ -55,7 +55,7 @@ export function workload$(props: WorkloadProps): Workload$ {
 
       try {
         state$.mutate(WorkloadState.Starting);
-        await onStart({
+        void onStart({
           scheduler,
           signal,
           setState(state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed) {
@@ -177,13 +177,13 @@ export interface Workload$ extends Dependency {
   /**
    * Starts the workload.
    */
-  start(this: void): Promise<void>;
+  start(this: void): void;
 
   /**
    * Starts the workload.
    * @internal
    */
-  start(this: void, scheduler: WorkloadScheduler): Promise<void>;
+  start(this: void, scheduler: WorkloadScheduler): void;
 
   /**
    * Cancels the workload.
