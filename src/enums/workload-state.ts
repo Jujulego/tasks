@@ -41,14 +41,14 @@ export enum WorkloadState {
 }
 
 // Utils
-export function isWorkloadWaiting(state: WorkloadState) {
+export function isWorkloadWaiting(state: WorkloadState): boolean {
   return [WorkloadState.Blocked, WorkloadState.Ready].includes(state);
 }
 
-export function isWorkloadActive(state: WorkloadState) {
+export function isWorkloadActive(state: WorkloadState): boolean {
   return [WorkloadState.Starting, WorkloadState.Running, WorkloadState.Canceling].includes(state);
 }
 
-export function isWorkloadEnded(state: WorkloadState) {
+export function isWorkloadEnded(state: WorkloadState): boolean {
   return [WorkloadState.Succeeded, WorkloadState.Failed, WorkloadState.Canceled].includes(state);
 }

@@ -17,6 +17,7 @@ export * from './enums/workload-state.js';
 
 export * from './dependency$.js';
 export * from './job$.js';
+export * from './parallelFlow$.js';
 export * from './scheduler$.js';
 export * from './spawn$.js';
 export * from './unscheduler$.js';
