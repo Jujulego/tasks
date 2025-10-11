@@ -21,23 +21,29 @@ export function group$(props: GroupProps): Group$ {
   return {
     ...job,
     items: () => items,
-    push: (workload) => {
-      assert(isWorkloadWaiting(job.state()), `Cannot add to a group a workload in ${job.state()} state`);
+    push: (...workloads) => {
+      assert(isWorkloadWaiting(job.state()), `Cannot add a workload to a group in ${job.state()} state`);
 
-      // Mark workload
-      const marked = workload as Marked;
+      for (const workload of workloads) {
+        assert(isWorkloadWaiting(workload.state()), `Cannot add a workload in ${workload.state()} state to a group`);
 
-      if (marked[GROUP_MARK] && marked[GROUP_MARK] !== job.id) {
-        throw new Error(`Cannot add workflow to group, it is already member of ${marked[GROUP_MARK]}`);
+        // Mark workload
+        const marked = workload as Marked;
+
+        if (!marked[GROUP_MARK]) {
+          Object.defineProperty(marked, GROUP_MARK, {
+            enumerable: true,
+            writable: false,
+            value: job.id,
+          });
+        }
+
+        if (marked[GROUP_MARK] !== job.id) {
+          throw new Error(`Cannot add workflow to group, it is already member of ${marked[GROUP_MARK]}`);
+        }
       }
 
-      Object.defineProperty(marked, GROUP_MARK, {
-        enumerable: true,
-        writable: false,
-        value: job.id,
-      });
-
-      items.push(workload);
+      items.push(...workloads);
     },
   };
 }
@@ -83,5 +89,5 @@ export interface Group$ extends Job$ {
   /**
    * Push an item to the group. Throws if group is not waiting.
    */
-  push(workload: Workload$): void;
+  push(...workloads: Workload$[]): void;
 }
