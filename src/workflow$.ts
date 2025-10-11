@@ -8,7 +8,7 @@ import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
  *
  * @since 3.0.0
  */
-export function workflow$(props: GroupProps): Group$ {
+export function workflow$(props: WorkflowProps): Workflow$ {
   const { onOrchestrate, ...rest } = props;
   const items: Workload$[] = [];
 
@@ -22,24 +22,24 @@ export function workflow$(props: GroupProps): Group$ {
     ...job,
     items: () => items,
     push: (...workloads) => {
-      assert(isWorkloadWaiting(job.state()), `Cannot add a workload to a group in ${job.state()} state`);
+      assert(isWorkloadWaiting(job.state()), `Cannot add a workload to a workflow in ${job.state()} state`);
 
       for (const workload of workloads) {
-        assert(isWorkloadWaiting(workload.state()), `Cannot add a workload in ${workload.state()} state to a group`);
+        assert(isWorkloadWaiting(workload.state()), `Cannot add a workload in ${workload.state()} state to a workflow`);
 
         // Mark workload
         const marked = workload as Marked;
 
-        if (!marked[GROUP_MARK]) {
-          Object.defineProperty(marked, GROUP_MARK, {
+        if (!marked[WORKFLOW_ID]) {
+          Object.defineProperty(marked, WORKFLOW_ID, {
             enumerable: true,
             writable: false,
             value: job.id,
           });
         }
 
-        if (marked[GROUP_MARK] !== job.id) {
-          throw new Error(`Cannot add workflow to group, it is already member of ${marked[GROUP_MARK]}`);
+        if (marked[WORKFLOW_ID] !== job.id) {
+          throw new Error(`Cannot add workload to workflow, it is already member of ${marked[WORKFLOW_ID]}`);
         }
       }
 
@@ -49,22 +49,22 @@ export function workflow$(props: GroupProps): Group$ {
 }
 
 // Utils
-const GROUP_MARK = Symbol.for('@jujulego/tasks:group-mark');
+const WORKFLOW_ID = Symbol.for('@jujulego/tasks:workflow-id');
 
 // Types
 interface Marked {
-  [GROUP_MARK]?: string;
+  [WORKFLOW_ID]?: string;
 }
 
-export interface GroupProps extends Omit<JobProps, 'onStart'> {
+export interface WorkflowProps extends Omit<JobProps, 'onStart'> {
   /**
-   * Uniquely identifies the group.
+   * Uniquely identifies the workflow.
    * One will be generated when if missing.
    */
   readonly id?: string;
 
   /**
-   * Group's orchestration weight. A group with a high weight need many resources, independently of its members.
+   * Workflow's orchestration weight. A workflow with a high weight need many resources, independently of its workloads.
    * Defaults to 1.
    */
   readonly weight?: number;
@@ -75,19 +75,19 @@ export interface GroupProps extends Omit<JobProps, 'onStart'> {
   readonly onOrchestrate: (this: void, items: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void> | void;
 
   /**
-   * Callback used to cancel or interrupt the group's orchestration.
+   * Callback used to cancel or interrupt the workflow's orchestration.
    */
   readonly onCancel?: (this: void) => Promise<void> | void;
 }
 
-export interface Group$ extends Job$ {
+export interface Workflow$ extends Job$ {
   /**
    * Items contained in group.
    */
-  items(): readonly Workload$[];
+  items(this: void): readonly Workload$[];
 
   /**
    * Push an item to the group. Throws if group is not waiting.
    */
-  push(...workloads: Workload$[]): void;
+  push(this: void, ...workloads: Workload$[]): void;
 }
