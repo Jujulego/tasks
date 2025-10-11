@@ -10,18 +10,18 @@ import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
  */
 export function workflow$(props: WorkflowProps): Workflow$ {
   const { onOrchestrate, onCancel, ...rest } = props;
-  const workloads: Workload$[] = [];
+  const items: Workload$[] = [];
 
   // Bases
   const job = job$({
     ...rest,
-    onStart: (props) => onOrchestrate(workloads, props),
-    onCancel: () => onCancel?.(workloads),
+    onStart: (props) => onOrchestrate(items, props),
+    onCancel: () => onCancel?.(items),
   });
 
   return {
     ...job,
-    workloads: () => workloads,
+    workloads: () => items,
     push: (...workloads) => {
       assert(isWorkloadWaiting(job.state()), `Cannot add a workload to a workflow in ${job.state()} state`);
 
@@ -44,7 +44,7 @@ export function workflow$(props: WorkflowProps): Workflow$ {
         }
       }
 
-      workloads.push(...workloads);
+      items.push(...workloads);
     },
   };
 }
