@@ -1,4 +1,4 @@
-import { group$ } from '@/src/group$.js';
+import { workflow$ } from '@/src/workflow$.js';
 import { workload$ } from '@/src/workload$.js';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -8,39 +8,39 @@ describe('group$', () => {
     const wklB = workload$({ onStart: vi.fn() });
 
     const onOrchestrate = vi.fn();
-    const grp = group$({ onOrchestrate });
+    const wkf = workflow$({ onOrchestrate });
 
-    grp.push(wklA, wklB);
-    grp.start();
+    wkf.push(wklA, wklB);
+    wkf.start();
 
     expect(onOrchestrate).toHaveBeenCalledExactlyOnceWith([wklA, wklB], expect.anything());
   });
 
   it('should throw when adding workload to a started group', () => {
     const wkl = workload$({ onStart: vi.fn() });
-    const grp = group$({ onOrchestrate: vi.fn() });
+    const wkf = workflow$({ onOrchestrate: vi.fn() });
 
-    grp.start();
+    wkf.start();
 
-    expect(() => grp.push(wkl)).toThrow(new Error('Cannot add a workload to a group in starting state'));
+    expect(() => wkf.push(wkl)).toThrow(new Error('Cannot add a workload to a group in starting state'));
   });
 
   it('should throw when adding a started workload to a group', () => {
     const wkl = workload$({ onStart: vi.fn() });
-    const grp = group$({ onOrchestrate: vi.fn() });
+    const wkf = workflow$({ onOrchestrate: vi.fn() });
 
     wkl.start();
 
-    expect(() => grp.push(wkl)).toThrow(new Error('Cannot add a workload in starting state to a group'));
+    expect(() => wkf.push(wkl)).toThrow(new Error('Cannot add a workload in starting state to a group'));
   });
 
   it('should throw when adding to a group a workload belonging to another group', () => {
     const wkl = workload$({ onStart: vi.fn() });
-    const grpA = group$({ onOrchestrate: vi.fn() });
-    const grpB = group$({ onOrchestrate: vi.fn() });
+    const wkfA = workflow$({ onOrchestrate: vi.fn() });
+    const wkfB = workflow$({ onOrchestrate: vi.fn() });
 
-    grpA.push(wkl);
+    wkfA.push(wkl);
 
-    expect(() => grpB.push(wkl)).toThrow(new Error(`Cannot add workflow to group, it is already member of ${grpA.id}`));
+    expect(() => wkfB.push(wkl)).toThrow(new Error(`Cannot add workflow to group, it is already member of ${wkfA.id}`));
   });
 });

@@ -8,7 +8,7 @@ import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
  *
  * @since 3.0.0
  */
-export function group$(props: GroupProps): Group$ {
+export function workflow$(props: GroupProps): Group$ {
   const { onOrchestrate, ...rest } = props;
   const items: Workload$[] = [];
 
