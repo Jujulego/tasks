@@ -1,4 +1,4 @@
-import { filter$, type Multiplexer, multiplexer$, once$, pipe$, reduce$, type Source, source$ } from 'kyrielle';
+import { filter$, is$, type Multiplexer, multiplexer$, once$, pipe$, reduce$, type Source, source$ } from 'kyrielle';
 import { cpus } from 'node:os';
 import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import type { Workload$ } from './workload$.js';
@@ -11,7 +11,7 @@ export const DEFAULT_STRENGTH = Math.max(cpus().length - 1, 1);
  *
  * @since 3.0.0
  */
-export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
+export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const { strength = DEFAULT_STRENGTH } = props;
 
   const events$ = multiplexer$({
@@ -24,7 +24,7 @@ export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const queue: Workload$[] = [];
   let dirty = false;
 
-  async function schedule() {
+  function schedule() {
     if (dirty) return;
     dirty = true;
 
@@ -40,7 +40,7 @@ export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       }
 
       // Start workload
-      await workload.start();
+      workload.start(scheduler);
       events$.emit('started', workload);
 
       running.add(workload);
@@ -55,14 +55,14 @@ export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
         running.delete(workload);
         runningWeight -= workload.weight;
 
-        void schedule();
+        schedule();
       });
     }
 
     dirty = false;
   }
 
-  return {
+  const scheduler = {
     events$,
     strength,
 
@@ -75,14 +75,12 @@ export default function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       events$.emit('added', workload);
 
       // Schedule new workloads once this one is ready
-      const isReady$ = pipe$(
-        workload.state$,
-        filter$((state) => state === WorkloadState.Ready)
-      );
-
-      once$(isReady$, () => void schedule());
+      const isReady$ = pipe$(workload.state$, is$(WorkloadState.Ready));
+      once$(isReady$, () => schedule());
     },
   };
+
+  return scheduler;
 }
 
 // Types
@@ -91,7 +89,7 @@ export interface SchedulerProps {
    * Scheduler's total strength, limits the total weight of running workloads.
    * Defaults to cpu count
    */
-  strength?: number;
+  readonly strength?: number;
 }
 
 export interface Scheduler$ {
@@ -110,7 +108,7 @@ export interface Scheduler$ {
   }>;
 
   /**
-   * Register workload
+   * Registers a workload to be started as soon as possible.
    */
   register(this: void, workload: Workload$): void;
 }

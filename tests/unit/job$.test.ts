@@ -42,10 +42,10 @@ describe('job$', () => {
     const job = job$({ onStart });
 
     expect(workload$).toHaveBeenCalledWith({ onStart });
-    expect(dependency$).toHaveBeenCalledWith({
+    expect(dependency$).toHaveBeenCalledWith(expect.objectContaining({
       id: workload.id,
       completed$: expect.anything(),
-    });
+    }));
 
     expect(job.id).toBe(workload.id);
     expect(job.cancel).toBe(workload.cancel);

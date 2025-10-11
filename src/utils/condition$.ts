@@ -1,4 +1,4 @@
-import { filter$, type Observable, pipe$, type Ref, var$, waitFor$ } from 'kyrielle';
+import { is$, type Observable, pipe$, type Ref, var$, waitFor$ } from 'kyrielle';
 
 /**
  * Tracks status of a "condition", emitting when its result changes
@@ -25,7 +25,7 @@ export async function waitValue$<T>(origin: Ref<T> & Observable<T>, value: T): P
     return;
   }
 
-  await waitFor$(pipe$(origin, filter$((v) => v === value)));
+  await waitFor$(pipe$(origin, is$(value)));
 }
 
 // Types

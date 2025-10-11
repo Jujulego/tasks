@@ -23,9 +23,10 @@ describe('scheduler$', () => {
     await vi.waitFor(() => expect(spyStarted).toHaveBeenCalledWith(workload));
   });
 
-  it('should throw when registering a non waiting workflow', async () => {
+  it('should throw when registering a non waiting workflow', () => {
     const workload = workload$({ id: 'test-1', onStart: vi.fn() });
-    await workload.start();
+
+    workload.start();
     vi.spyOn(workload, 'start');
 
     const scheduler = scheduler$();

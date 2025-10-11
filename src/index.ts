@@ -18,6 +18,7 @@ export * from './enums/workload-state.js';
 export * from './dependency$.js';
 export * from './job$.js';
 export * from './scheduler$.js';
-export { default as scheduler$ } from './scheduler$.js';
 export * from './spawn$.js';
+export * from './unscheduler$.js';
+export * from './workflow$.js';
 export * from './workload$.js';

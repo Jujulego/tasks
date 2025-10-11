@@ -67,11 +67,11 @@ describe('workload$', () => {
   });
 
   describe('start', () => {
-    it('should update workload state to starting and call onStart callback', async () => {
+    it('should update workload state to starting and call onStart callback', () => {
       const onStart = vi.fn();
       const workload = workload$({ onStart });
 
-      await workload.start();
+      workload.start();
 
       expect(workload.state()).toBe(WorkloadState.Starting);
       expect(onStart).toHaveBeenCalled();
@@ -81,31 +81,31 @@ describe('workload$', () => {
       WorkloadState.Running,
       WorkloadState.Succeeded,
       WorkloadState.Failed,
-    ] as const)('should apply running state as triggerred by onStart callback', async (state) => {
+    ] as const)('should apply running state as triggerred by onStart callback', (state) => {
       const onStart = vi.fn(({ setState }: WorkloadOnStartProps) => setState(state));
       const workload = workload$({ onStart });
 
-      await workload.start();
+      workload.start();
 
       expect(workload.state()).toBe(state);
     });
 
-    it('should update workload state to failed if onStart callback throws', async () => {
+    it('should update workload state to failed if onStart callback throws', () => {
       const onStart = vi.fn(() => {
         throw new Error('Test');
       });
       const workload = workload$({ onStart });
 
-      await expect(workload.start()).rejects.toThrow(new Error('Test'));
+      expect(() => workload.start()).toThrow(new Error('Test'));
 
       expect(workload.state()).toBe(WorkloadState.Failed);
     });
 
-    it('should throw if workload is not waiting', async () => {
+    it('should throw if workload is not waiting', () => {
       const workload = workload$({ onStart: vi.fn() });
 
-      await workload.start();
-      await expect(workload.start()).rejects.toThrow(new Error('Workload in "starting" state cannot be started.'));
+      workload.start();
+      expect(() => workload.start()).toThrow(new Error('Workload in "starting" state cannot be started.'));
     });
   });
 
@@ -115,7 +115,7 @@ describe('workload$', () => {
       const workload = workload$({ onStart });
 
       // First start the workload
-      await workload.start();
+      workload.start();
 
       const { signal } = onStart.mock.calls[0]![0];
       expect(signal.aborted).toBe(false);
@@ -135,7 +135,7 @@ describe('workload$', () => {
       });
       const workload = workload$({ onStart: vi.fn(), onCancel });
 
-      await workload.start();
+      workload.start();
       await workload.cancel();
 
       expect(workload.state()).toBe(WorkloadState.Canceled);

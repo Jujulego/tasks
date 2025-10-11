@@ -2,6 +2,7 @@ import { map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 import type { Dependency } from './dependency$.js';
 import { isWorkloadActive, WorkloadState } from './enums/workload-state.js';
+import { unscheduler$ } from './unscheduler$.js';
 
 /**
  * Wraps workload status logic.
@@ -45,7 +46,7 @@ export function workload$(props: WorkloadProps): Workload$ {
       }
     },
 
-    async start(): Promise<void> {
+    start(scheduler: WorkloadScheduler = unscheduler$()): void {
       if (state$.defer() !== WorkloadState.Ready) {
         throw new Error(`Workload in "${state$.defer()}" state cannot be started.`);
       }
@@ -54,7 +55,8 @@ export function workload$(props: WorkloadProps): Workload$ {
 
       try {
         state$.mutate(WorkloadState.Starting);
-        await onStart({
+        void onStart({
+          scheduler,
           signal,
           setState(state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed) {
             if (!signal.aborted && isWorkloadActive(state$.defer())) {
@@ -124,6 +126,11 @@ export interface WorkloadProps {
 
 export interface WorkloadOnStartProps {
   /**
+   * Scheduler used to start the workload
+   */
+  readonly scheduler: WorkloadScheduler;
+
+  /**
    * Triggered when workload is canceled
    */
   readonly signal: AbortSignal;
@@ -132,6 +139,13 @@ export interface WorkloadOnStartProps {
    * Updates current workload state
    */
   setState(this: void, state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed): void;
+}
+
+export interface WorkloadScheduler {
+  /**
+   * Registers a workload to be started as soon as possible.
+   */
+  register(workload: Workload$): void;
 }
 
 export interface Workload$ extends Dependency {
@@ -163,7 +177,13 @@ export interface Workload$ extends Dependency {
   /**
    * Starts the workload.
    */
-  start(this: void): Promise<void>;
+  start(this: void): void;
+
+  /**
+   * Starts the workload.
+   * @internal
+   */
+  start(this: void, scheduler: WorkloadScheduler): void;
 
   /**
    * Cancels the workload.

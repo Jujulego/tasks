@@ -13,7 +13,7 @@ describe('spawn$', () => {
     expect(job.exitCode).toBeNull();
 
     // Start process
-    await job.start();
+    job.start();
 
     expect(job.state()).toBe(WorkloadState.Starting);
     expect(job.exitCode).toBeNull();
@@ -33,7 +33,7 @@ describe('spawn$', () => {
     expect(task.exitCode).toBeNull();
 
     // Start process
-    await task.start();
+    task.start();
 
     expect(task.state()).toBe(WorkloadState.Starting);
     expect(task.exitCode).toBeNull();
