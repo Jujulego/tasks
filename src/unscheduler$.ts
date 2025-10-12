@@ -1,4 +1,4 @@
-import { is$, once$, pipe$ } from 'kyrielle';
+import { filter$, is$, once$, pick$, pipe$ } from 'kyrielle';
 import { registry$, type Registry$ } from './bases/registry$.js';
 import { isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import type { Workload$ } from './workload$.js';
@@ -11,11 +11,10 @@ import type { Workload$ } from './workload$.js';
 export function unscheduler$(): Registry$ {
   const registry = registry$();
 
-  registry.events$.on('added', (workload: Workload$) => {
-    if (!isWorkloadWaiting(workload.state())) {
-      return;
-    }
-
+  pipe$(
+    pick$(registry.events$, 'added'),
+    filter$((wkl) => isWorkloadWaiting(wkl.state()))
+  ).subscribe((workload: Workload$) => {
     const isReady = pipe$(workload.state$, is$(WorkloadState.Ready));
     once$(isReady, () => void workload.start(registry));
   });
