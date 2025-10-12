@@ -8,35 +8,37 @@ describe('scheduler$', () => {
     vi.spyOn(workload, 'start');
 
     const scheduler = scheduler$();
-
-    const spyAdded = vi.fn();
-    const spyStarted = vi.fn();
-    scheduler.events$.on('added', spyAdded);
-    scheduler.events$.on('started', spyStarted);
-
     scheduler.register(workload);
 
-    expect(spyAdded).toHaveBeenCalledWith(workload);
-
     expect(workload.start).toHaveBeenCalled();
-
-    await vi.waitFor(() => expect(spyStarted).toHaveBeenCalledWith(workload));
   });
 
-  it('should throw when registering a non waiting workflow', () => {
+  it('should wait workload to be ready before starting it', () => {
     const workload = workload$({ id: 'test-1', onStart: vi.fn() });
+    workload.block();
 
+    vi.spyOn(workload, 'start');
+
+    const scheduler = scheduler$();
+    scheduler.register(workload);
+
+    expect(workload.start).not.toHaveBeenCalled();
+
+    workload.unblock();
+
+    expect(workload.start).toHaveBeenCalled();
+  });
+
+  it('should not start a started task', () => {
+    const workload = workload$({ id: 'test-1', onStart: vi.fn() });
     workload.start();
+
     vi.spyOn(workload, 'start');
 
     const scheduler = scheduler$();
 
-    const spyAdded = vi.fn();
-    scheduler.events$.on('added', spyAdded);
+    scheduler.register(workload);
 
-    expect(() => scheduler.register(workload)).toThrow(new Error('Cannot schedule a workload in starting state'));
-
-    expect(spyAdded).not.toHaveBeenCalledWith(workload);
     expect(workload.start).not.toHaveBeenCalled();
   });
 
@@ -49,19 +51,8 @@ describe('scheduler$', () => {
 
     const scheduler = scheduler$({ strength: 1 });
 
-    const spyAdded = vi.fn();
-    const spyStarted = vi.fn();
-    scheduler.events$.on('added', spyAdded);
-    scheduler.events$.on('started', spyStarted);
-
     scheduler.register(w1);
     scheduler.register(w2);
-
-    expect(spyAdded).toHaveBeenCalledTimes(2);
-    expect(spyAdded).toHaveBeenCalledWith(w1);
-    expect(spyAdded).toHaveBeenCalledWith(w2);
-
-    await vi.waitFor(() => expect(spyStarted).toHaveBeenCalledWith(w1));
 
     expect(w1.start).toHaveBeenCalled();
     expect(w2.start).not.toHaveBeenCalled();
@@ -80,20 +71,9 @@ describe('scheduler$', () => {
 
     const scheduler = scheduler$({ strength: 1 });
 
-    const spyAdded = vi.fn();
-    const spyStarted = vi.fn();
-    scheduler.events$.on('added', spyAdded);
-    scheduler.events$.on('started', spyStarted);
-
     scheduler.register(w1);
     scheduler.register(w2);
 
-    expect(spyAdded).toHaveBeenCalledTimes(2);
-    expect(spyAdded).toHaveBeenCalledWith(w1);
-    expect(spyAdded).toHaveBeenCalledWith(w2);
-
-    await vi.waitFor(() => expect(spyStarted).toHaveBeenCalledWith(w1));
-    
     expect(w1.start).toHaveBeenCalled();
     expect(w2.start).toHaveBeenCalled();
   });
@@ -112,25 +92,13 @@ describe('scheduler$', () => {
 
     const scheduler = scheduler$({ strength: 1 });
 
-    const spyAdded = vi.fn();
-    const spyStarted = vi.fn();
-    scheduler.events$.on('added', spyAdded);
-    scheduler.events$.on('started', spyStarted);
-
     scheduler.register(w1);
     scheduler.register(w2);
-
-    expect(spyAdded).toHaveBeenCalledTimes(2);
-    expect(spyAdded).toHaveBeenCalledWith(w1);
-    expect(spyAdded).toHaveBeenCalledWith(w2);
-
-    await vi.waitFor(() => expect(spyStarted).toHaveBeenCalledWith(w1));
 
     expect(w1.start).toHaveBeenCalled();
     expect(w2.start).not.toHaveBeenCalled();
 
     end$.mutate(WorkloadState.Succeeded);
-    await vi.waitFor(() => expect(spyStarted).toHaveBeenCalledWith(w2));
 
     expect(w2.start).toHaveBeenCalled();
   });

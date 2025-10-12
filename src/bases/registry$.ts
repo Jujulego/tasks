@@ -1,6 +1,5 @@
-import { filter$, is$, type Multiplexer, multiplexer$, once$, pipe$, reduce$, type Source, source$ } from 'kyrielle';
-import { cpus } from 'node:os';
-import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from '../enums/workload-state.js';
+import { filter$, is$, type Multiplexer, multiplexer$, once$, pipe$, type Source, source$ } from 'kyrielle';
+import { isWorkloadEnded, WorkloadState } from '../enums/workload-state.js';
 import type { Workload$ } from '../workload$.js';
 
 /**
@@ -22,6 +21,17 @@ export function registry$(): Registry$ {
 
     register(workload: Workload$) {
       workloads.push(workload);
+
+      once$(
+        pipe$(workload.state$, is$(WorkloadState.Running)),
+        () => events$.emit('started', workload)
+      );
+
+      once$(
+        pipe$(workload.state$, filter$(isWorkloadEnded)),
+        () => events$.emit('ended', workload)
+      );
+
       events$.emit('added', workload);
     },
     workloads: () => workloads,
