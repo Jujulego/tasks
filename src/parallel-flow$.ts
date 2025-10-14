@@ -7,14 +7,14 @@ import { workflow$, type WorkflowProps } from './workflow$.js';
  *
  * @since 3.0.0
  */
-export function parallelFlow$(props: ParallelFlowProps) {
+export function parallelFlow$(props: ParallelFlowProps = {}) {
   return workflow$({
     ...props,
     weight: 0,
     onOrchestrate(workloads, { scheduler, setState }) {
       setState(WorkloadState.Running);
 
-      let failed = false;
+      let succeeded = true;
       let ended = 0;
 
       for (const workload of workloads) {
@@ -22,11 +22,11 @@ export function parallelFlow$(props: ParallelFlowProps) {
 
         const ended$ = pipe$(workload.state$, filter$(isWorkloadEnded));
         once$(ended$, (state) => {
-          failed = failed || (state !== WorkloadState.Succeeded);
+          succeeded &&= state === WorkloadState.Succeeded;
           ended++;
 
-          if (ended === workloads.length) {
-            setState(!failed ? WorkloadState.Succeeded : WorkloadState.Failed);
+          if (ended >= workloads.length) {
+            setState(succeeded ? WorkloadState.Succeeded : WorkloadState.Failed);
           }
         });
       }

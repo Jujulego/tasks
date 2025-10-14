@@ -1,6 +1,4 @@
-import { registry$ } from '@/src/bases/registry$.js';
-import { WorkloadState } from '@/src/enums/workload-state.js';
-import { workload$ } from '@/src/workload$.js';
+import { registry$, workload$, WorkloadState } from '@/src/index.js';
 import { once$, var$ } from 'kyrielle';
 import { describe, expect, it, vi } from 'vitest';
 
