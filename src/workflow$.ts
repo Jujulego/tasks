@@ -9,18 +9,19 @@ import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
  * @since 3.0.0
  */
 export function workflow$(props: WorkflowProps): Workflow$ {
-  const { onOrchestrate, ...rest } = props;
+  const { onOrchestrate, onCancel, ...rest } = props;
   const items: Workload$[] = [];
 
   // Bases
   const job = job$({
     ...rest,
     onStart: (props) => onOrchestrate(items, props),
+    onCancel: () => onCancel?.(items),
   });
 
   return {
     ...job,
-    items: () => items,
+    workloads: () => items,
     push: (...workloads) => {
       assert(isWorkloadWaiting(job.state()), `Cannot add a workload to a workflow in ${job.state()} state`);
 
@@ -56,7 +57,7 @@ interface Marked {
   [WORKFLOW_ID]?: string;
 }
 
-export interface WorkflowProps extends Omit<JobProps, 'onStart'> {
+export interface WorkflowProps extends Omit<JobProps, 'onStart' | 'onCancel'> {
   /**
    * Uniquely identifies the workflow.
    * One will be generated when if missing.
@@ -72,22 +73,22 @@ export interface WorkflowProps extends Omit<JobProps, 'onStart'> {
   /**
    * Callback used to register each task in the order they should start.
    */
-  readonly onOrchestrate: (this: void, items: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void> | void;
+  readonly onOrchestrate: (this: void, workloads: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void> | void;
 
   /**
-   * Callback used to cancel or interrupt the workflow's orchestration.
+   * Callback used to cancel or interrupt the workflow's orchestration and workloads.
    */
-  readonly onCancel?: (this: void) => Promise<void> | void;
+  readonly onCancel?: (this: void, workloads: readonly Workload$[]) => Promise<void> | void;
 }
 
 export interface Workflow$ extends Job$ {
   /**
-   * Items contained in group.
+   * Workloads contained in group.
    */
-  items(this: void): readonly Workload$[];
+  workloads(this: void): readonly Workload$[];
 
   /**
-   * Push an item to the group. Throws if group is not waiting.
+   * Push some workloads to the workflow.
    */
   push(this: void, ...workloads: Workload$[]): void;
 }
