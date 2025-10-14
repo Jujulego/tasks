@@ -29,7 +29,7 @@ describe('unscheduler$', () => {
     expect(workload.start).toHaveBeenCalled();
   });
 
-  it('should throw when registering a non waiting task', () => {
+  it('should not start a started task', () => {
     const workload = workload$({ onStart: vi.fn() });
     workload.start();
 
@@ -37,7 +37,7 @@ describe('unscheduler$', () => {
 
     const scheduler = unscheduler$();
 
-    expect(() => scheduler.register(workload)).toThrow(new Error('Cannot schedule a workload in starting state'));
+    scheduler.register(workload);
 
     expect(workload.start).not.toHaveBeenCalled();
   });

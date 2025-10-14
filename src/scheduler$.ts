@@ -1,5 +1,6 @@
-import { filter$, is$, type Multiplexer, multiplexer$, once$, pipe$, reduce$, type Source, source$ } from 'kyrielle';
+import { filter$, is$, once$, pick$, pipe$, reduce$ } from 'kyrielle';
 import { cpus } from 'node:os';
+import { registry$, type Registry$ } from './bases/registry$.js';
 import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import type { Workload$ } from './workload$.js';
 
@@ -14,11 +15,7 @@ export const DEFAULT_STRENGTH = Math.max(cpus().length - 1, 1);
 export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
   const { strength = DEFAULT_STRENGTH } = props;
 
-  const events$ = multiplexer$({
-    added: source$<Workload$>(),
-    started: source$<Workload$>(),
-    ended: source$<Workload$>(),
-  });
+  const registry = registry$();
 
   const running = new Set<Workload$>();
   const queue: Workload$[] = [];
@@ -40,8 +37,7 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       }
 
       // Start workload
-      workload.start(scheduler);
-      events$.emit('started', workload);
+      workload.start(registry);
 
       running.add(workload);
       runningWeight += workload.weight;
@@ -50,8 +46,6 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
       const isEnded$ = pipe$(workload.state$, filter$(isWorkloadEnded));
 
       once$(isEnded$, () => {
-        events$.emit('ended', workload);
-
         running.delete(workload);
         runningWeight -= workload.weight;
 
@@ -62,25 +56,21 @@ export function scheduler$(props: SchedulerProps = {}): Scheduler$ {
     dirty = false;
   }
 
-  const scheduler = {
-    events$,
+  pipe$(
+    pick$(registry.events$, 'added'),
+    filter$((wkl) => isWorkloadWaiting(wkl.state()))
+  ).subscribe((workload) => {
+    queue.push(workload);
+
+    // Schedule new workloads once this one is ready
+    const isReady$ = pipe$(workload.state$, is$(WorkloadState.Ready));
+    once$(isReady$, () => schedule());
+  });
+  
+  return {
+    ...registry,
     strength,
-
-    register(workload: Workload$) {
-      if (!isWorkloadWaiting(workload.state())) {
-        throw new Error(`Cannot schedule a workload in ${workload.state()} state`);
-      }
-
-      queue.push(workload);
-      events$.emit('added', workload);
-
-      // Schedule new workloads once this one is ready
-      const isReady$ = pipe$(workload.state$, is$(WorkloadState.Ready));
-      once$(isReady$, () => schedule());
-    },
   };
-
-  return scheduler;
 }
 
 // Types
@@ -92,23 +82,9 @@ export interface SchedulerProps {
   readonly strength?: number;
 }
 
-export interface Scheduler$ {
+export interface Scheduler$ extends Registry$ {
   /**
    * Scheduler's total strength, limits the total weight of running workloads.
    */
   readonly strength: number;
-
-  /**
-   * Scheduler's events
-   */
-  readonly events$: Multiplexer<{
-    'added': Source<Workload$>,
-    'started': Source<Workload$>,
-    'ended': Source<Workload$>,
-  }>;
-
-  /**
-   * Registers a workload to be started as soon as possible.
-   */
-  register(this: void, workload: Workload$): void;
 }
