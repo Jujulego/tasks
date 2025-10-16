@@ -74,11 +74,13 @@ export function workload$(props: WorkloadProps): Workload$ {
 
     async cancel(): Promise<void> {
       try {
-        state$.mutate(WorkloadState.Canceling);
-        controller.abort(new WorkloadCancel());
+        if (isWorkloadActive(state$.defer())) {
+          state$.mutate(WorkloadState.Canceling);
+          controller.abort(new WorkloadCancel());
 
-        if (onCancel) {
-          await onCancel();
+          if (onCancel) {
+            await onCancel();
+          }
         }
       } finally {
         state$.mutate(WorkloadState.Canceled);
