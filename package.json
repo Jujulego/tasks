@@ -3,13 +3,7 @@
   "version": "3.0.0-alpha.4",
   "license": "MIT",
   "author": "Julien Capellari <julien.capellari@gmail.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jujulego/tasks"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "repository": "github:Jujulego/tasks",
   "sideEffects": false,
   "files": [
     "dist"
