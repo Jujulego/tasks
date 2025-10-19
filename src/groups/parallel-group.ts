@@ -3,6 +3,7 @@ import type { Task, TaskContext } from '../task.js';
 import { GroupTask } from './group-task.js';
 
 // Class
+/** @deprecated use {@link parallelFlow$} instead */
 export class ParallelGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
   // Methods
   protected* onOrchestrate(): Generator<Task> {

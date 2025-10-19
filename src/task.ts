@@ -6,6 +6,8 @@ import type { TaskManager } from './task-manager.js';
 
 /**
  * Represents a task state
+ *
+ * @deprecated use {@link workload$} instead
  */
 export abstract class Task<C extends TaskContext = TaskContext> {
   // Attributes
