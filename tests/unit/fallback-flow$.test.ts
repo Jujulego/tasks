@@ -1,6 +1,6 @@
 import { registry$ } from '@/src/bases/registry$.js';
 import { WorkloadState } from '@/src/enums/workload-state.js';
-import { sequenceFlow$ } from '@/src/index.js';
+import { fallbackFlow$ } from '@/src/index.js';
 import { workflow$, type Workflow$ } from '@/src/workflow$.js';
 import { workload$ } from '@/src/workload$.js';
 import { var$ } from 'kyrielle';
@@ -14,12 +14,12 @@ beforeEach(() => {
 });
 
 // Tests
-describe('sequenceFlow$', () => {
+describe('fallbackFlow$', () => {
   it('should build a workflow', () => {
     const workflow = {} as Workflow$;
     vi.mocked(workflow$).mockReturnValue(workflow);
 
-    expect(sequenceFlow$()).toBe(workflow);
+    expect(fallbackFlow$()).toBe(workflow);
 
     expect(workflow$).toHaveBeenCalledWith({
       weight: 0,
@@ -29,7 +29,7 @@ describe('sequenceFlow$', () => {
   });
 
   describe('onOrchestrate', () => {
-    it('should register workloads one after the other, as they succeeds', async () => {
+    it('should register workloads one after the other, as they fails', async () => {
       // Prepare elements
       const reg = registry$();
       vi.spyOn(reg, 'register');
@@ -41,7 +41,7 @@ describe('sequenceFlow$', () => {
       const controller = new AbortController();
 
       // Call callback
-      sequenceFlow$();
+      fallbackFlow$();
 
       const { onOrchestrate } = vi.mocked(workflow$).mock.calls[0]![0];
       const prom = onOrchestrate([wkl1, wkl2] as unknown as Workflow$[], {
@@ -57,20 +57,20 @@ describe('sequenceFlow$', () => {
       expect(reg.register).toHaveBeenCalledWith(wkl1);
       expect(reg.register).not.toHaveBeenCalledWith(wkl2);
 
-      // When first succeeds ...
-      wkl1.state$.mutate(WorkloadState.Succeeded);
+      // When first fails ...
+      wkl1.state$.mutate(WorkloadState.Failed);
 
       await vi.waitFor(() => expect(reg.register).toHaveBeenCalledWith(wkl2));
 
       // When second succeeds ...
-      wkl2.state$.mutate(WorkloadState.Succeeded);
+      wkl2.state$.mutate(WorkloadState.Failed);
 
       await prom;
 
-      expect(setState).toHaveBeenCalledWith(WorkloadState.Succeeded);
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
     });
 
-    it('should fail as one workload fails', async () => {
+    it('should succeeds as one workload succeeds', async () => {
       // Prepare elements
       const reg = registry$();
       vi.spyOn(reg, 'register');
@@ -82,7 +82,7 @@ describe('sequenceFlow$', () => {
       const controller = new AbortController();
 
       // Call callback
-      sequenceFlow$();
+      fallbackFlow$();
 
       const { onOrchestrate } = vi.mocked(workflow$).mock.calls[0]![0];
       const prom = onOrchestrate([wkl1, wkl2] as unknown as Workflow$[], {
@@ -95,11 +95,11 @@ describe('sequenceFlow$', () => {
       expect(reg.register).toHaveBeenCalledWith(wkl1);
 
       // When first fails ...
-      wkl1.state$.mutate(WorkloadState.Failed);
+      wkl1.state$.mutate(WorkloadState.Succeeded);
 
       await prom;
 
-      expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Succeeded);
       expect(reg.register).not.toHaveBeenCalledWith(wkl2);
     });
   });
@@ -114,7 +114,7 @@ describe('sequenceFlow$', () => {
       vi.spyOn(wkl2, 'cancel').mockResolvedValue();
 
       // Call callback
-      sequenceFlow$();
+      fallbackFlow$();
 
       const { onCancel } = vi.mocked(workflow$).mock.calls[0]![0];
       await onCancel!([wkl1, wkl2]);
