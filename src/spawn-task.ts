@@ -7,6 +7,8 @@ import { Task, type TaskContext, type TaskOptions } from './task.js';
 
 /**
  * Spawns a process.
+ *
+ * @deprecated use {@link spawn$} instead
  */
 export class SpawnTask<C extends TaskContext = TaskContext> extends Task<C> {
   // Attributes

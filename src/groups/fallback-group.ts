@@ -3,6 +3,7 @@ import type { Task, TaskContext } from '../task.js';
 import { SequenceGroup } from './sequence-group.js';
 
 // Class
+/** @deprecated use {@link fallbackFlow$} instead */
 export class FallbackGroup<C extends TaskContext = TaskContext> extends SequenceGroup<C> {
   // Methods
   protected async* onOrchestrate(): AsyncGenerator<Task> {

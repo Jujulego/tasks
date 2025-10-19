@@ -3,6 +3,7 @@ import { multiplexer$, once$, source$ } from 'kyrielle';
 import os from 'node:os';
 import type { Task } from './task.js';
 
+/** @deprecated use {@link scheduler$} instead */
 export class TaskManager {
   // Attributes
   private _dirty = false;

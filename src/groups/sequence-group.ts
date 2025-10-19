@@ -3,6 +3,7 @@ import type { Task, TaskContext } from '../task.js';
 import { GroupTask } from './group-task.js';
 
 // Class
+/** @deprecated use {@link sequenceFlow$} instead */
 export class SequenceGroup<C extends TaskContext = TaskContext> extends GroupTask<C> {
   // Attributes
   private _stopped = false;

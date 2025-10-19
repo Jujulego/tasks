@@ -4,6 +4,8 @@ import { Task, type TaskContext, type TaskOptions, type TaskStatus, type TaskSum
 
 /**
  * Represents a group of tasks. This task itself does nothing except orchestrating member tasks
+ *
+ * @deprecated use {@link workflow$} instead
  */
 export abstract class GroupTask<C extends TaskContext = TaskContext> extends Task<C> {
   // Attributes
