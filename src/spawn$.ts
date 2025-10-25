@@ -18,6 +18,7 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
   const stderr = new PassThrough({ allowHalfOpen: false });
 
   const job = job$({
+    label: [cmd, ...args].join(' '),
     ...rest,
     id: id || createSpawnId(cmd, args, cwd),
     onStart({ signal, setState }) {
@@ -105,7 +106,12 @@ export interface SpawnJob$ extends Job$ {
   readonly exitCode$: Ref<number | undefined> & Observable<number>;
 }
 
-export interface SpawnProps extends Omit<JobProps, 'onStart' | 'onCancel'> {
+export interface SpawnProps extends Omit<JobProps, 'label' | 'onStart' | 'onCancel'> {
+  /**
+   * Friendly name of the workload
+   */
+  readonly label?: string;
+
   /**
    * Directory where to run the command
    */
