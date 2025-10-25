@@ -22,6 +22,7 @@ describe('sequenceFlow$', () => {
     expect(sequenceFlow$()).toBe(workflow);
 
     expect(workflow$).toHaveBeenCalledWith({
+      label: 'Sequence flow',
       weight: 0,
       onOrchestrate: expect.any(Function),
       onCancel: expect.any(Function),

@@ -26,6 +26,7 @@ describe('parallelFlow$', () => {
     expect(parallelFlow$()).toBe(workflow);
 
     expect(workflow$).toHaveBeenCalledWith({
+      label: 'Parallel flow',
       weight: 0,
       onOrchestrate: expect.any(Function),
       onCancel: expect.any(Function),

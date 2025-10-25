@@ -8,7 +8,7 @@ describe('workflow$', () => {
     const wklB = workload$({ label: 'test', onStart: vi.fn() });
 
     const onOrchestrate = vi.fn();
-    const wkf = workflow$({ onOrchestrate });
+    const wkf = workflow$({ label: 'test', onOrchestrate });
 
     wkf.push(wklA, wklB);
     wkf.start();
@@ -18,7 +18,7 @@ describe('workflow$', () => {
 
   it('should throw when adding workload to a started workflow', () => {
     const wkl = workload$({ label: 'test', onStart: vi.fn() });
-    const wkf = workflow$({ onOrchestrate: vi.fn() });
+    const wkf = workflow$({ label: 'test', onOrchestrate: vi.fn() });
 
     wkf.start();
 
@@ -27,7 +27,7 @@ describe('workflow$', () => {
 
   it('should throw when adding a started workload to a workflow', () => {
     const wkl = workload$({ label: 'test', onStart: vi.fn() });
-    const wkf = workflow$({ onOrchestrate: vi.fn() });
+    const wkf = workflow$({ label: 'test', onOrchestrate: vi.fn() });
 
     wkl.start();
 
@@ -36,8 +36,8 @@ describe('workflow$', () => {
 
   it('should throw when adding to a group a workload belonging to another group', () => {
     const wkl = workload$({ label: 'test', onStart: vi.fn() });
-    const wkfA = workflow$({ onOrchestrate: vi.fn() });
-    const wkfB = workflow$({ onOrchestrate: vi.fn() });
+    const wkfA = workflow$({ label: 'test', onOrchestrate: vi.fn() });
+    const wkfB = workflow$({ label: 'test', onOrchestrate: vi.fn() });
 
     wkfA.push(wkl);
 

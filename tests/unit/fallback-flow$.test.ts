@@ -22,6 +22,7 @@ describe('fallbackFlow$', () => {
     expect(fallbackFlow$()).toBe(workflow);
 
     expect(workflow$).toHaveBeenCalledWith({
+      label: 'Fallback flow',
       weight: 0,
       onOrchestrate: expect.any(Function),
       onCancel: expect.any(Function),
