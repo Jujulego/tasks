@@ -9,6 +9,7 @@ import { workflow$, type WorkflowProps } from './workflow$.js';
  */
 export function sequenceFlow$(props: SequenceFlowProps = {}) {
   return workflow$({
+    label: 'Sequence flow',
     ...props,
     weight: 0,
     async onOrchestrate(workloads, { scheduler, setState, signal }) {
@@ -34,4 +35,6 @@ export function sequenceFlow$(props: SequenceFlowProps = {}) {
   });
 }
 
-export type SequenceFlowProps = Omit<WorkflowProps, 'weight' | 'onOrchestrate' | 'onCancel'>;
+export type SequenceFlowProps =
+  Omit<WorkflowProps, 'label' | 'weight' | 'onOrchestrate' | 'onCancel'>
+  & Partial<Pick<WorkflowProps, 'label'>>;

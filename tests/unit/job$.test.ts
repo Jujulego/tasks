@@ -17,6 +17,7 @@ const node = {
 
 const workload = {
   id: 'mocked-workload-id',
+  label: 'mocked workload',
   weight: 1,
   completed$: var$(false),
   state$: var$<WorkloadState>(WorkloadState.Ready),
@@ -39,9 +40,9 @@ beforeEach(() => {
 describe('job$', () => {
   it('should create a job using both workload$ & dependency$', () => {
     const onStart = vi.fn();
-    const job = job$({ onStart });
+    const job = job$({ label: 'test', onStart });
 
-    expect(workload$).toHaveBeenCalledWith({ onStart });
+    expect(workload$).toHaveBeenCalledWith({ label: 'test', onStart });
     expect(dependency$).toHaveBeenCalledWith(expect.objectContaining({
       id: workload.id,
       completed$: expect.anything(),
@@ -57,15 +58,15 @@ describe('job$', () => {
 
   it('should pass given props to workload$', () => {
     const onStart = vi.fn();
-    job$({ id: 'life', weight: 2, onStart });
+    job$({ id: '42', label: 'life', weight: 2, onStart });
 
-    expect(workload$).toHaveBeenCalledWith({ id: 'life', weight: 2, onStart });
+    expect(workload$).toHaveBeenCalledWith({ id: '42', label: 'life', weight: 2, onStart });
   });
 
   describe('dependsOn', () => {
     it('should add dependency and change workload state to blocked', () => {
       const dep = { completed$: var$(false) };
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
 
       job.dependsOn(dep);
 
@@ -75,7 +76,7 @@ describe('job$', () => {
 
     it('should add the completed dependency and keep workload state', () => {
       const dep = { completed$: var$(true) };
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
 
       job.dependsOn(dep);
 
@@ -85,7 +86,7 @@ describe('job$', () => {
 
     it('should unblock workload upon dependency completion', () => {
       const dep = { completed$: var$(false) };
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
 
       job.dependsOn(dep);
 
@@ -99,7 +100,7 @@ describe('job$', () => {
 
     it('should not unblock workload upon dependency completion, if it was manually blocked', () => {
       const dep = { completed$: var$(false) };
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
 
       job.dependsOn(dep);
       job.block();
@@ -114,7 +115,7 @@ describe('job$', () => {
 
     it('should throw if workload is not waiting', async () => {
       const dep = { completed$: var$(false) };
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
 
       workload.state$.mutate(WorkloadState.Running);
       workload.state.mockReturnValue(WorkloadState.Running);
@@ -128,7 +129,7 @@ describe('job$', () => {
 
   describe('block', () => {
     it('should block workload', () => {
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
       job.block();
 
       expect(workload.block).toHaveBeenCalled();
@@ -137,14 +138,14 @@ describe('job$', () => {
 
   describe('unblock', () => {
     it('should unblock workload', () => {
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
       job.unblock();
 
       expect(workload.unblock).toHaveBeenCalled();
     });
 
     it('should not unblock workload, if it has uncompleted dependencies', () => {
-      const job = job$({ onStart: vi.fn() });
+      const job = job$({ label: 'test', onStart: vi.fn() });
 
       node.dependencies.push({ completed$: var$(false) });
 
