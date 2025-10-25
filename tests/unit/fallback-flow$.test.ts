@@ -107,10 +107,10 @@ describe('fallbackFlow$', () => {
   describe('onCancel', () => {
     it('should cancel all added workloads', async () => {
       // Prepare workloads
-      const wkl1 = workload$({ onStart: vi.fn() });
+      const wkl1 = workload$({ label: 'test', onStart: vi.fn() });
       vi.spyOn(wkl1, 'cancel').mockResolvedValue();
 
-      const wkl2 = workload$({ onStart: vi.fn() });
+      const wkl2 = workload$({ label: 'test', onStart: vi.fn() });
       vi.spyOn(wkl2, 'cancel').mockResolvedValue();
 
       // Call callback

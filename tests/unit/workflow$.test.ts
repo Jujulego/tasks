@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 describe('workflow$', () => {
   it('should pass added workloads to onOrchestrate callback', () => {
-    const wklA = workload$({ onStart: vi.fn() });
-    const wklB = workload$({ onStart: vi.fn() });
+    const wklA = workload$({ label: 'test', onStart: vi.fn() });
+    const wklB = workload$({ label: 'test', onStart: vi.fn() });
 
     const onOrchestrate = vi.fn();
     const wkf = workflow$({ onOrchestrate });
@@ -17,7 +17,7 @@ describe('workflow$', () => {
   });
 
   it('should throw when adding workload to a started workflow', () => {
-    const wkl = workload$({ onStart: vi.fn() });
+    const wkl = workload$({ label: 'test', onStart: vi.fn() });
     const wkf = workflow$({ onOrchestrate: vi.fn() });
 
     wkf.start();
@@ -26,7 +26,7 @@ describe('workflow$', () => {
   });
 
   it('should throw when adding a started workload to a workflow', () => {
-    const wkl = workload$({ onStart: vi.fn() });
+    const wkl = workload$({ label: 'test', onStart: vi.fn() });
     const wkf = workflow$({ onOrchestrate: vi.fn() });
 
     wkl.start();
@@ -35,7 +35,7 @@ describe('workflow$', () => {
   });
 
   it('should throw when adding to a group a workload belonging to another group', () => {
-    const wkl = workload$({ onStart: vi.fn() });
+    const wkl = workload$({ label: 'test', onStart: vi.fn() });
     const wkfA = workflow$({ onOrchestrate: vi.fn() });
     const wkfB = workflow$({ onOrchestrate: vi.fn() });
 

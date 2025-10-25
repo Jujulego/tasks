@@ -10,7 +10,7 @@ import { unscheduler$ } from './unscheduler$.js';
  * @since 3.0.0
  */
 export function workload$(props: WorkloadProps): Workload$ {
-  const { id = randomUUID(), weight, onStart, onCancel } = props;
+  const { id = randomUUID(), label, weight, onStart, onCancel } = props;
 
   const controller = new AbortController();
   const state$ = var$(WorkloadState.Ready);
@@ -20,6 +20,7 @@ export function workload$(props: WorkloadProps): Workload$ {
 
   return {
     id,
+    label,
     completed$,
     state$,
     completed: completed$.defer,
@@ -110,6 +111,11 @@ export interface WorkloadProps {
   readonly id?: string;
 
   /**
+   * Friendly name for the workload
+   */
+  readonly label: string;
+
+  /**
    * Workload's weight. A workload with a high weight need many resources.
    * Defaults to 1.
    */
@@ -155,6 +161,11 @@ export interface Workload$ extends Dependency {
    * Uniquely identifies the workload.
    */
   readonly id: string;
+
+  /**
+   * Friendly name of the workload
+   */
+  readonly label: string;
 
   /**
    * Workload's weight. A workload with a high weight need many resources.
