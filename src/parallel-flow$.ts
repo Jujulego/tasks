@@ -9,7 +9,7 @@ import { workflow$, type WorkflowProps } from './workflow$.js';
  */
 export function parallelFlow$(props: ParallelFlowProps = {}) {
   return workflow$({
-    label: 'Parallel Flow',
+    label: 'Parallel flow',
     ...props,
     weight: 0,
     onOrchestrate(workloads, { scheduler, setState }) {
