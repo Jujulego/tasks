@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 describe('registry$', () => {
   it('should trigger added event once task is registered', () => {
     const reg = registry$();
-    const wkl = workload$({ label: 'test', onStart: vi.fn() });
+    const wkl = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
 
     const spy = vi.fn();
     reg.events$.on('added', spy);
@@ -21,6 +21,7 @@ describe('registry$', () => {
     const trigger = var$<WorkloadState.Running>();
     const wkl = workload$({
       label: 'test',
+      type: 'test',
       onStart: ({ setState }) => void once$(trigger, setState),
     });
 
@@ -43,6 +44,7 @@ describe('registry$', () => {
     const trigger = var$<WorkloadState.Succeeded>();
     const wkl = workload$({
       label: 'test',
+      type: 'test',
       onStart: ({ setState }) => void once$(trigger, setState),
     });
 
