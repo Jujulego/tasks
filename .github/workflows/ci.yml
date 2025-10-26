@@ -166,7 +166,7 @@ jobs:
     steps:
       # language=Bash
       - run: |
-          if $(echo $RESULTS | jq -j 'any(.=="success")'); then
+          if $(echo $RESULTS | jq -j 'any(.!="success")'); then
             echo '::error:Some required checks failed';
             exit 1;
           fi
