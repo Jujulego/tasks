@@ -21,7 +21,7 @@ describe('registry$', () => {
     const trigger = var$<WorkloadState.Running>();
     const wkl = workload$({
       label: 'test',
-      type: 'test',
+      // type: 'test',
       onStart: ({ setState }) => void once$(trigger, setState),
     });
 

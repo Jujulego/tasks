@@ -158,12 +158,21 @@ jobs:
     name: 'Ready'
     runs-on: ubuntu-latest
     needs: [ lint, build, tests ]
+    if: ${{ always() }}
 
     permissions:
       contents: read
 
     steps:
-      - run: echo 'You are sooo curious!'
+      # language=Bash
+      - run: |
+          echo $RESULTS;
+          if $(echo $RESULTS | jq -j 'any(.=="success")'); then
+            echo '::error:Some required checks failed';
+            exit 1;
+          fi
+        env:
+          RESULTS: ${{ toJson(needs.*.result) }}
 
   publish:
     if: ${{ github.event_name == 'push' }}
