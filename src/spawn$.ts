@@ -2,8 +2,8 @@ import { type Observable, type Ref, var$, waitFor$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
-import { type Job$, job$, type JobProps } from './job$.js';
 import { WorkloadState } from './enums/workload-state.js';
+import { type Job$, job$, type JobProps } from './job$.js';
 
 /**
  * Creates a job spawning a process in a shell.
@@ -57,19 +57,13 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
     }
   });
 
-  const spawned = Object.assign(job, {
+  return {
+    ...job,
     exitCode$,
     stderr,
     stdout,
-  });
-
-  Object.defineProperty(spawned, 'exitCode', {
-    enumerable: true,
-    configurable: true,
-    get: () => exitCode$.defer() ?? null,
-  });
-
-  return spawned as unknown as SpawnJob$;
+    exitCode: () => exitCode$.defer() ?? null
+  };
 }
 
 function createSpawnId(cmd: string, args: readonly string[], cwd: string) {
@@ -99,7 +93,7 @@ export interface SpawnJob$ extends Job$ {
   /**
    * Spawned process exit code.
    */
-  readonly exitCode: number | null;
+  exitCode(this: void): number | null;
 
   /**
    * Reference on spawned process exit code.
