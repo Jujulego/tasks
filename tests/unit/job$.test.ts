@@ -18,6 +18,7 @@ const node = {
 const workload = {
   id: 'mocked-workload-id',
   label: 'mocked workload',
+  type: 'mocked',
   weight: 1,
   completed$: var$(false),
   state$: var$<WorkloadState>(WorkloadState.Ready),
@@ -42,7 +43,7 @@ describe('job$', () => {
     const onStart = vi.fn();
     const job = job$({ label: 'test', onStart });
 
-    expect(workload$).toHaveBeenCalledWith({ label: 'test', onStart });
+    expect(workload$).toHaveBeenCalledWith({ label: 'test', type: 'job', onStart });
     expect(dependency$).toHaveBeenCalledWith(expect.objectContaining({
       id: workload.id,
       completed$: expect.anything(),
@@ -58,9 +59,9 @@ describe('job$', () => {
 
   it('should pass given props to workload$', () => {
     const onStart = vi.fn();
-    job$({ id: '42', label: 'life', weight: 2, onStart });
+    job$({ id: '42', label: 'life', type: 'test', weight: 2, onStart });
 
-    expect(workload$).toHaveBeenCalledWith({ id: '42', label: 'life', weight: 2, onStart });
+    expect(workload$).toHaveBeenCalledWith({ id: '42', label: 'life', type: 'test', weight: 2, onStart });
   });
 
   describe('dependsOn', () => {

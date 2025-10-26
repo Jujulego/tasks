@@ -10,6 +10,7 @@ import { workflow$, type WorkflowProps } from './workflow$.js';
 export function sequenceFlow$(props: SequenceFlowProps = {}) {
   return workflow$({
     label: 'Sequence flow',
+    type: 'workflow.sequence',
     ...props,
     weight: 0,
     async onOrchestrate(workloads, { scheduler, setState, signal }) {

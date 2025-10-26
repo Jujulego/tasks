@@ -4,29 +4,30 @@ import { describe, expect, it, vi } from 'vitest';
 // Tests
 describe('workload$', () => {
   it('should create a workload in ready state, with defaults applied', () => {
-    const workload = workload$({ label: 'test', onStart: vi.fn() });
+    const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
 
     expect(workload.id).toBeDefined();
     expect(workload.label).toBe('test');
+    expect(workload.type).toBe('test');
     expect(workload.state()).toBe(WorkloadState.Ready);
     expect(workload.weight).toBe(1);
   });
 
   it('should apply given id', () => {
-    const workload = workload$({ id: 'life', label: 'test', onStart: vi.fn() });
+    const workload = workload$({ id: 'life', label: 'test', type: 'test', onStart: vi.fn() });
 
     expect(workload.id).toBe('life');
   });
 
   it('should apply given weight', () => {
-    const workload = workload$({ weight: 42, label: 'test', onStart: vi.fn() });
+    const workload = workload$({ weight: 42, label: 'test', type: 'test', onStart: vi.fn() });
 
     expect(workload.weight).toBe(42);
   });
 
   describe('block', () => {
     it('should change workload state to blocked', () => {
-      const workload = workload$({ label: 'test', onStart: vi.fn() });
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
 
       // Blocks a "ready" workload
       workload.block();
@@ -38,7 +39,7 @@ describe('workload$', () => {
     });
 
     it('should throw if workload state is neither blocked or ready', async () => {
-      const workload = workload$({ label: 'test', onStart: vi.fn() });
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
       await workload.cancel();
 
       expect(() => workload.block()).toThrow(new Error('Workload in "canceled" state cannot be blocked.'));
@@ -47,7 +48,7 @@ describe('workload$', () => {
 
   describe('unblock', () => {
     it('should change workload state to ready', () => {
-      const workload = workload$({ label: 'test', onStart: vi.fn() });
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
 
       // Unblocks a "ready" workload
       workload.unblock();
@@ -60,7 +61,7 @@ describe('workload$', () => {
     });
 
     it('should throw if workload state is neither blocked or ready', async () => {
-      const workload = workload$({ label: 'test', onStart: vi.fn() });
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
       await workload.cancel();
 
       expect(() => workload.unblock()).toThrow(new Error('Workload in "canceled" state cannot be unblocked.'));
@@ -70,7 +71,7 @@ describe('workload$', () => {
   describe('start', () => {
     it('should update workload state to starting and call onStart callback', () => {
       const onStart = vi.fn();
-      const workload = workload$({ label: 'test', onStart });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
 
       workload.start();
 
@@ -84,7 +85,7 @@ describe('workload$', () => {
       WorkloadState.Failed,
     ] as const)('should apply running state as triggerred by onStart callback', (state) => {
       const onStart = vi.fn(({ setState }: WorkloadOnStartProps) => setState(state));
-      const workload = workload$({ label: 'test', onStart });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
 
       workload.start();
 
@@ -95,7 +96,7 @@ describe('workload$', () => {
       const onStart = vi.fn(() => {
         throw new Error('Test');
       });
-      const workload = workload$({ label: 'test', onStart });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
 
       expect(() => workload.start()).toThrow(new Error('Test'));
 
@@ -103,7 +104,7 @@ describe('workload$', () => {
     });
 
     it('should throw if workload is not waiting', () => {
-      const workload = workload$({ label: 'test', onStart: vi.fn() });
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
 
       workload.start();
       expect(() => workload.start()).toThrow(new Error('Workload in "starting" state cannot be started.'));
@@ -113,7 +114,7 @@ describe('workload$', () => {
   describe('cancel', () => {
     it('should update workload state to cancelled and trigger onStart signal', async () => {
       const onStart = vi.fn<(props: WorkloadOnStartProps) => void>();
-      const workload = workload$({ label: 'test', onStart });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
 
       // First start the workload
       workload.start();
@@ -134,7 +135,7 @@ describe('workload$', () => {
       const onCancel = vi.fn(() => {
         expect(workload.state()).toBe(WorkloadState.Canceling);
       });
-      const workload = workload$({ label: 'test', onStart: vi.fn(), onCancel });
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn(), onCancel });
 
       workload.start();
       await workload.cancel();

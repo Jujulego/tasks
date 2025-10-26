@@ -23,6 +23,7 @@ describe('spawn$', () => {
     expect(job$).toHaveBeenCalledWith({
       id: 'cbe401e31f0981953038940216faffe6',
       label: 'echo Hello World!',
+      type: 'spawn',
       weight: 2,
       onStart: expect.any(Function),
       onCancel: expect.any(Function),
