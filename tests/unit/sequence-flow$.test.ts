@@ -23,6 +23,7 @@ describe('sequenceFlow$', () => {
 
     expect(workflow$).toHaveBeenCalledWith({
       label: 'Sequence flow',
+      type: 'workflow.sequence',
       weight: 0,
       onOrchestrate: expect.any(Function),
       onCancel: expect.any(Function),
@@ -108,10 +109,10 @@ describe('sequenceFlow$', () => {
   describe('onCancel', () => {
     it('should cancel all added workloads', async () => {
       // Prepare workloads
-      const wkl1 = workload$({ label: 'test', onStart: vi.fn() });
+      const wkl1 = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
       vi.spyOn(wkl1, 'cancel').mockResolvedValue();
 
-      const wkl2 = workload$({ label: 'test', onStart: vi.fn() });
+      const wkl2 = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
       vi.spyOn(wkl2, 'cancel').mockResolvedValue();
 
       // Call callback

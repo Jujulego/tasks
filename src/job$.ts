@@ -12,7 +12,7 @@ import { workload$, type Workload$, type WorkloadProps } from './workload$.js';
  */
 export function job$(props: JobProps): Job$ {
   // Bases
-  const workload = workload$(props);
+  const workload = workload$({ type: 'job', ...props });
   const node = dependency$(workload);
 
   // Block management
@@ -65,5 +65,11 @@ export function job$(props: JobProps): Job$ {
 }
 
 // Types
-export type JobProps = WorkloadProps;
+export interface JobProps extends Omit<WorkloadProps, 'type'> {
+  /**
+   * Type of job. Defaults to "job".
+   */
+  readonly type?: string;
+}
+
 export type Job$ = Dependency$ & Workload$;

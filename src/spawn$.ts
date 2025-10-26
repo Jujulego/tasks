@@ -19,6 +19,7 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
 
   const job = job$({
     label: [cmd, ...args].join(' '),
+    type: 'spawn',
     ...rest,
     id: id || createSpawnId(cmd, args, cwd),
     onStart({ signal, setState }) {
