@@ -7,7 +7,7 @@ import { isWorkload$, type Workload$ } from '../workload$.js';
  * Builds iterator on all dependencies of given element.
  */
 export function allDependencies$(node: Dependency$): SimpleIterator<Dependency> {
-  const queue: Dependency[] = [node];
+  const queue: Dependency[] = [...node.dependencies];
   const marks = new Set(queue);
 
   return iterator$({
