@@ -22,12 +22,14 @@ describe('spawn$', () => {
 
     expect(job$).toHaveBeenCalledWith({
       id: 'cbe401e31f0981953038940216faffe6',
+      label: 'echo Hello World!',
+      type: 'spawn',
       weight: 2,
       onStart: expect.any(Function),
       onCancel: expect.any(Function),
     });
 
-    expect(job.exitCode).toBeNull();
+    expect(job.exitCode()).toBeNull();
   });
 
   describe('callbacks', () => {
@@ -114,7 +116,7 @@ describe('spawn$', () => {
         .mock.calls.find((call) => call[0] === 'close')![1](0, null);
 
       expect(setState).toHaveBeenCalledWith(WorkloadState.Succeeded);
-      expect(job.exitCode).toBe(0);
+      expect(job.exitCode()).toBe(0);
 
       await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
     });
@@ -136,7 +138,7 @@ describe('spawn$', () => {
         .mock.calls.find((call) => call[0] === 'close')![1](1, null);
 
       expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
-      expect(job.exitCode).toBe(1);
+      expect(job.exitCode()).toBe(1);
 
       await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
     });

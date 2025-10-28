@@ -9,6 +9,8 @@ import { workflow$, type WorkflowProps } from './workflow$.js';
  */
 export function parallelFlow$(props: ParallelFlowProps = {}) {
   return workflow$({
+    label: 'Parallel flow',
+    type: 'workflow.parallel',
     ...props,
     weight: 0,
     onOrchestrate(workloads, { scheduler, setState }) {
@@ -37,4 +39,6 @@ export function parallelFlow$(props: ParallelFlowProps = {}) {
   });
 }
 
-export type ParallelFlowProps = Omit<WorkflowProps, 'weight' | 'onOrchestrate' | 'onCancel'>;
+export type ParallelFlowProps =
+  Omit<WorkflowProps, 'label' | 'weight' | 'onOrchestrate' | 'onCancel'>
+  & Partial<Pick<WorkflowProps, 'label'>>;

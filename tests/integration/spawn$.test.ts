@@ -10,16 +10,16 @@ describe('spawn$', () => {
     const job = spawn$('echo', ['Hello World!']);
 
     expect(job.state()).toBe(WorkloadState.Ready);
-    expect(job.exitCode).toBeNull();
+    expect(job.exitCode()).toBeNull();
 
     // Start process
     job.start();
 
     expect(job.state()).toBe(WorkloadState.Starting);
-    expect(job.exitCode).toBeNull();
+    expect(job.exitCode()).toBeNull();
 
     await vi.waitFor(() => expect(job.state()).toBe(WorkloadState.Succeeded));
-    expect(job.exitCode).toBe(0);
+    expect(job.exitCode()).toBe(0);
 
     // Read stdout stream
     await expect(text(job.stdout)).resolves.toBe(`Hello World!${EOL}`);
@@ -30,15 +30,15 @@ describe('spawn$', () => {
     const task = spawn$('exit', ['1']);
 
     expect(task.state()).toBe(WorkloadState.Ready);
-    expect(task.exitCode).toBeNull();
+    expect(task.exitCode()).toBeNull();
 
     // Start process
     task.start();
 
     expect(task.state()).toBe(WorkloadState.Starting);
-    expect(task.exitCode).toBeNull();
+    expect(task.exitCode()).toBeNull();
 
     await vi.waitFor(() => expect(task.state()).toBe(WorkloadState.Failed));
-    expect(task.exitCode).toBe(1);
+    expect(task.exitCode()).toBe(1);
   });
 });

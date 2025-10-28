@@ -14,6 +14,7 @@ export function workflow$(props: WorkflowProps): Workflow$ {
 
   // Bases
   const job = job$({
+    type: 'workflow',
     ...rest,
     onStart: (props) => onOrchestrate(items, props),
     onCancel: () => onCancel?.(items),

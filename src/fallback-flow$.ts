@@ -10,6 +10,8 @@ import { workflow$, type WorkflowProps } from './workflow$.js';
  */
 export function fallbackFlow$(props: FallbackFlowProps = {}) {
   return workflow$({
+    label: 'Fallback flow',
+    type: 'workflow.fallback',
     ...props,
     weight: 0,
     async onOrchestrate(workloads, { scheduler, setState, signal }) {
@@ -35,4 +37,6 @@ export function fallbackFlow$(props: FallbackFlowProps = {}) {
   });
 }
 
-export type FallbackFlowProps = Omit<WorkflowProps, 'weight' | 'onOrchestrate' | 'onCancel'>;
+export type FallbackFlowProps =
+  Omit<WorkflowProps, 'label' | 'weight' | 'onOrchestrate' | 'onCancel'>
+  & Partial<Pick<WorkflowProps, 'label'>>;
