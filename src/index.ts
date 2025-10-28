@@ -17,6 +17,8 @@ export * from './bases/registry$.js';
 
 export * from './enums/workload-state.js';
 
+export * from './utils/dependency.js';
+
 export * from './dependency$.js';
 export * from './fallback-flow$.js';
 export * from './job$.js';

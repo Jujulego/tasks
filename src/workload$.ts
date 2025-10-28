@@ -1,8 +1,9 @@
-import { map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
+import { isDeferrable, isSubscribable, map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 import type { Dependency } from './dependency$.js';
 import { isWorkloadActive, WorkloadState } from './enums/workload-state.js';
 import { unscheduler$ } from './unscheduler$.js';
+import { hasMethod, hasProperty, isNonNullObject } from './utils/predicates.js';
 
 /**
  * Wraps workload status logic.
@@ -225,3 +226,15 @@ export interface Workload$ extends Dependency {
   completed(this: void): boolean;
 }
 
+export function isWorkload$<T>(value: T): value is T & Workload$ {
+  return isNonNullObject(value)
+    && hasProperty(value, 'id', (prop) => typeof prop === 'string')
+    && hasProperty(value, 'weight', (prop) => typeof prop === 'number')
+    && hasProperty(value, 'state$', (prop) => isSubscribable(prop) && isDeferrable(prop))
+    && hasMethod(value, 'block')
+    && hasMethod(value, 'unblock')
+    && hasMethod(value, 'start')
+    && hasMethod(value, 'cancel')
+    && hasMethod(value, 'state')
+    && hasMethod(value, 'completed');
+}

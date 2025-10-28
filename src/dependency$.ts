@@ -1,5 +1,15 @@
-import { type Observable, pipe$, type Ref, store$, type Subscribable, var$ } from 'kyrielle';
+import {
+  isDeferrable,
+  isSubscribable,
+  type Observable,
+  pipe$,
+  type Ref,
+  store$,
+  type Subscribable,
+  var$
+} from 'kyrielle';
 import { randomUUID } from 'node:crypto';
+import { hasMethod, hasProperty, isNonNullObject } from './utils/predicates.js';
 
 /**
  * Dependency graph node
@@ -43,7 +53,7 @@ export interface Dependency {
   readonly completed$: Ref<boolean | undefined> & Observable<boolean>;
 }
 
-export interface Dependency$ extends Dependency{
+export interface Dependency$ extends Dependency {
   /**
    * Uniquely identifies the node.
    */
@@ -64,4 +74,12 @@ export interface Dependency$ extends Dependency{
    * Adds a dependency to this node.
    */
   dependsOn(this: void, node: Dependency): void;
+}
+
+export function isDependency$<T>(value: T): value is T & Dependency$ {
+  return isNonNullObject(value)
+    && hasProperty(value, 'id', (prop) => typeof prop === 'string')
+    && hasProperty(value, 'completed$', (prop) => isSubscribable(prop) && isDeferrable(prop))
+    && hasProperty(value, 'dependencies', (prop) => Array.isArray(prop))
+    && hasMethod(value, 'dependsOn');
 }
