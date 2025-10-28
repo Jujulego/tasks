@@ -1,7 +1,7 @@
 import { isDeferrable, isSubscribable, map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 import type { Dependency } from './dependency$.js';
-import { isWorkloadActive, WorkloadState } from './enums/workload-state.js';
+import { isWorkloadActive, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import { unscheduler$ } from './unscheduler$.js';
 import { hasMethod, hasProperty, isNonNullObject } from './utils/predicates.js';
 
@@ -76,17 +76,19 @@ export function workload$(props: WorkloadProps): Workload$ {
     },
 
     async cancel(): Promise<void> {
-      try {
-        if (isWorkloadActive(state$.defer())) {
-          state$.mutate(WorkloadState.Canceling);
-          controller.abort(new WorkloadCancel());
-
-          if (onCancel) {
-            await onCancel();
-          }
-        }
-      } finally {
+      if (isWorkloadWaiting(state$.defer())) {
         state$.mutate(WorkloadState.Canceled);
+      } else if (isWorkloadActive(state$.defer())) {
+        try {
+            state$.mutate(WorkloadState.Canceling);
+            controller.abort(new WorkloadCancel());
+
+            if (onCancel) {
+              await onCancel();
+            }
+        } finally {
+          state$.mutate(WorkloadState.Canceled);
+        }
       }
     },
   };

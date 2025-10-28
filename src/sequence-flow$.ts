@@ -14,21 +14,28 @@ export function sequenceFlow$(props: SequenceFlowProps = {}) {
     ...props,
     weight: 0,
     async onOrchestrate(workloads, { scheduler, setState, signal }) {
+      let output = WorkloadState.Succeeded;
       setState(WorkloadState.Running);
 
       for (const workload of workloads) {
-        scheduler.register(workload);
+        if (signal.aborted) {
+          break;
+        }
 
-        const outcome = await waitFor$(pipe$(workload.state$, filter$(isWorkloadEnded)));
-        signal.throwIfAborted();
+        if (output === WorkloadState.Succeeded) {
+          scheduler.register(workload);
 
-        if (outcome !== WorkloadState.Succeeded) {
-          setState(WorkloadState.Failed);
-          return;
+          const outcome = await waitFor$(pipe$(workload.state$, filter$(isWorkloadEnded)));
+
+          if (outcome !== WorkloadState.Succeeded) {
+            output = WorkloadState.Failed;
+          }
+        } else {
+          await workload.cancel();
         }
       }
 
-      setState(WorkloadState.Succeeded);
+      setState(output);
     },
     async onCancel(workloads) {
       await Promise.all(workloads.map((wkl) => wkl.cancel()));

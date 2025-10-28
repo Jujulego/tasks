@@ -77,8 +77,8 @@ describe('sequenceFlow$', () => {
       const reg = registry$();
       vi.spyOn(reg, 'register');
 
-      const wkl1 = { id: '1', state$: var$(WorkloadState.Ready) };
-      const wkl2 = { id: '2', state$: var$(WorkloadState.Ready) };
+      const wkl1 = { id: '1', state$: var$(WorkloadState.Ready), cancel: vi.fn() };
+      const wkl2 = { id: '2', state$: var$(WorkloadState.Ready), cancel: vi.fn() };
 
       const setState = vi.fn();
       const controller = new AbortController();
@@ -102,6 +102,8 @@ describe('sequenceFlow$', () => {
       await prom;
 
       expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
+
+      expect(wkl2.cancel).toHaveBeenCalledOnce();
       expect(reg.register).not.toHaveBeenCalledWith(wkl2);
     });
   });
