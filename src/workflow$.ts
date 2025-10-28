@@ -1,6 +1,7 @@
 import { isWorkloadWaiting } from './enums/workload-state.js';
-import { job$, type Job$, type JobProps } from './job$.js';
+import { isJob$, job$, type Job$, type JobProps } from './job$.js';
 import { assert } from './utils/assert.js';
+import { hasMethod } from './utils/predicates.js';
 import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
 
 /**
@@ -52,6 +53,12 @@ export function workflow$(props: WorkflowProps): Workflow$ {
 
 // Utils
 const WORKFLOW_ID = Symbol.for('@jujulego/tasks:workflow-id');
+
+export function isWorkflow$<T>(value: T): value is T & Workflow$ {
+  return isJob$(value)
+    && hasMethod(value, 'workloads')
+    && hasMethod(value, 'push');
+}
 
 // Types
 interface Marked {
