@@ -6,8 +6,10 @@ export function testWorkload$(props: TestWorkloadProps) {
   const workload = workload$({
     label: props.label,
     type: 'test',
-    onStart: ({ setState }) => {
-      setTimeout(() => setState(props.outcome), props.wait);
+    onStart: ({ setState, signal }) => {
+      const id = setTimeout(() => setState(props.outcome), props.wait);
+      signal.addEventListener('abort', () => clearTimeout(id), { once: true });
+
       setState(WorkloadState.Running);
     },
   });
