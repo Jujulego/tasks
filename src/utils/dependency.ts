@@ -1,6 +1,7 @@
 import { filter$, iterator$, pipe$, type SimpleIterator } from 'kyrielle';
 import type { Registry$ } from '../bases/registry$.js';
 import { type Dependency, type Dependency$, isDependency$ } from '../dependency$.js';
+import { isWorkflow$ } from '../workflow$.js';
 import { isWorkload$, type Workload$ } from '../workload$.js';
 
 /**
@@ -8,6 +9,11 @@ import { isWorkload$, type Workload$ } from '../workload$.js';
  */
 export function allDependencies$(node: Dependency$): SimpleIterator<Dependency> {
   const queue: Dependency[] = [...node.dependencies];
+
+  if (isWorkflow$(node)) {
+    queue.push(...node.workloads());
+  }
+
   const marks = new Set(queue);
 
   return iterator$({
@@ -20,6 +26,17 @@ export function allDependencies$(node: Dependency$): SimpleIterator<Dependency> 
 
       if (isDependency$(item)) {
         for (const dependency of item.dependencies) {
+          if (marks.has(dependency)) {
+            continue;
+          }
+
+          marks.add(dependency);
+          queue.push(dependency);
+        }
+      }
+
+      if (isWorkflow$(item)) {
+        for (const dependency of item.workloads()) {
           if (marks.has(dependency)) {
             continue;
           }

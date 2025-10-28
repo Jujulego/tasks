@@ -104,6 +104,20 @@ export class WorkloadCancel extends Error {
   }
 }
 
+// Utils
+export function isWorkload$<T>(value: T): value is T & Workload$ {
+  return isNonNullObject(value)
+    && hasProperty(value, 'id', (prop) => typeof prop === 'string')
+    && hasProperty(value, 'weight', (prop) => typeof prop === 'number')
+    && hasProperty(value, 'state$', (prop) => isSubscribable(prop) && isDeferrable(prop))
+    && hasMethod(value, 'block')
+    && hasMethod(value, 'unblock')
+    && hasMethod(value, 'start')
+    && hasMethod(value, 'cancel')
+    && hasMethod(value, 'state')
+    && hasMethod(value, 'completed');
+}
+
 // Types
 export interface WorkloadProps {
   /**
@@ -224,17 +238,4 @@ export interface Workload$ extends Dependency {
    * Returns true if the workload is successfully completed
    */
   completed(this: void): boolean;
-}
-
-export function isWorkload$<T>(value: T): value is T & Workload$ {
-  return isNonNullObject(value)
-    && hasProperty(value, 'id', (prop) => typeof prop === 'string')
-    && hasProperty(value, 'weight', (prop) => typeof prop === 'number')
-    && hasProperty(value, 'state$', (prop) => isSubscribable(prop) && isDeferrable(prop))
-    && hasMethod(value, 'block')
-    && hasMethod(value, 'unblock')
-    && hasMethod(value, 'start')
-    && hasMethod(value, 'cancel')
-    && hasMethod(value, 'state')
-    && hasMethod(value, 'completed');
 }

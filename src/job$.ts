@@ -1,8 +1,9 @@
 import { is$, once$, pipe$, var$ } from 'kyrielle';
-import { dependency$, type Dependency$ } from './dependency$.js';
+import { dependency$, type Dependency$, isDependency$ } from './dependency$.js';
 import { isWorkloadWaiting } from './enums/workload-state.js';
+import type { NonNullObject } from './types.js';
 import { assert } from './utils/assert.js';
-import { workload$, type Workload$, type WorkloadProps } from './workload$.js';
+import { isWorkload$, workload$, type Workload$, type WorkloadProps } from './workload$.js';
 
 /**
  * A job is a workload that can be part of a greater process. It can be and have dependencies
@@ -64,6 +65,11 @@ export function job$(props: JobProps): Job$ {
   };
 }
 
+// Utils
+export function isJob$<T>(value: T): value is T & NonNullObject & Job$ {
+  return isDependency$(value) && isWorkload$(value);
+}
+
 // Types
 export interface JobProps extends Omit<WorkloadProps, 'type'> {
   /**
@@ -73,3 +79,4 @@ export interface JobProps extends Omit<WorkloadProps, 'type'> {
 }
 
 export type Job$ = Dependency$ & Workload$;
+
