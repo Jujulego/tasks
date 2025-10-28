@@ -11,7 +11,7 @@ import { type Job$, job$, type JobProps } from './job$.js';
  * @since 3.0.0
  */
 export function spawn$(cmd: string, args: readonly string[], props: SpawnProps = {}): SpawnJob$ {
-  const { id, cwd = process.cwd(), env, ...rest } = props;
+  const { id, cwd = process.cwd(), env = {}, ...rest } = props;
   const closed$ = var$();
   const exitCode$ = var$<number>();
   const stdout = new PassThrough({ allowHalfOpen: false });
@@ -59,6 +59,10 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
 
   return {
     ...job,
+    cmd,
+    args,
+    cwd,
+    env,
     exitCode$,
     stderr,
     stdout,
@@ -80,6 +84,19 @@ function createSpawnId(cmd: string, args: readonly string[], cwd: string) {
 }
 
 export interface SpawnJob$ extends Job$ {
+  readonly cmd: string;
+  readonly args: readonly string[];
+
+  /**
+   * Directory where to run the command
+   */
+  readonly cwd: string | undefined;
+
+  /**
+   * Environment variables. Will be merged with `process.env`.
+   */
+  readonly env: Readonly<Record<string, string>>;
+
   /**
    * Spawned process stdout stream.
    */

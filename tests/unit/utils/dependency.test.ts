@@ -29,10 +29,10 @@ describe('allDependencies$', () => {
 
 describe('recursiveRegister', () => {
   it('should register workload and all its dependencies', () => {
-    const nodeA = job$({ label: 'test', type: 'test', onStart: vi.fn() });
-    const nodeB = job$({ label: 'test', type: 'test', onStart: vi.fn() });
-    const nodeC = job$({ label: 'test', type: 'test', onStart: vi.fn() });
-    const root = job$({ label: 'test', type: 'test', onStart: vi.fn() });
+    const nodeA = job$({ label: 'test', onStart: vi.fn() });
+    const nodeB = job$({ label: 'test', onStart: vi.fn() });
+    const nodeC = job$({ label: 'test', onStart: vi.fn() });
+    const root = job$({ label: 'test', onStart: vi.fn() });
 
     nodeC.dependsOn(nodeA);
     nodeC.dependsOn(nodeB);
