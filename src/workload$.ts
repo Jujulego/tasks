@@ -1,8 +1,7 @@
-import { isDeferrable, isSubscribable, type Observable, type Ref, var$ } from 'kyrielle';
+import { type Observable, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 import { isWorkloadActive, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import { unscheduler$ } from './unscheduler$.js';
-import { hasMethod, hasProperty, isNonNullObject } from './utils/predicates.js';
 
 /**
  * Wraps workload status logic.
@@ -98,20 +97,6 @@ export class WorkloadCancel extends Error {
   constructor() {
     super('Workload canceled.');
   }
-}
-
-// Utils
-export function isWorkload$<T>(value: T): value is T & Workload$ {
-  return isNonNullObject(value)
-    && hasProperty(value, 'id', (prop) => typeof prop === 'string')
-    && hasProperty(value, 'weight', (prop) => typeof prop === 'number')
-    && hasProperty(value, 'state$', (prop) => isSubscribable(prop) && isDeferrable(prop))
-    && hasMethod(value, 'block')
-    && hasMethod(value, 'unblock')
-    && hasMethod(value, 'start')
-    && hasMethod(value, 'cancel')
-    && hasMethod(value, 'state')
-    && hasMethod(value, 'completed');
 }
 
 // Types

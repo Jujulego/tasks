@@ -1,20 +1,11 @@
-import { type Dependency, type Dependency$, dependency$ } from '@/src/dependency$.js';
 import { job$, type Workload$, workload$, WorkloadState } from '@/src/index.js';
 import { var$ } from 'kyrielle';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mocks
-vi.mock('@/src/dependency$.js');
 vi.mock('@/src/workload$.js');
 
 // Setup
-const node = {
-  id: 'mocked-dependency-id',
-  completed$: var$(false),
-  dependsOn: vi.fn(),
-  dependencies: [] as Dependency[],
-} satisfies Dependency$;
-
 const workload = {
   id: 'mocked-workload-id',
   label: 'mocked workload',
@@ -31,7 +22,6 @@ const workload = {
 beforeEach(() => {
   vi.resetAllMocks();
 
-  vi.mocked(dependency$).mockReturnValue(node);
   vi.mocked(workload$).mockReturnValue(workload);
 });
 
@@ -184,7 +174,7 @@ describe('job$', () => {
 
       expect(() => job.dependsOn(dep)).toThrow(new Error('Cannot add dependency to job in "running" state.'));
 
-      expect(node.dependsOn).not.toHaveBeenCalled();
+      expect(job.dependencies()).not.toContain(dep);
       expect(workload.block).not.toHaveBeenCalled();
     });
   });
