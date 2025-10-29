@@ -1,6 +1,5 @@
-import { isDeferrable, isSubscribable, map$, type Observable, pipe$, type Ref, var$ } from 'kyrielle';
+import { isDeferrable, isSubscribable, type Observable, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
-import type { Dependency } from './dependency$.js';
 import { isWorkloadActive, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import { unscheduler$ } from './unscheduler$.js';
 import { hasMethod, hasProperty, isNonNullObject } from './utils/predicates.js';
@@ -15,17 +14,12 @@ export function workload$(props: WorkloadProps): Workload$ {
 
   const controller = new AbortController();
   const state$ = var$(WorkloadState.Ready);
-  const completed$ = pipe$(state$,
-    map$((state) => state === WorkloadState.Succeeded)
-  );
 
   return {
     id,
     label,
     type,
-    completed$,
     state$,
-    completed: completed$.defer,
     state: state$.defer,
     weight: weight ?? 1,
 
@@ -179,7 +173,7 @@ export interface WorkloadScheduler {
   register(workload: Workload$): void;
 }
 
-export interface Workload$ extends Dependency {
+export interface Workload$ {
   /**
    * Uniquely identifies the workload.
    */
@@ -235,9 +229,4 @@ export interface Workload$ extends Dependency {
    * Returns current state of the workload.
    */
   state(this: void): WorkloadState;
-
-  /**
-   * Returns true if the workload is successfully completed
-   */
-  completed(this: void): boolean;
 }

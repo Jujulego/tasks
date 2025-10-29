@@ -1,8 +1,7 @@
-import { is$, once$, pipe$, var$ } from 'kyrielle';
-import { dependency$, type Dependency$, isDependency$ } from './dependency$.js';
-import { isWorkloadWaiting } from './enums/workload-state.js';
+import { filter$, once$, pipe$, var$ } from 'kyrielle';
+import { isDependency$ } from './dependency$.js';
+import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import type { NonNullObject } from './types.js';
-import { assert } from './utils/assert.js';
 import { isWorkload$, workload$, type Workload$, type WorkloadProps } from './workload$.js';
 
 /**
@@ -12,45 +11,55 @@ import { isWorkload$, workload$, type Workload$, type WorkloadProps } from './wo
  * @since 3.0.0
  */
 export function job$(props: JobProps): Job$ {
-  // Bases
+  const dependencies: Workload$[] = [];
   const workload = workload$({ type: 'job', ...props });
-  const node = dependency$(workload);
 
   // Block management
   const selfBlock$ = var$(false);
 
   function updateBlock() {
-    assert(isWorkloadWaiting(workload.state()), `updateBlock called on a "${workload.state()}" job.`);
+    if (!isWorkloadWaiting(workload.state())) {
+      return;
+    }
 
     const selfBlock = selfBlock$.defer();
-    const depsBlock = node.dependencies.some((dep) => !dep.completed$.defer());
+    const depsBlock = dependencies.some((dep) => !isWorkloadEnded(dep.state()));
 
-    if (!selfBlock && !depsBlock) {
-      workload.unblock();
-    } else {
+    if (selfBlock || depsBlock) {
       workload.block();
+    } else {
+      workload.unblock();
     }
   }
 
   // Build object
   return {
-    ...node,
     ...workload,
 
-    dependsOn(dependency: Dependency$) {
+    dependencies(): readonly Workload$[] {
+      return dependencies;
+    },
+    dependsOn(dependency: Workload$) {
       if (!isWorkloadWaiting(workload.state())) {
         throw new Error(`Cannot add dependency to job in "${workload.state()}" state.`);
       }
 
-      node.dependsOn(dependency);
+      dependencies.push(dependency);
 
-      if (!dependency.completed$.defer()) {
+      if (!isWorkloadEnded(dependency.state())) {
         workload.block();
       }
 
       // Track dependency state
-      const isCompleted$ = pipe$(dependency.completed$, is$(true));
-      once$(isCompleted$, updateBlock);
+      const finalState$ = pipe$(dependency.state$, filter$(isWorkloadEnded));
+
+      once$(finalState$, (state) => {
+        if (state === WorkloadState.Succeeded) {
+          updateBlock();
+        } else {
+          void workload.cancel();
+        }
+      });
     },
 
     block() {
@@ -78,5 +87,15 @@ export interface JobProps extends Omit<WorkloadProps, 'type'> {
   readonly type?: string;
 }
 
-export type Job$ = Dependency$ & Workload$;
+export interface Job$ extends Workload$ {
+  /**
+   * Job's dependencies.
+   */
+  dependencies(this: void): readonly Workload$[];
+
+  /**
+   * Adds a dependency to this job.
+   */
+  dependsOn(this: void, node: Workload$): void;
+}
 
