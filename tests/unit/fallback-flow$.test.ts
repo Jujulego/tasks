@@ -2,7 +2,6 @@ import { registry$ } from '@/src/bases/registry$.js';
 import { WorkloadState } from '@/src/enums/workload-state.js';
 import { fallbackFlow$ } from '@/src/index.js';
 import { workflow$, type Workflow$ } from '@/src/workflow$.js';
-import { workload$ } from '@/src/workload$.js';
 import { var$ } from 'kyrielle';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -26,7 +25,6 @@ describe('fallbackFlow$', () => {
       type: 'workflow.fallback',
       weight: 0,
       onOrchestrate: expect.any(Function),
-      onCancel: expect.any(Function),
     });
   });
 
@@ -104,22 +102,33 @@ describe('fallbackFlow$', () => {
       expect(setState).toHaveBeenCalledWith(WorkloadState.Succeeded);
       expect(reg.register).not.toHaveBeenCalledWith(wkl2);
     });
-  });
 
-  describe('onCancel', () => {
-    it('should cancel all added workloads', async () => {
-      // Prepare workloads
-      const wkl1 = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
-      vi.spyOn(wkl1, 'cancel').mockResolvedValue();
+    it('should cancel all workflows when signal aborts', async () => {
+      // Prepare elements
+      const reg = registry$();
+      vi.spyOn(reg, 'register');
 
-      const wkl2 = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
-      vi.spyOn(wkl2, 'cancel').mockResolvedValue();
+      const wkl1 = { id: '1', state$: var$(WorkloadState.Ready), cancel: vi.fn() };
+      const wkl2 = { id: '2', state$: var$(WorkloadState.Ready), cancel: vi.fn() };
+
+      const setState = vi.fn();
+      const controller = new AbortController();
 
       // Call callback
       fallbackFlow$();
 
-      const { onCancel } = vi.mocked(workflow$).mock.calls[0]![0];
-      await onCancel!([wkl1, wkl2]);
+      const { onOrchestrate } = vi.mocked(workflow$).mock.calls[0]![0];
+      void onOrchestrate([wkl1, wkl2] as unknown as Workflow$[], {
+        setState,
+        scheduler: reg,
+        signal: controller.signal,
+      });
+
+      expect(setState).toHaveBeenCalledWith(WorkloadState.Running);
+      expect(reg.register).toHaveBeenCalledWith(wkl1);
+
+      // Abort !
+      controller.abort();
 
       expect(wkl1.cancel).toHaveBeenCalledOnce();
       expect(wkl2.cancel).toHaveBeenCalledOnce();

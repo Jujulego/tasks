@@ -9,7 +9,11 @@ export function testJob$(props: TestWorkloadProps) {
     type: 'test',
     onStart: ({ setState, signal }) => {
       const id = setTimeout(() => setState(props.outcome), props.wait);
-      signal.addEventListener('abort', () => clearTimeout(id), { once: true });
+
+      signal.addEventListener('abort', () => {
+        clearTimeout(id);
+        setState(WorkloadState.Canceled);
+      }, { once: true });
 
       setState(WorkloadState.Running);
     },

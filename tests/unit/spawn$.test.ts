@@ -1,7 +1,8 @@
 import { type WorkloadOnStartProps, spawn$, type SpawnJob$, type Job$, job$, WorkloadState } from '@/src/index.js';
 import { unscheduler$ } from '@/src/unscheduler$.js';
+import { type Var, var$ } from 'kyrielle';
 import { type ChildProcess, execFile } from 'node:child_process';
-import { type Readable } from 'node:stream';
+import { type Readable, type PassThrough } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mocks
@@ -9,10 +10,13 @@ vi.mock('node:child_process');
 vi.mock('@/src/job$.js');
 
 // Setup
+let jobState$: Var<WorkloadState>;
+
 beforeEach(() => {
   vi.resetAllMocks();
 
-  vi.mocked(job$).mockReturnValue({} as Job$);
+  jobState$ = var$<WorkloadState>(WorkloadState.Ready);
+  vi.mocked(job$).mockReturnValue({ state$: jobState$ } as unknown as Job$);
 });
 
 // Tests
@@ -26,23 +30,32 @@ describe('spawn$', () => {
       type: 'spawn',
       weight: 2,
       onStart: expect.any(Function),
-      onCancel: expect.any(Function),
     });
 
     expect(job.exitCode()).toBeNull();
   });
 
-  describe('callbacks', () => {
+  it('should close streams once job completes', () => {
+    const job = spawn$('echo', ['Hello World!'], { cwd: '/test', weight: 2 });
+
+    vi.spyOn(job.stdout as PassThrough, 'end');
+    vi.spyOn(job.stderr as PassThrough, 'end');
+
+    jobState$.mutate(WorkloadState.Succeeded);
+
+    expect((job.stdout as PassThrough).end).toHaveBeenCalledOnce();
+    expect((job.stderr as PassThrough).end).toHaveBeenCalledOnce();
+  });
+
+  describe('onStart', () => {
     let job: SpawnJob$;
     let child: ChildProcess;
     let onStart: (this: void, props: WorkloadOnStartProps) => void;
-    let onCancel: (this: void) => Promise<void>;
 
     beforeEach(() => {
       job = spawn$('echo', ['Hello World!'], { cwd: '/test' });
 
       onStart = vi.mocked(job$).mock.calls[0]![0].onStart as (this: void, props: WorkloadOnStartProps) => void;
-      onCancel = vi.mocked(job$).mock.calls[0]![0].onCancel! as (this: void) => Promise<void>;
 
       child = {
         once: vi.fn(),
@@ -102,14 +115,11 @@ describe('spawn$', () => {
     it('should set task state to succeeded when process closes with exit code 0', async () => {
       const controller = new AbortController();
       const setState = vi.fn();
-      const cancelResolved = vi.fn();
 
       onStart({ scheduler: unscheduler$(), signal: controller.signal, setState });
-      void onCancel().then(cancelResolved);
 
       expect(child.once).toHaveBeenCalledWith('close', expect.any(Function));
       expect(setState).not.toHaveBeenCalled();
-      expect(cancelResolved).not.toHaveBeenCalled();
 
       // Call "spawn" event callback
       vi.mocked(child.once as ((event: string, cb: (...args: unknown[]) => void) => void))
@@ -117,21 +127,16 @@ describe('spawn$', () => {
 
       expect(setState).toHaveBeenCalledWith(WorkloadState.Succeeded);
       expect(job.exitCode()).toBe(0);
-
-      await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
     });
 
     it('should set task state to failed when process closes with exit code 1', async () => {
       const controller = new AbortController();
       const setState = vi.fn();
-      const cancelResolved = vi.fn();
 
       onStart({ scheduler: unscheduler$(), signal: controller.signal, setState });
-      void onCancel().then(cancelResolved);
 
       expect(child.once).toHaveBeenCalledWith('close', expect.any(Function));
       expect(setState).not.toHaveBeenCalled();
-      expect(cancelResolved).not.toHaveBeenCalled();
 
       // Call "spawn" event callback
       vi.mocked(child.once as ((event: string, cb: (...args: unknown[]) => void) => void))
@@ -139,8 +144,6 @@ describe('spawn$', () => {
 
       expect(setState).toHaveBeenCalledWith(WorkloadState.Failed);
       expect(job.exitCode()).toBe(1);
-
-      await vi.waitFor(() => expect(cancelResolved).toHaveBeenCalled());
     });
   });
 });

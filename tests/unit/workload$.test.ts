@@ -40,7 +40,7 @@ describe('workload$', () => {
 
     it('should throw if workload state is neither blocked or ready', async () => {
       const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
-      await workload.cancel();
+      workload.cancel();
 
       expect(() => workload.block()).toThrow(new Error('Workload in "canceled" state cannot be blocked.'));
     });
@@ -62,7 +62,7 @@ describe('workload$', () => {
 
     it('should throw if workload state is neither blocked or ready', async () => {
       const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
-      await workload.cancel();
+      workload.cancel();
 
       expect(() => workload.unblock()).toThrow(new Error('Workload in "canceled" state cannot be unblocked.'));
     });
@@ -112,7 +112,16 @@ describe('workload$', () => {
   });
 
   describe('cancel', () => {
-    it('should update workload state to cancelled and trigger onStart signal', async () => {
+    it('should update workload state to canceled', () => {
+      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
+
+      // Cancel the workload
+      workload.cancel();
+
+      expect(workload.state()).toBe(WorkloadState.Canceled);
+    });
+
+    it('should update workload state to canceling and trigger onStart signal', () => {
       const onStart = vi.fn<(props: WorkloadOnStartProps) => void>();
       const workload = workload$({ label: 'test', type: 'test', onStart });
 
@@ -123,25 +132,10 @@ describe('workload$', () => {
       expect(signal.aborted).toBe(false);
 
       // Then cancel it !
-      await workload.cancel();
+      workload.cancel();
 
-      expect(workload.state()).toBe(WorkloadState.Canceled);
+      expect(workload.state()).toBe(WorkloadState.Canceling);
       expect(signal.aborted).toBe(true);
-    });
-
-    it('should call onCancel callback', async () => {
-      expect.assertions(3);
-
-      const onCancel = vi.fn(() => {
-        expect(workload.state()).toBe(WorkloadState.Canceling);
-      });
-      const workload = workload$({ label: 'test', type: 'test', onStart: vi.fn(), onCancel });
-
-      workload.start();
-      await workload.cancel();
-
-      expect(workload.state()).toBe(WorkloadState.Canceled);
-      expect(onCancel).toHaveBeenCalled();
     });
   });
 });
