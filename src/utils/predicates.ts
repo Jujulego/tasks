@@ -1,13 +1,6 @@
-import type { NonNullObject, PredicateFn } from '../types.js';
+import type { Job$ } from '../job$.js';
+import type { Workload$ } from '../workload$.js';
 
-export function isNonNullObject(value: unknown): value is NonNullObject {
-  return typeof value === 'object' && value !== null;
-}
-
-export function hasProperty<O extends NonNullObject, const K extends keyof O, T extends O[K]>(value: O, key: K, predicate: PredicateFn<O[K], T>): value is O & Record<K, O[K] & T> {
-  return key in value && predicate(value[key]);
-}
-
-export function hasMethod<O extends NonNullObject, const K extends keyof O>(value: NonNullObject, key: K) {
-  return hasProperty(value, key, (prop) => typeof prop === 'function');
+export function isJob$(workload: Workload$): workload is Job$ {
+  return 'dependencies' in workload && typeof workload.dependencies === 'function';
 }
