@@ -155,7 +155,8 @@ describe('sequence-flow$', () => {
     // After cancel, B & C should be canceled
     sequence.cancel();
 
-    expect(sequence.state()).toBe(WorkloadState.Canceled);
+    await vi.waitFor(() => expect(sequence.state()).toBe(WorkloadState.Canceled));
+
     expect(wklA.state()).toBe(WorkloadState.Succeeded);
     expect(wklB.state()).toBe(WorkloadState.Canceled);
     expect(wklC.state()).toBe(WorkloadState.Canceled);
