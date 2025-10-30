@@ -18,6 +18,8 @@ export function registry$(): Registry$ {
   });
 
   function _register(workload: Workload$) {
+    workloads.push(workload);
+
     once$(
       pipe$(workload.state$, is$(WorkloadState.Running)),
       () => events$.emit('started', workload)
