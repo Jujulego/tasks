@@ -1,6 +1,7 @@
 import { filter$, once$, pipe$, var$ } from 'kyrielle';
 import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import { workload$, type Workload$, type WorkloadProps } from './workload$.js';
+import { assert } from './utils/assert.js';
 
 /**
  * A job is a workload that can be part of a greater process. It can be and have dependencies
@@ -16,9 +17,7 @@ export function job$(props: JobProps): Job$ {
   const selfBlock$ = var$(false);
 
   function updateBlock() {
-    if (!isWorkloadWaiting(workload.state())) {
-      return;
-    }
+    assert(isWorkloadWaiting(workload.state()), `updateBlock called on a "${workload.state()}" job.`);
 
     const selfBlock = selfBlock$.defer();
     const depsBlock = dependencies.some((dep) => !isWorkloadEnded(dep.state()));
