@@ -15,6 +15,7 @@ export function fallbackFlow$(props: FallbackFlowProps = {}) {
     ...props,
     weight: 0,
     async onOrchestrate(workloads, { scheduler, setState, signal }) {
+      let output = WorkloadState.Failed;
       setState(WorkloadState.Running);
 
       signal.addEventListener('abort', () => {
@@ -24,17 +25,24 @@ export function fallbackFlow$(props: FallbackFlowProps = {}) {
       }, { once: true });
 
       for (const workload of workloads) {
-        scheduler.register(workload);
+        if (signal.aborted) {
+          break;
+        }
 
-        const outcome = await waitFor$(pipe$(workload.state$, filter$(isWorkloadEnded)));
+        if (output === WorkloadState.Failed) {
+          scheduler.register(workload);
 
-        if (outcome === WorkloadState.Succeeded) {
-          setState(WorkloadState.Succeeded);
-          return;
+          const outcome = await waitFor$(pipe$(workload.state$, filter$(isWorkloadEnded)));
+
+          if (outcome === WorkloadState.Succeeded) {
+            output = WorkloadState.Succeeded;
+          }
+        } else {
+          workload.cancel();
         }
       }
 
-      setState(WorkloadState.Failed);
+      setState(output);
     }
   });
 }

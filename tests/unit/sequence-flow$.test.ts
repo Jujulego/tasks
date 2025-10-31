@@ -106,7 +106,7 @@ describe('sequenceFlow$', () => {
       expect(reg.register).not.toHaveBeenCalledWith(wkl2);
     });
 
-    it('should cancel all added workloads', () => {
+    it('should cancel all workflows when signal aborts', async () => {
       // Prepare workloads
       const reg = registry$();
 
