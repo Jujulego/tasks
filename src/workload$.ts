@@ -12,6 +12,7 @@ export function workload$(props: WorkloadProps): Workload$ {
   const { id = randomUUID(), label, type, weight, onStart } = props;
 
   const controller = new AbortController();
+  const error$ = var$<Error>();
   const state$ = var$(WorkloadState.Ready);
 
   return {
@@ -19,7 +20,9 @@ export function workload$(props: WorkloadProps): Workload$ {
     label,
     type,
     state$,
+    error$,
     state: state$.defer,
+    error: error$.defer,
     weight: weight ?? 1,
 
     block(): void {
@@ -49,29 +52,34 @@ export function workload$(props: WorkloadProps): Workload$ {
 
       const signal = controller.signal;
 
-      try {
-        state$.mutate(WorkloadState.Starting);
-        void onStart({
-          scheduler,
-          signal,
-          setState(state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed | WorkloadState.Canceled) {
-            if (!signal.aborted) {
-              if (isWorkloadActive(state$.defer())) {
-                state$.mutate(state);
+      void (async () => {
+        try {
+          state$.mutate(WorkloadState.Starting);
+          await onStart({
+            scheduler,
+            signal,
+            setState(state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed | WorkloadState.Canceled) {
+              if (!signal.aborted) {
+                if (isWorkloadActive(state$.defer())) {
+                  state$.mutate(state);
+                }
+              } else if (isWorkloadEnded(state)) {
+                state$.mutate(WorkloadState.Canceled);
               }
-            } else if (isWorkloadEnded(state)) {
-              state$.mutate(WorkloadState.Canceled);
             }
+          });
+        } catch (err) {
+          if (!(err instanceof WorkloadCancel)) {
+            error$.mutate(err as Error);
           }
-        });
-      } catch (err) {
-        if (signal.aborted) {
-          state$.mutate(WorkloadState.Canceled);
-        } else {
-          state$.mutate(WorkloadState.Failed);
-          throw err;
+
+          if (signal.aborted) {
+            state$.mutate(WorkloadState.Canceled);
+          } else {
+            state$.mutate(WorkloadState.Failed);
+          }
         }
-      }
+      })();
     },
 
     cancel(): void {
@@ -178,6 +186,11 @@ export interface Workload$ {
   readonly state$: Ref<WorkloadState> & Observable<WorkloadState>;
 
   /**
+   * Reference on error emitted by `onStart` callback.
+   */
+  readonly error$: Ref<Error | undefined> & Observable<Error>;
+
+  /**
    * Blocks the workload. A blocked workload cannot be started.
    */
   block(this: void): void;
@@ -207,4 +220,9 @@ export interface Workload$ {
    * Returns current state of the workload.
    */
   state(this: void): WorkloadState;
+
+  /**
+   * Returns error emitted by `onStart` callback, if any.
+   */
+  error(this: void): Error | undefined;
 }

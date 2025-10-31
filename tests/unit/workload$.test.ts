@@ -1,4 +1,5 @@
 import { workload$, type WorkloadOnStartProps, WorkloadState, } from '@/src/index.js';
+import { once$, source$, waitFor$ } from 'kyrielle';
 import { describe, expect, it, vi } from 'vitest';
 
 // Tests
@@ -10,6 +11,7 @@ describe('workload$', () => {
     expect(workload.label).toBe('test');
     expect(workload.type).toBe('test');
     expect(workload.state()).toBe(WorkloadState.Ready);
+    expect(workload.error()).toBeUndefined();
     expect(workload.weight).toBe(1);
   });
 
@@ -83,7 +85,8 @@ describe('workload$', () => {
       WorkloadState.Running,
       WorkloadState.Succeeded,
       WorkloadState.Failed,
-    ] as const)('should apply running state as triggerred by onStart callback', (state) => {
+      WorkloadState.Canceled,
+    ] as const)('should apply %s state as triggerred by onStart', (state) => {
       const onStart = vi.fn(({ setState }: WorkloadOnStartProps) => setState(state));
       const workload = workload$({ label: 'test', type: 'test', onStart });
 
@@ -92,15 +95,71 @@ describe('workload$', () => {
       expect(workload.state()).toBe(state);
     });
 
+    it('should ignore running state when triggerred by onStart while workload is canceling', async () => {
+      const trigger = source$<void>();
+      const onStart = vi.fn(({ setState }: WorkloadOnStartProps) => {
+        once$(trigger, () => setState(WorkloadState.Running));
+      });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
+
+      workload.start();
+      expect(workload.state()).toBe(WorkloadState.Starting);
+
+      workload.cancel();
+      expect(workload.state()).toBe(WorkloadState.Canceling);
+
+      trigger.next();
+      expect(workload.state()).toBe(WorkloadState.Canceling);
+    });
+
+    it.each([
+      WorkloadState.Succeeded,
+      WorkloadState.Failed,
+    ] as const)('should apply canceled state if %s is triggerred by onStart while workload is canceling', async (state) => {
+      const trigger = source$<void>();
+      const onStart = vi.fn(({ setState }: WorkloadOnStartProps) => {
+        once$(trigger, () => setState(state));
+      });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
+
+      workload.start();
+
+      workload.cancel();
+      expect(workload.state()).toBe(WorkloadState.Canceling);
+
+      trigger.next();
+      expect(workload.state()).toBe(WorkloadState.Canceled);
+    });
+
     it('should update workload state to failed if onStart callback throws', () => {
       const onStart = vi.fn(() => {
         throw new Error('Test');
       });
       const workload = workload$({ label: 'test', type: 'test', onStart });
 
-      expect(() => workload.start()).toThrow(new Error('Test'));
+      workload.start();
 
       expect(workload.state()).toBe(WorkloadState.Failed);
+      expect(workload.error()).toEqual(new Error('Test'));
+    });
+
+    it('should update workload state to canceled if onStart callback throws while canceling', async () => {
+      const trigger$ = source$<void>();
+      const onStart = vi.fn(async () => {
+        await waitFor$(trigger$);
+        throw new Error('Test');
+      });
+      const workload = workload$({ label: 'test', type: 'test', onStart });
+
+      workload.start();
+      workload.cancel();
+
+      expect(workload.state()).toBe(WorkloadState.Canceling);
+
+      trigger$.next();
+
+      await vi.waitFor(() => expect(workload.state()).toBe(WorkloadState.Canceled));
+      expect(workload.error()).toEqual(new Error('Test'));
     });
 
     it('should throw if workload is not waiting', () => {
