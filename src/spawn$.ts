@@ -1,8 +1,8 @@
-import { type Observable, type Ref, var$, waitFor$ } from 'kyrielle';
+import { filter$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
-import { WorkloadState } from './enums/workload-state.js';
+import { isWorkloadEnded, WorkloadState } from './enums/workload-state.js';
 import { type Job$, job$, type JobProps } from './job$.js';
 
 /**
@@ -12,7 +12,6 @@ import { type Job$, job$, type JobProps } from './job$.js';
  */
 export function spawn$(cmd: string, args: readonly string[], props: SpawnProps = {}): SpawnJob$ {
   const { id, cwd = process.cwd(), env = {}, ...rest } = props;
-  const closed$ = var$();
   const exitCode$ = var$<number>();
   const stdout = new PassThrough({ allowHalfOpen: false });
   const stderr = new PassThrough({ allowHalfOpen: false });
@@ -45,16 +44,17 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
         if (code !== null) {
           exitCode$.mutate(code);
         }
-
-        closed$.mutate(true);
       });
 
       spawned.stdout!.pipe(stdout);
       spawned.stderr!.pipe(stderr);
-    },
-    async onCancel() {
-      await waitFor$(closed$);
     }
+  });
+
+  const ended$ = pipe$(job.state$, filter$(isWorkloadEnded));
+  once$(ended$, () => {
+    stdout.end();
+    stderr.end();
   });
 
   return {

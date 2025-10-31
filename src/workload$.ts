@@ -1,6 +1,6 @@
 import { type Observable, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
-import { isWorkloadActive, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
+import { isWorkloadActive, isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import { unscheduler$ } from './unscheduler$.js';
 
 /**
@@ -9,9 +9,10 @@ import { unscheduler$ } from './unscheduler$.js';
  * @since 3.0.0
  */
 export function workload$(props: WorkloadProps): Workload$ {
-  const { id = randomUUID(), label, type, weight, onStart, onCancel } = props;
+  const { id = randomUUID(), label, type, weight, onStart } = props;
 
   const controller = new AbortController();
+  const error$ = var$<Error>();
   const state$ = var$(WorkloadState.Ready);
 
   return {
@@ -19,7 +20,9 @@ export function workload$(props: WorkloadProps): Workload$ {
     label,
     type,
     state$,
+    error$,
     state: state$.defer,
+    error: error$.defer,
     weight: weight ?? 1,
 
     block(): void {
@@ -49,39 +52,42 @@ export function workload$(props: WorkloadProps): Workload$ {
 
       const signal = controller.signal;
 
-      try {
-        state$.mutate(WorkloadState.Starting);
-        void onStart({
-          scheduler,
-          signal,
-          setState(state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed) {
-            if (!signal.aborted && isWorkloadActive(state$.defer())) {
-              state$.mutate(state);
+      void (async () => {
+        try {
+          state$.mutate(WorkloadState.Starting);
+          await onStart({
+            scheduler,
+            signal,
+            setState(state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed | WorkloadState.Canceled) {
+              if (!signal.aborted) {
+                if (isWorkloadActive(state$.defer())) {
+                  state$.mutate(state);
+                }
+              } else if (isWorkloadEnded(state)) {
+                state$.mutate(WorkloadState.Canceled);
+              }
             }
+          });
+        } catch (err) {
+          if (!(err instanceof WorkloadCancel)) {
+            error$.mutate(err as Error);
           }
-        });
-      } catch (err) {
-        if (!signal.aborted) {
-          state$.mutate(WorkloadState.Failed);
-          throw err;
+
+          if (signal.aborted) {
+            state$.mutate(WorkloadState.Canceled);
+          } else {
+            state$.mutate(WorkloadState.Failed);
+          }
         }
-      }
+      })();
     },
 
-    async cancel(): Promise<void> {
+    cancel(): void {
       if (isWorkloadWaiting(state$.defer())) {
         state$.mutate(WorkloadState.Canceled);
       } else if (isWorkloadActive(state$.defer())) {
-        try {
-            state$.mutate(WorkloadState.Canceling);
-            controller.abort(new WorkloadCancel());
-
-            if (onCancel) {
-              await onCancel();
-            }
-        } finally {
-          state$.mutate(WorkloadState.Canceled);
-        }
+        state$.mutate(WorkloadState.Canceling);
+        controller.abort(new WorkloadCancel());
       }
     },
   };
@@ -127,11 +133,6 @@ export interface WorkloadProps {
    * Callback used to start the workload. it should yield next states as the workload proceed
    */
   onStart(this: void, props: WorkloadOnStartProps): Promise<void> | void;
-
-  /**
-   * Callback use to cancel or interrupt the workload.
-   */
-  readonly onCancel?: (this: void) => Promise<void> | void;
 }
 
 export interface WorkloadOnStartProps {
@@ -148,7 +149,7 @@ export interface WorkloadOnStartProps {
   /**
    * Updates current workload state
    */
-  setState(this: void, state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed): void;
+  setState(this: void, state: WorkloadState.Running | WorkloadState.Succeeded | WorkloadState.Failed | WorkloadState.Canceled): void;
 }
 
 export interface WorkloadScheduler {
@@ -185,6 +186,11 @@ export interface Workload$ {
   readonly state$: Ref<WorkloadState> & Observable<WorkloadState>;
 
   /**
+   * Reference on error emitted by `onStart` callback.
+   */
+  readonly error$: Ref<Error | undefined> & Observable<Error>;
+
+  /**
    * Blocks the workload. A blocked workload cannot be started.
    */
   block(this: void): void;
@@ -208,10 +214,15 @@ export interface Workload$ {
   /**
    * Cancels the workload.
    */
-  cancel(this: void): Promise<void>;
+  cancel(this: void): void;
 
   /**
    * Returns current state of the workload.
    */
   state(this: void): WorkloadState;
+
+  /**
+   * Returns error emitted by `onStart` callback, if any.
+   */
+  error(this: void): Error | undefined;
 }

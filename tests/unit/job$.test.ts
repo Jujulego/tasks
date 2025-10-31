@@ -11,11 +11,13 @@ const workload = {
   label: 'mocked workload',
   type: 'mocked',
   weight: 1,
+  error$: var$<Error>(),
   state$: var$<WorkloadState>(WorkloadState.Ready),
   block: vi.fn(),
   unblock: vi.fn(),
   start: vi.fn(),
   cancel: vi.fn(),
+  error: vi.fn(),
   state: vi.fn(() => WorkloadState.Ready),
 } satisfies Workload$;
 

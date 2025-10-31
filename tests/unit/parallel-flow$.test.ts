@@ -30,7 +30,6 @@ describe('parallelFlow$', () => {
       type: 'workflow.parallel',
       weight: 0,
       onOrchestrate: expect.any(Function),
-      onCancel: expect.any(Function),
     });
   });
 
@@ -120,22 +119,31 @@ describe('parallelFlow$', () => {
 
       expect(setState).toHaveBeenCalledExactlyOnceWith(WorkloadState.Failed);
     });
-  });
 
-  describe('onCancel', () => {
     it('should cancel all added workloads', async () => {
       // Prepare workloads
+      const reg = registry$();
+
       const wkl1 = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
       vi.spyOn(wkl1, 'cancel').mockResolvedValue();
 
       const wkl2 = workload$({ label: 'test', type: 'test', onStart: vi.fn() });
       vi.spyOn(wkl2, 'cancel').mockResolvedValue();
 
+      const setState = vi.fn();
+      const controller = new AbortController();
+
       // Call callback
       parallelFlow$();
 
-      const { onCancel } = vi.mocked(workflow$).mock.calls[0]![0];
-      await onCancel!([wkl1, wkl2]);
+      const { onOrchestrate } = vi.mocked(workflow$).mock.calls[0]![0];
+      await onOrchestrate([wkl1, wkl2] as unknown as Workload$[], {
+        setState,
+        scheduler: reg,
+        signal: controller.signal,
+      });
+
+      controller.abort();
 
       expect(wkl1.cancel).toHaveBeenCalledOnce();
       expect(wkl2.cancel).toHaveBeenCalledOnce();

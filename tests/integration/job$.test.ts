@@ -75,7 +75,7 @@ describe('job$', () => {
     expect(jobB.state()).toBe(WorkloadState.Canceled);
   });
 
-  it('should cancel once dependency is canceled', async () => {
+  it('should cancel once dependency is canceled', () => {
     // Prepare workload
     const wklA = testWorkload$({ label: 'A', wait: 1000, outcome: WorkloadState.Failed });
     const jobB = testJob$({ label: 'B', wait: 1000, outcome: WorkloadState.Succeeded });
@@ -97,7 +97,7 @@ describe('job$', () => {
     expect(jobB.state()).toBe(WorkloadState.Blocked);
 
     // Now cancel workload A
-    await wklA.cancel();
+    wklA.cancel();
 
     expect(wklA.start).toHaveBeenCalledOnce();
     expect(jobB.start).not.toHaveBeenCalled();

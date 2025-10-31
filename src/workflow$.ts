@@ -9,7 +9,7 @@ import { type Workload$, type WorkloadOnStartProps } from './workload$.js';
  * @since 3.0.0
  */
 export function workflow$(props: WorkflowProps): Workflow$ {
-  const { onOrchestrate, onCancel, ...rest } = props;
+  const { onOrchestrate, ...rest } = props;
   const items: Workload$[] = [];
 
   // Bases
@@ -17,7 +17,6 @@ export function workflow$(props: WorkflowProps): Workflow$ {
     type: 'workflow',
     ...rest,
     onStart: (props) => onOrchestrate(items, props),
-    onCancel: () => onCancel?.(items),
   });
 
   return {
@@ -75,11 +74,6 @@ export interface WorkflowProps extends Omit<JobProps, 'onStart' | 'onCancel'> {
    * Callback used to register each task in the order they should start.
    */
   readonly onOrchestrate: (this: void, workloads: readonly Workload$[], props: WorkloadOnStartProps) => Promise<void> | void;
-
-  /**
-   * Callback used to cancel or interrupt the workflow's orchestration and workloads.
-   */
-  readonly onCancel?: (this: void, workloads: readonly Workload$[]) => Promise<void> | void;
 }
 
 export interface Workflow$ extends Job$ {

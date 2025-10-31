@@ -19,26 +19,54 @@ describe('spawn$', () => {
     expect(job.exitCode()).toBeNull();
 
     await vi.waitFor(() => expect(job.state()).toBe(WorkloadState.Succeeded));
-    expect(job.exitCode()).toBe(0);
 
-    // Read stdout stream
+    expect(job.exitCode()).toBe(0);
     await expect(text(job.stdout)).resolves.toBe(`Hello World!${EOL}`);
+    await expect(text(job.stderr)).resolves.toBe('');
   });
 
   it('should spawn failing process', async () => {
     // Initiate
-    const task = spawn$('exit', ['1']);
+    const job = spawn$('exit', ['1']);
 
-    expect(task.state()).toBe(WorkloadState.Ready);
-    expect(task.exitCode()).toBeNull();
+    expect(job.state()).toBe(WorkloadState.Ready);
+    expect(job.exitCode()).toBeNull();
 
     // Start process
-    task.start();
+    job.start();
 
-    expect(task.state()).toBe(WorkloadState.Starting);
-    expect(task.exitCode()).toBeNull();
+    expect(job.state()).toBe(WorkloadState.Starting);
+    expect(job.exitCode()).toBeNull();
 
-    await vi.waitFor(() => expect(task.state()).toBe(WorkloadState.Failed));
-    expect(task.exitCode()).toBe(1);
+    await vi.waitFor(() => expect(job.state()).toBe(WorkloadState.Failed));
+
+    expect(job.exitCode()).toBe(1);
+    await expect(text(job.stdout)).resolves.toBe('');
+    await expect(text(job.stderr)).resolves.toBe('');
+  });
+
+  it('should cancel spawned process', async () => {
+    // Initiate
+    const job = spawn$('node', ['-e', '"setTimeout(() => console.log(\'Hello world!\'), 1000)"']);
+
+    expect(job.state()).toBe(WorkloadState.Ready);
+    expect(job.exitCode()).toBeNull();
+
+    // Start process
+    job.start();
+
+    expect(job.state()).toBe(WorkloadState.Starting);
+    expect(job.exitCode()).toBeNull();
+
+    await vi.waitFor(() => expect(job.state()).toBe(WorkloadState.Running));
+
+    // Cancel process
+    job.cancel();
+
+    await vi.waitFor(() => expect(job.state()).toBe(WorkloadState.Canceled));
+
+    expect(job.exitCode()).toBeNull();
+    await expect(text(job.stdout)).resolves.toBe('');
+    await expect(text(job.stderr)).resolves.toBe('');
   });
 });

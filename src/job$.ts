@@ -54,7 +54,7 @@ export function job$(props: JobProps): Job$ {
         if (state === WorkloadState.Succeeded) {
           updateBlock();
         } else {
-          void workload.cancel();
+          workload.cancel();
         }
       });
     },

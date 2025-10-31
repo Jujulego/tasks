@@ -13,8 +13,14 @@ export function parallelFlow$(props: ParallelFlowProps = {}) {
     type: 'workflow.parallel',
     ...props,
     weight: 0,
-    onOrchestrate(workloads, { scheduler, setState }) {
+    onOrchestrate(workloads, { scheduler, setState, signal }) {
       setState(WorkloadState.Running);
+
+      signal.addEventListener('abort', () => {
+        for (const wkl of workloads) {
+          wkl.cancel();
+        }
+      }, { once: true });
 
       let succeeded = true;
       let ended = 0;
@@ -32,9 +38,6 @@ export function parallelFlow$(props: ParallelFlowProps = {}) {
           }
         });
       }
-    },
-    async onCancel(workloads) {
-      await Promise.all(workloads.map((wkl) => wkl.cancel()));
     }
   });
 }

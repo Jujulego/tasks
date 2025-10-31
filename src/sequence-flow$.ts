@@ -17,6 +17,12 @@ export function sequenceFlow$(props: SequenceFlowProps = {}) {
       let output = WorkloadState.Succeeded;
       setState(WorkloadState.Running);
 
+      signal.addEventListener('abort', () => {
+        for (const wkl of workloads) {
+          wkl.cancel();
+        }
+      }, { once: true });
+
       for (const workload of workloads) {
         if (signal.aborted) {
           break;
@@ -31,14 +37,11 @@ export function sequenceFlow$(props: SequenceFlowProps = {}) {
             output = WorkloadState.Failed;
           }
         } else {
-          await workload.cancel();
+          workload.cancel();
         }
       }
 
       setState(output);
-    },
-    async onCancel(workloads) {
-      await Promise.all(workloads.map((wkl) => wkl.cancel()));
     }
   });
 }
