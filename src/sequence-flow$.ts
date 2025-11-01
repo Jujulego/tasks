@@ -14,7 +14,7 @@ export function sequenceFlow$(props: SequenceFlowProps = {}) {
     ...props,
     weight: 0,
     async onOrchestrate(workloads, { scheduler, setState, signal }) {
-      let output = WorkloadState.Succeeded;
+      let outcome = WorkloadState.Succeeded;
       setState(WorkloadState.Running);
 
       signal.addEventListener('abort', () => {
@@ -28,20 +28,20 @@ export function sequenceFlow$(props: SequenceFlowProps = {}) {
           break;
         }
 
-        if (output === WorkloadState.Succeeded) {
+        if (outcome === WorkloadState.Succeeded) {
           scheduler.register(workload);
 
-          const outcome = await waitFor$(pipe$(workload.state$, filter$(isWorkloadEnded)));
+          const finalState = await waitFor$(pipe$(workload.state$, filter$(isWorkloadEnded)));
 
-          if (outcome !== WorkloadState.Succeeded) {
-            output = WorkloadState.Failed;
+          if (finalState !== WorkloadState.Succeeded) {
+            outcome = WorkloadState.Failed;
           }
         } else {
           workload.cancel();
         }
       }
 
-      setState(output);
+      setState(outcome);
     }
   });
 }

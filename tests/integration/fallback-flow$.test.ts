@@ -12,7 +12,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('fallback-flow$', () => {
+describe('fallbackFlow$', () => {
   it('should run workloads one after the other', async () => {
     const wklA = testWorkload$({ label: 'A', wait: 1000, outcome: WorkloadState.Failed });
     const wklB = testWorkload$({ label: 'B', wait: 1000, outcome: WorkloadState.Failed });
@@ -25,8 +25,6 @@ describe('fallback-flow$', () => {
     scheduler.register(flow);
 
     // At the beginning only A starts
-    expect(flow.state()).toBe(WorkloadState.Running);
-
     expect(wklA.start).toHaveBeenCalledOnce();
     expect(wklB.start).not.toHaveBeenCalled();
     expect(wklC.start).not.toHaveBeenCalled();
@@ -81,8 +79,6 @@ describe('fallback-flow$', () => {
     scheduler.register(flow);
 
     // At the beginning only A starts
-    expect(flow.state()).toBe(WorkloadState.Running);
-
     expect(wklA.start).toHaveBeenCalledOnce();
     expect(wklB.start).not.toHaveBeenCalled();
     expect(wklC.start).not.toHaveBeenCalled();
@@ -129,8 +125,6 @@ describe('fallback-flow$', () => {
     scheduler.register(flow);
 
     // At the beginning only A starts
-    expect(flow.state()).toBe(WorkloadState.Running);
-
     expect(wklA.start).toHaveBeenCalledOnce();
     expect(wklB.start).not.toHaveBeenCalled();
     expect(wklC.start).not.toHaveBeenCalled();

@@ -14,27 +14,32 @@ export function parallelFlow$(props: ParallelFlowProps = {}) {
     ...props,
     weight: 0,
     onOrchestrate(workloads, { scheduler, setState, signal }) {
-      setState(WorkloadState.Running);
+      let outcome: WorkloadState.Succeeded | WorkloadState.Failed = WorkloadState.Succeeded;
+      let ended = 0;
 
-      signal.addEventListener('abort', () => {
+      function abort() {
         for (const wkl of workloads) {
           wkl.cancel();
         }
-      }, { once: true });
+      }
 
-      let succeeded = true;
-      let ended = 0;
+      setState(WorkloadState.Running);
+      signal.addEventListener('abort', abort, { once: true });
 
       for (const workload of workloads) {
         scheduler.register(workload);
 
         const ended$ = pipe$(workload.state$, filter$(isWorkloadEnded));
         once$(ended$, (state) => {
-          succeeded &&= state === WorkloadState.Succeeded;
           ended++;
 
+          if (state !== WorkloadState.Succeeded) {
+            outcome = WorkloadState.Failed;
+            abort();
+          }
+
           if (ended >= workloads.length) {
-            setState(succeeded ? WorkloadState.Succeeded : WorkloadState.Failed);
+            setState(outcome);
           }
         });
       }

@@ -91,12 +91,12 @@ describe('parallelFlow$', () => {
       expect(setState).toHaveBeenCalledExactlyOnceWith(WorkloadState.Succeeded);
     });
 
-    it('should set state to failed if one workload failed', async () => {
+    it('should set state to failed if one workload failed, and cancel others', async () => {
       // Prepare elements
       const reg = registry$();
 
-      const wkl1 = { state$: var$(WorkloadState.Ready) };
-      const wkl2 = { state$: var$(WorkloadState.Ready) };
+      const wkl1 = { state$: var$(WorkloadState.Ready), cancel: vi.fn() };
+      const wkl2 = { state$: var$(WorkloadState.Ready), cancel: vi.fn() };
 
       const setState = vi.fn();
       const controller = new AbortController();
@@ -118,6 +118,9 @@ describe('parallelFlow$', () => {
       wkl2.state$.mutate(WorkloadState.Failed);
 
       expect(setState).toHaveBeenCalledExactlyOnceWith(WorkloadState.Failed);
+
+      expect(wkl1.cancel).toHaveBeenCalledOnce();
+      expect(wkl2.cancel).toHaveBeenCalledOnce();
     });
 
     it('should cancel all added workloads', async () => {
