@@ -1,6 +1,23 @@
 import { workload$, type WorkloadOnStartProps, WorkloadState, } from '@/src/index.js';
-import { once$, source$, waitFor$ } from 'kyrielle';
-import { describe, expect, it, vi } from 'vitest';
+import { type WorkloadDuration, workloadDuration$ } from '@/src/utils/workload-duration$.js';
+import { once$, source$, var$, waitFor$ } from 'kyrielle';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mocks
+vi.mock('@/src/utils/workload-duration$.js');
+
+// Setup
+beforeEach(() => {
+  vi.resetAllMocks();
+
+  vi.mocked(workloadDuration$).mockReturnValue(
+    var$<WorkloadDuration>({
+      start: null,
+      end: null,
+      seconds: () => 0,
+    })
+  );
+});
 
 // Tests
 describe('workload$', () => {
@@ -13,6 +30,8 @@ describe('workload$', () => {
     expect(workload.state()).toBe(WorkloadState.Ready);
     expect(workload.error()).toBeUndefined();
     expect(workload.weight).toBe(1);
+
+    expect(workloadDuration$).toHaveBeenCalledWith(workload.state$);
   });
 
   it('should apply given id', () => {
