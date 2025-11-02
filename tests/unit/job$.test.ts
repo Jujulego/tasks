@@ -1,4 +1,5 @@
 import { job$, type Workload$, workload$, WorkloadState } from '@/src/index.js';
+import type { WorkloadDuration } from '@/src/utils/workload-duration$.js';
 import { var$ } from 'kyrielle';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,12 +13,14 @@ const workload = {
   type: 'mocked',
   weight: 1,
   error$: var$<Error>(),
+  duration$: var$<WorkloadDuration>({ start: 0, end: 0, seconds: () => 0 }),
   state$: var$<WorkloadState>(WorkloadState.Ready),
   block: vi.fn(),
   unblock: vi.fn(),
   start: vi.fn(),
   cancel: vi.fn(),
   error: vi.fn(),
+  duration: vi.fn(),
   state: vi.fn(() => WorkloadState.Ready),
 } satisfies Workload$;
 

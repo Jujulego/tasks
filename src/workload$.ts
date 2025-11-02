@@ -2,6 +2,7 @@ import { type Observable, type Ref, var$ } from 'kyrielle';
 import { randomUUID } from 'node:crypto';
 import { isWorkloadActive, isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import { unscheduler$ } from './unscheduler$.js';
+import { type WorkloadDuration, workloadDuration$ } from './utils/workload-duration$.js';
 
 /**
  * Wraps workload status logic.
@@ -14,6 +15,7 @@ export function workload$(props: WorkloadProps): Workload$ {
   const controller = new AbortController();
   const error$ = var$<Error>();
   const state$ = var$(WorkloadState.Ready);
+  const duration$ = workloadDuration$(state$);
 
   return {
     id,
@@ -21,8 +23,10 @@ export function workload$(props: WorkloadProps): Workload$ {
     type,
     state$,
     error$,
+    duration$,
     state: state$.defer,
     error: error$.defer,
+    duration: duration$.defer,
     weight: weight ?? 1,
 
     block(): void {
@@ -55,6 +59,7 @@ export function workload$(props: WorkloadProps): Workload$ {
       void (async () => {
         try {
           state$.mutate(WorkloadState.Starting);
+
           await onStart({
             scheduler,
             signal,
@@ -191,6 +196,11 @@ export interface Workload$ {
   readonly error$: Ref<Error | undefined> & Observable<Error>;
 
   /**
+   * Reference on duration of the workload.
+   */
+  readonly duration$: Ref<WorkloadDuration> & Observable<WorkloadDuration>;
+
+  /**
    * Blocks the workload. A blocked workload cannot be started.
    */
   block(this: void): void;
@@ -225,4 +235,9 @@ export interface Workload$ {
    * Returns error emitted by `onStart` callback, if any.
    */
   error(this: void): Error | undefined;
+
+  /**
+   * Returns error emitted by `onStart` callback, if any.
+   */
+  duration(this: void): WorkloadDuration;
 }
