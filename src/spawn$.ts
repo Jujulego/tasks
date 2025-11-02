@@ -1,6 +1,5 @@
 import { filter$, type Observable, once$, pipe$, type Ref, var$ } from 'kyrielle';
 import { execFile } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { PassThrough, type Readable } from 'node:stream';
 import { isWorkloadEnded, WorkloadState } from './enums/workload-state.js';
 import { type Job$, job$, type JobProps } from './job$.js';
@@ -11,7 +10,7 @@ import { type Job$, job$, type JobProps } from './job$.js';
  * @since 3.0.0
  */
 export function spawn$(cmd: string, args: readonly string[], props: SpawnProps = {}): SpawnJob$ {
-  const { id, cwd = process.cwd(), env = {}, ...rest } = props;
+  const { cwd = process.cwd(), env = {}, ...rest } = props;
   const exitCode$ = var$<number>();
   const stdout = new PassThrough({ allowHalfOpen: false });
   const stderr = new PassThrough({ allowHalfOpen: false });
@@ -20,7 +19,6 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
     label: [cmd, ...args].join(' '),
     type: 'spawn',
     ...rest,
-    id: id || createSpawnId(cmd, args, cwd),
     onStart({ signal, setState }) {
       // TODO: escape args & pass them as string, to resolve DEP0190
       const spawned = execFile(cmd, args, {
@@ -68,19 +66,6 @@ export function spawn$(cmd: string, args: readonly string[], props: SpawnProps =
     stdout,
     exitCode: () => exitCode$.defer() ?? null
   };
-}
-
-function createSpawnId(cmd: string, args: readonly string[], cwd: string) {
-  const hash = createHash('md5');
-
-  hash.update(cwd);
-  hash.update(cmd);
-
-  for (const arg of args) {
-    hash.update(arg);
-  }
-
-  return hash.digest('hex');
 }
 
 export interface SpawnJob$ extends Job$ {

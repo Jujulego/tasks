@@ -25,7 +25,6 @@ describe('spawn$', () => {
     const job = spawn$('echo', ['Hello World!'], { cwd: '/test', weight: 2 });
 
     expect(job$).toHaveBeenCalledWith({
-      id: 'cbe401e31f0981953038940216faffe6',
       label: 'echo Hello World!',
       type: 'spawn',
       weight: 2,
@@ -33,6 +32,9 @@ describe('spawn$', () => {
     });
 
     expect(job.exitCode()).toBeNull();
+    expect(job.cmd).toBe('echo');
+    expect(job.args).toEqual(['Hello World!']);
+    expect(job.cwd).toBe('/test');
   });
 
   it('should close streams once job completes', () => {
