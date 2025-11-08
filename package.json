@@ -1,6 +1,6 @@
 {
   "name": "@jujulego/tasks",
-  "version": "3.0.0-alpha.10",
+  "version": "3.0.0-alpha.11",
   "license": "MIT",
   "author": "Julien Capellari <julien.capellari@gmail.com>",
   "repository": "github:Jujulego/tasks",
@@ -25,10 +25,8 @@
     "test:types": "tsc --project tests"
   },
   "dependencies": {
-    "@kyrielle/logger": "^2.0.0",
     "@swc/helpers": "^0.5.3",
-    "kyrielle": "^2.8.0",
-    "tree-kill": "^1.2.2"
+    "kyrielle": "^2.8.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.1",
