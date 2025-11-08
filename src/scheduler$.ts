@@ -1,11 +1,11 @@
 import { filter$, is$, once$, pick$, pipe$, reduce$ } from 'kyrielle';
-import { cpus } from 'node:os';
+import os from 'node:os';
 import { registry$, type Registry$ } from './bases/registry$.js';
 import { isWorkloadEnded, isWorkloadWaiting, WorkloadState } from './enums/workload-state.js';
 import type { Workload$ } from './workload$.js';
 
 // Constants
-export const DEFAULT_STRENGTH = Math.max(cpus().length - 1, 1);
+export const DEFAULT_STRENGTH = os.availableParallelism();
 
 /**
  * Creates a workload scheduler.
