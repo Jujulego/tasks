@@ -32,7 +32,7 @@
     "@eslint/js": "9.39.2",
     "@jujulego/vite-plugin-swc": "1.2.1",
     "@microsoft/eslint-formatter-sarif": "3.1.0",
-    "@swc/cli": "0.7.10",
+    "@swc/cli": "0.8.0",
     "@swc/core": "1.15.11",
     "@types/node": "24.10.11",
     "@typescript-eslint/utils": "8.54.0",
