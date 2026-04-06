@@ -43,7 +43,7 @@
     "shx": "0.4.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.57.1",
-    "vite": "7.3.1",
+    "vite": "8.0.5",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
   },
