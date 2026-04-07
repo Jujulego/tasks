@@ -98,7 +98,7 @@ jobs:
         run: yarn vitest tests/unit --coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           flags: unit
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -141,7 +141,7 @@ jobs:
         run: yarn vitest tests/integration --coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           flags: node-${{ matrix.node }}
           token: ${{ secrets.CODECOV_TOKEN }}
