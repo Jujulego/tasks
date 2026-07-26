@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.0.0
@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.0.0
@@ -80,7 +80,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Use Node.js
         uses: actions/setup-node@v6.0.0
@@ -126,7 +126,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v6.0.0
@@ -187,7 +187,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.0.0
@@ -224,7 +224,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Read package.json
         id: info
