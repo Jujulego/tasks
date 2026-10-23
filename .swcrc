@@ -1,6 +1,7 @@
 {
   "jsc": {
     "target": "esnext",
+    "externalHelpers": true,
     "parser": {
       "syntax": "typescript"
     }
